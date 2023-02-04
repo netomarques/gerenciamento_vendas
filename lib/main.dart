@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/widgets/add_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,11 +14,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        //primarySwatch: ColorSwatch(primary, _swatch) const Color(0xff006940),
         primarySwatch: buildMaterialColor(
           const Color(0xFF006940),
         ),
-        scaffoldBackgroundColor: Colors.lightGreen,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -67,29 +66,61 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Painel de controle'),
+        title: const Text(''),
       ),
-      body: Container(
-        color: Colors.white70,
-        height: size.height,
-        child: Column(
-          children: <Widget>[
-            _painel(),
-            Container(
-              width: size.width,
-              color: Colors.green,
-              padding: const EdgeInsets.all(3.0),
-              child: const Text(
-                textAlign: TextAlign.center,
-                'Painel de controle',
-                style: TextStyle(color: Colors.grey, fontSize: 20),
-              ),
-            ),
-            _widgetOptions.elementAt(_selectedIndex),
-          ],
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+                //shrinkWrap: true,
+                children: <Widget>[
+                  Container(
+                    color: const Color(0xffFDFFFF),
+                    //height: size.height,
+                    child: Column(
+                      children: <Widget>[
+                        _painel(),
+                        _textoInformacao(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        _containerVenda(),
+                        //_widgetOptions.elementAt(_selectedIndex),
+                      ],
+                    ),
+                  ),
+                ]),
+          ),
+          //_bottonNavigator(),
+
+          // TextButton(
+          //   style: TextButton.styleFrom(backgroundColor: Colors.blue),
+          //   onPressed: () {},
+          //   child: const Text('ADD'),
+          // ),
+        ],
+      ),
+      floatingActionButton: _bottonfloatinNavigator(),
+      //bottomNavigationBar: _bottonNavigator(),
+    );
+  }
+
+  _textoInformacao() {
+    return Container(
+      width: size.width,
+      color: const Color(0xff3B7554),
+      padding: const EdgeInsets.all(3.0),
+      child: const Opacity(
+        opacity: 0.65,
+        child: Text(
+          textAlign: TextAlign.center,
+          'Painel de controle',
+          style: TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
         ),
       ),
-      bottomNavigationBar: _bottonNavigator(),
     );
   }
 
@@ -109,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _painelResumo() {
-    return Container(
+    return SizedBox(
       width: size.width,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -137,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             alignment: Alignment.topLeft,
             child: const Text(
-              'RS 30000,00',
+              'R\$ 30000,00',
               style: TextStyle(color: Colors.white, fontSize: 32),
             ),
           ),
@@ -152,15 +183,97 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment.topCenter,
       decoration: BoxDecoration(
         color: const Color(0xff486153),
-        // border: Border.all(
-        //   width: 1,
-        // ),
         borderRadius: BorderRadius.circular(32),
       ),
       child: const Text(
         '24 JAN 2023',
         style: TextStyle(fontSize: 20, color: Colors.white),
       ),
+    );
+  }
+
+  _vendaData() {
+    return Container(
+      width: size.width * 0.26,
+      height: size.height * 0.03,
+      margin: const EdgeInsets.only(left: 8, top: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xffFDFFFF),
+        // border: Border.all(
+        //   width: 1,
+        // ),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: const Text(
+        '24 JAN 2023',
+        style: TextStyle(
+          fontSize: 16,
+          color: Color(0xff969CAF),
+        ),
+      ),
+    );
+  }
+
+  _vendaQuantidadePrecoPorKG() {
+    return Container(
+      width: size.width * 0.5,
+      height: 61,
+      margin: const EdgeInsets.only(left: 8, top: 8),
+      child: Row(children: <Widget>[
+        const Icon(
+          Icons.monetization_on,
+          color: Color(0xffEB710A),
+          size: 60,
+        ),
+        Container(
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const <Widget>[
+                Text(
+                  'Quant: ',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xffffffff),
+                  ),
+                ),
+                Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    'Preço/kg: ',
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: Color(0xffffffff),
+                    ),
+                  ),
+                ),
+              ]),
+        ),
+        Container(
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const <Widget>[
+                Text(
+                  '80 Kg',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Color(0xfffdffff),
+                  ),
+                ),
+                Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    'R\$ 12,00',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xfffdffff),
+                    ),
+                  ),
+                ),
+              ]),
+        ),
+      ]),
     );
   }
 
@@ -189,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: size.width * 0.4 * 0.3,
             child: const Icon(
               Icons.auto_graph,
-              //color: Colors.yellow,
+              color: Color(0xffEB710A),
               size: 36.0,
             ),
           ),
@@ -202,15 +315,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.only(left: 8),
                   child: const Text(
                     '04',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 8),
-                  child: const Text(
-                    'Total de vendas',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      'Total de vendas',
+                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
+                    ),
                   ),
                 ),
               ],
@@ -233,16 +349,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 Container(
                   alignment: Alignment.topLeft,
                   child: const Text(
-                    'RS 21690,00',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    'R\$ 21690,00',
+                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   //padding: const EdgeInsets.only(left: 8),
-                  child: const Text(
-                    '02 Rua',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      '02 Rua',
+                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
+                    ),
                   ),
                 ),
               ],
@@ -256,16 +375,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   //padding: const EdgeInsets.only(left: 16),
                   alignment: Alignment.topLeft,
                   child: const Text(
-                    'RS 36000,00',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    'R\$ 36000,00',
+                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
                 ),
                 Container(
                   //padding: const EdgeInsets.only(left: 16),
                   alignment: Alignment.topLeft,
-                  child: const Text(
-                    '02 Fiados',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: const Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      '02 Fiados',
+                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
+                    ),
                   ),
                 ),
               ],
@@ -276,25 +398,96 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  _containerVenda() {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, top: 8, right: 16),
+      width: size.width,
+      //height: 101,
+      height: size.height * 0.155,
+      color: const Color(0xff910029),
+      child: Row(
+        children: <Widget>[
+          Column(
+              //mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _vendaData(),
+                _vendaQuantidadePrecoPorKG(),
+              ]),
+          _vendaValorTotal(),
+        ],
+      ),
+    );
+  }
+
+  _vendaValorTotal() {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.only(top: 8),
+      alignment: Alignment.topRight,
+      child: const Text(
+        "R\$ 18000,00",
+        style: TextStyle(color: Colors.white, fontSize: 24),
+      ),
+    );
+  }
+
   _bottonNavigator() {
-    return BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+    return Container(
+      margin: const EdgeInsets.only(left: 40.0, right: 10.0),
+      child: BottomNavigationBar(
+          backgroundColor: const Color(0xFF006940),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'CLIENTES',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_shopping_cart),
+              label: 'VENDA',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'PESQUISA',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: const Color(0xffEB710A),
+          onTap: _onItemTapped),
+    );
+  }
+
+  _bottonfloatinNavigator() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF17CA84),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      margin: const EdgeInsets.only(right: 20),
+      width: size.width * 0.8,
+      padding: const EdgeInsets.all(4),
+      //color: const Color(0xFF17CA84),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          FloatingActionButton(
+            tooltip: 'Increment',
+            onPressed: () {},
+            child: const Icon(Icons.people),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
+          FloatingActionButton(
+            tooltip: 'Increment',
+            onPressed: () {},
+            child: const Icon(Icons.add_shopping_cart),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
+          FloatingActionButton(
+            tooltip: 'Increment',
+            onPressed: () {},
+            child: const Icon(Icons.search),
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped);
+      ),
+    );
   }
 }
 

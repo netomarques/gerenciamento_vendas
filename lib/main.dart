@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
 import 'package:vendas_gerenciamento/pages/home_painel.dart';
 import 'package:vendas_gerenciamento/utils/build_material_color.dart';
 
@@ -18,8 +19,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: BuildMaterialColor(
           const Color(0xFF006940),
         ),
+        scaffoldBackgroundColor: const Color(0xFFFDFFFF),
       ),
-      home: const HomePainel(),
+      home: const CadastroCliente(),
     );
   }
 }

@@ -33,7 +33,7 @@ class _HomePainelState extends State<HomePainel> {
             itemBuilder: (context, index) {
               return _containerVenda();
             },
-            itemCount: 20,
+            itemCount: 7,
           ),
         ),
         const NavButtonsFloating(),

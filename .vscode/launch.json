@@ -17,13 +17,19 @@
             "type": "dart",
             "deviceId": "emulator-5554"
         },
+        {
+            "name": "Moto e 7",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "ZF5236VJKV"
+        },
     ],
     "compounds": [
         {
             "name": "All Devices",
             "configurations": [
                 "Moto G 5 Plus",
-                "sdk gphone x86 64"
+                "Moto e 7"
             ]
         }
     ]

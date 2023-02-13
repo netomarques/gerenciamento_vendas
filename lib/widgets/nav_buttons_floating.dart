@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 
 class NavButtonsFloating extends StatelessWidget {
   const NavButtonsFloating({super.key});
@@ -7,6 +7,7 @@ class NavButtonsFloating extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF17CA84),
@@ -19,19 +20,27 @@ class NavButtonsFloating extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButton("Cadastro de cliente", Icons.people),
-          _floatingActionButton("Venda", Icons.add_shopping_cart),
-          _floatingActionButton("Pesquisa de cliente", Icons.search),
+          _floatingActionButton("Cadastro de cliente", Icons.people, context,
+              "/cadastro_cliente"),
+          _floatingActionButton(
+              "Venda", Icons.add_shopping_cart, context, "/cadastro_venda_rua"),
+          _floatingActionButton("Pesquisa de cliente", Icons.search, context,
+              "/pesquisa_cliente"),
         ],
       ),
     );
   }
 
-  _floatingActionButton(String tooltip, IconData iconData) {
+  _floatingActionButton(String tooltip, IconData iconData, BuildContext context,
+      String routeName) {
     return FloatingActionButton(
+      heroTag: UniqueKey(),
       backgroundColor: const Color(0xff910029),
       tooltip: tooltip,
-      onPressed: () => {},
+      onPressed: () => {
+        if (route != routeName)
+            pushNamed(context, routeName),
+      },
       child: Icon(iconData),
     );
   }

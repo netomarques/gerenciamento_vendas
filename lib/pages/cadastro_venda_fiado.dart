@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field.dart';
-import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 
 class CadastroVendaFiado extends StatefulWidget {
   const CadastroVendaFiado({super.key});
@@ -54,7 +53,6 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
               ],
             ),
           ),
-          const NavButtonsFloating(),
         ],
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field.dart';
-import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 
 class CadastroCliente extends StatefulWidget {
   const CadastroCliente({super.key});
@@ -37,8 +36,10 @@ class _CadastroClienteState extends State<CadastroCliente> {
             child: ListView(
               shrinkWrap: true,
               children: [
-                _containerText(const AppTextFormField("Informe o nome", "Nome")),
-                _containerText(const AppTextFormField("Informe o Telefone", "Telefone")),
+                _containerText(
+                    const AppTextFormField("Informe o nome", "Nome")),
+                _containerText(
+                    const AppTextFormField("Informe o Telefone", "Telefone")),
                 _containerText(const AppTextFormField("Informe o CPF", "CPF")),
                 Container(
                   margin: const EdgeInsets.only(
@@ -48,7 +49,6 @@ class _CadastroClienteState extends State<CadastroCliente> {
               ],
             ),
           ),
-          const NavButtonsFloating(),
         ],
       ),
     );

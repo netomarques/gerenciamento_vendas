@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
-import 'package:vendas_gerenciamento/pages/home_painel.dart';
 import 'package:vendas_gerenciamento/utils/build_material_color.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +20,8 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFFFDFFFF),
       ),
-      home: const CadastroCliente(),
+      initialRoute: '/',
+      routes: routes(),
     );
   }
 }

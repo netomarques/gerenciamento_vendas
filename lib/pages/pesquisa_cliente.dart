@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 
 class PesquisaCliente extends StatefulWidget {
@@ -19,7 +20,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
       appBar: AppBar(
         title: const Text(''),
       ),
-      //resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: _body(),
     );
   }
@@ -38,7 +39,10 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
             child: ListView.builder(
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                return _containerCliente();
+                return GestureDetector(
+                  child: _containerCliente(),
+                  onTap: () => pushNamed(context, "/painel_cliente"),
+                );
               },
               itemCount: 7,
             ),
@@ -97,12 +101,6 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
           border: InputBorder.none,
         ),
       ),
-    );
-  }
-
-  _divider() {
-    return const Divider(
-      color: Color(0xFF910029),
     );
   }
 

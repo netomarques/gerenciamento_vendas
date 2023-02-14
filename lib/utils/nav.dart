@@ -3,6 +3,7 @@ import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_fiado.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_rua.dart';
 import 'package:vendas_gerenciamento/pages/home_painel.dart';
+import 'package:vendas_gerenciamento/pages/painel_cliente.dart';
 import 'package:vendas_gerenciamento/pages/pesquisa_cliente.dart';
 
 String route = "";
@@ -14,6 +15,7 @@ routes() {
     '/cadastro_venda_fiado': (context) => const CadastroVendaFiado(),
     '/cadastro_venda_rua': (context) => const CadastroVendaRua(),
     '/pesquisa_cliente': (context) => const PesquisaCliente(),
+    '/painel_cliente': (context) => const PainelCliente(),
   };
   return routes;
 }

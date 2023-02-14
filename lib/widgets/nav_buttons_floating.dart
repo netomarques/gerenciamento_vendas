@@ -37,10 +37,7 @@ class NavButtonsFloating extends StatelessWidget {
       heroTag: UniqueKey(),
       backgroundColor: const Color(0xff910029),
       tooltip: tooltip,
-      onPressed: () => {
-        if (route != routeName)
-            pushNamed(context, routeName),
-      },
+      onPressed: () => pushNamed(context, routeName),
       child: Icon(iconData),
     );
   }

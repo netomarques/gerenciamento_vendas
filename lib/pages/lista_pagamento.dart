@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
 
-class PainelCliente extends StatefulWidget {
-  const PainelCliente({super.key});
+class ListaPagamento extends StatefulWidget {
+  const ListaPagamento({super.key});
 
   @override
-  State<PainelCliente> createState() => _PainelClienteState();
+  State<ListaPagamento> createState() => _ListaPagamentoState();
 }
 
-class _PainelClienteState extends State<PainelCliente> {
-  Size size = const Size(0, 0);
+class _ListaPagamentoState extends State<ListaPagamento> {
+  Size _size = const Size(0, 0);
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    _size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
       ),
-      resizeToAvoidBottomInset: false,
+      //resizeToAvoidBottomInset: false,
       body: _body(),
     );
   }
@@ -28,31 +27,27 @@ class _PainelClienteState extends State<PainelCliente> {
     return Column(
       children: <Widget>[
         _head(),
-        _textoInformacao(),
-        Stack(
-          children: <Widget>[
-            Opacity(
-              opacity: 0.5,
-              child: Container(
-                height: size.height * 0.075,
-                margin: const EdgeInsets.only(
-                    left: 16, top: 20, right: 32, bottom: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF006940),
-                  borderRadius: BorderRadius.circular(32),
-                ),
-              ),
-            ),
-            _containerText(),
-          ],
+        Container(
+          width: _size.width,
+          height: _size.height * 0.07,
+          color: const Color(0xff3B7554),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              _textoInformacao("A receber: R\$ 1200,00"),
+              _botaoAbatimento(),
+            ],
+          ),
         ),
+        _venda(),
+        _textoInformacao("Histórico de abatimento"),
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              return _containerVenda();
+              return _abatimento();
             },
-            itemCount: 7,
+            itemCount: 4,
           ),
         )
       ],
@@ -63,18 +58,18 @@ class _PainelClienteState extends State<PainelCliente> {
     return Stack(
       children: <Widget>[
         Container(
-          width: size.width,
-          height: 160,
+          width: _size.width,
+          height: _size.height * 0.23,
           color: const Color(0xFF910029),
           child: Column(
             children: <Widget>[
               Container(
                 color: const Color(0xFF006940),
-                width: size.width,
-                height: 60,
+                width: _size.width,
+                height: _size.height * 0.075,
               ),
               Container(
-                height: 80,
+                height: _size.height * 0.085,
                 margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -97,97 +92,125 @@ class _PainelClienteState extends State<PainelCliente> {
           ),
         ),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: size.width * 0.35),
-          child: const Icon(
-            Icons.person_pin_outlined,
-            size: 100,
-            color: Color(0xffEB710A),
+          margin: EdgeInsets.only(top: 8, left: _size.width * 0.40),
+          child: Image.asset(
+            "assets/images/client_avatar_icon.png",
+            height: _size.height * 0.1,
           ),
         ),
       ],
     );
   }
 
-  _containerText() {
+  _textoInformacao(text) {
     return Container(
-      height: size.height * 0.075,
-      margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
-      child: _textForm("Data", "Informe a data"),
-    );
-  }
-
-  _textForm(labelText, hintText) {
-    return Container(
-      padding: const EdgeInsets.only(left: 12),
-      decoration: BoxDecoration(
-        color: null,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: TextFormField(
-        style: const TextStyle(
-          fontSize: 14,
-          color: Color(0xff910029),
-        ),
-        decoration: InputDecoration(
-          icon: const Icon(Icons.find_in_page_sharp, size: 40),
-          labelText: labelText,
-          labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            fontSize: 14,
-            color: Color(0xff910029),
-          ),
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
-
-  _textoInformacao() {
-    return Container(
-      width: size.width,
-      height: size.height * 0.07,
+      //width: _size.width,
+      height: _size.height * 0.07,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
-      child: const Opacity(
+      child: Opacity(
         opacity: 0.65,
         child: Center(
           child: Text(
-            "Total a receber: R\$ 3009,00",
-            style: TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
+            text,
+            style: const TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
           ),
         ),
       ),
     );
   }
 
-  _containerVenda() {
+  _botaoAbatimento() {
     return GestureDetector(
-      onTap: () => pushNamed(context, "/lista_pagamento"),
-      child: Container(
-        margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: size.width,
-        height: size.height * 0.155,
-        color: const Color(0xFF006940),
-        child: Row(
-          children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _vendaData(),
-                  _vendaQuantidadePrecoPorKG(),
-                ]),
-            _vendaValorTotal(),
-          ],
+      onTap: () => {},
+      child: Image.asset("assets/images/check_money_icon.png"),
+    );
+  }
+
+  _venda() {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
+      width: _size.width,
+      height: _size.height * 0.155,
+      color: const Color(0xFF006940),
+      child: Row(
+        children: <Widget>[
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _vendaData(),
+                _vendaQuantidadePrecoPorKG(),
+              ]),
+          _vendaValorTotal(),
+        ],
+      ),
+    );
+  }
+
+  _abatimento() {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
+      width: _size.width,
+      height: _size.height * 0.155,
+      color: const Color(0xFF006940),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _abatimentoData(),
+          _abatimentoValor(),
+        ],
+      ),
+    );
+  }
+
+  _abatimentoData() {
+    return Container(
+      width: _size.width * 0.26,
+      height: _size.height * 0.03,
+      margin: const EdgeInsets.only(left: 16, top: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDFFFF),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: const Text(
+        '24 JAN 2023',
+        style: TextStyle(
+          fontSize: 16,
+          color: Color(0xFF969CAF),
         ),
+      ),
+    );
+  }
+
+  _abatimentoValor() {
+    return Container(
+      width: _size.width * 0.6,
+      height: _size.height * 0.095,
+      margin: const EdgeInsets.only(left: 16, top: 8),
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            "assets/images/save_money_icon.png",
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 8, bottom: 8),
+            child: const Text(
+              "R\$ 300,00",
+              style: TextStyle(
+                fontSize: 20,
+                color: Color(0xFFFDFFFF),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   _vendaData() {
     return Container(
-      width: size.width * 0.26,
-      height: size.height * 0.03,
+      width: _size.width * 0.26,
+      height: _size.height * 0.03,
       margin: const EdgeInsets.only(left: 8, top: 8),
       decoration: BoxDecoration(
         color: const Color(0xffFDFFFF),
@@ -205,14 +228,12 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _vendaQuantidadePrecoPorKG() {
     return Container(
-      width: size.width * 0.5,
+      width: _size.width * 0.5,
       height: 61,
       margin: const EdgeInsets.only(left: 8, top: 8),
       child: Row(children: <Widget>[
-        const Icon(
-          Icons.monetization_on,
-          color: Color(0xffEB710A),
-          size: 60,
+        Image.asset(
+          "assets/images/checkout_price_icon.png",
         ),
         Container(
           padding: const EdgeInsets.only(top: 8, bottom: 8),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/widgets/app_text_form_field.dart';
 
 class ListaPagamento extends StatefulWidget {
   const ListaPagamento({super.key});
@@ -18,7 +19,7 @@ class _ListaPagamentoState extends State<ListaPagamento> {
       appBar: AppBar(
         title: const Text(''),
       ),
-      //resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: _body(),
     );
   }
@@ -106,7 +107,7 @@ class _ListaPagamentoState extends State<ListaPagamento> {
     return Container(
       //width: _size.width,
       height: _size.height * 0.07,
-      color: const Color(0xff3B7554),
+      color: const Color(0xFF3B7554),
       padding: const EdgeInsets.all(3.0),
       child: Opacity(
         opacity: 0.65,
@@ -120,10 +121,80 @@ class _ListaPagamentoState extends State<ListaPagamento> {
     );
   }
 
+  _textoInformacaoDialog(text) {
+    return Container(
+      height: _size.height * 0.07,
+      color: const Color(0xFF3B7554),
+      padding: const EdgeInsets.all(3.0),
+      child: Opacity(
+        opacity: 0.65,
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(color: Color(0xFF7AA28B), fontSize: 20),
+          ),
+        ),
+      ),
+    );
+  }
+
   _botaoAbatimento() {
     return GestureDetector(
-      onTap: () => {},
+      onTap: () => _onTapDialog(),
       child: Image.asset("assets/images/check_money_icon.png"),
+    );
+  }
+
+  _onTapDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF006940),
+          shape: const RoundedRectangleBorder(
+              side: BorderSide(
+                width: 2,
+                color: Color(0xFF910029),
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(26))),
+          content: SizedBox(
+            height: _size.height * 0.3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                _textoInformacaoDialog("A receber: R\$ 1200,00"),
+                const AppTextFormField("Valor do abatimento", "valor"),
+                const AppTextFormField(
+                    "Data do abatimento", "Data de abatimento"),
+              ],
+            ),
+          ),
+          actions: [
+            _botaoCadastrarAbatimento(),
+          ],
+        );
+      },
+    );
+  }
+
+  _botaoCadastrarAbatimento() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: _size.width * 0.1),
+      width: _size.width * 0.5,
+      decoration: BoxDecoration(
+        color: const Color(0xFF910029),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextButton(
+        onPressed: () => {},
+        child: const Text(
+          "Cadastrar",
+          style: TextStyle(
+            color: Color(0xFFFDFFFF),
+            fontSize: 20,
+          ),
+        ),
+      ),
     );
   }
 

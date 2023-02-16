@@ -22,12 +22,21 @@ class NavButtonsFloating extends StatelessWidget {
         children: [
           _floatingActionButton("Cadastro de cliente", Icons.people, context,
               "/cadastro_cliente"),
-          _floatingActionButton(
-              "Venda", Icons.add_shopping_cart, context, "/cadastro_venda_rua"),
+          _botaoDialogVenda("Venda", Icons.add_shopping_cart, context),
           _floatingActionButton("Pesquisa de cliente", Icons.search, context,
               "/pesquisa_cliente"),
         ],
       ),
+    );
+  }
+
+  _botaoDialogVenda(String tooltip, IconData iconData, BuildContext context) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: const Color(0xff910029),
+      tooltip: tooltip,
+      onPressed: () => _onTapDialog(context),
+      child: Icon(iconData),
     );
   }
 
@@ -39,6 +48,70 @@ class NavButtonsFloating extends StatelessWidget {
       tooltip: tooltip,
       onPressed: () => pushNamed(context, routeName),
       child: Icon(iconData),
+    );
+  }
+
+  _onTapDialog(context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Container(
+            margin: const EdgeInsets.only(top: 15),
+            color: const Color(0xFF910029),
+            child: const Text(
+              textAlign: TextAlign.center,
+              "Venda",
+              style: TextStyle(
+                color: Color(0xFFFDFFFF),
+                fontSize: 30,
+              ),
+            ),
+          ),
+          backgroundColor: const Color(0xFF006940),
+          shape: const RoundedRectangleBorder(
+              side: BorderSide(
+                width: 4,
+                color: Color(0xFF910029),
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(26))),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                _botaoVenda(context, "Rua", "/cadastro_venda_rua"),
+                _botaoVenda(context, "Fiado", "/cadastro_venda_fiado"),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _botaoVenda(context, botaoTexto, routeName) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.1),
+      width: MediaQuery.of(context).size.width * 0.5,
+      decoration: BoxDecoration(
+        color: const Color(0xFF910029),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextButton(
+        onPressed: () => {
+          Navigator.pop(context),
+          pushNamed(context, routeName),
+        },
+        child: Text(
+          botaoTexto,
+          style: const TextStyle(
+            color: Color(0xFFFDFFFF),
+            fontSize: 20,
+          ),
+        ),
+      ),
     );
   }
 }

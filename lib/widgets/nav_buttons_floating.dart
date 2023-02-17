@@ -20,34 +20,55 @@ class NavButtonsFloating extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButton("Cadastro de cliente", Icons.people, context,
+          _floatingActionButton(
+              "Cadastro de cliente",
+              "assets/images/account_client_icon.png",
+              context,
               "/cadastro_cliente"),
-          _botaoDialogVenda("Venda", Icons.add_shopping_cart, context),
-          _floatingActionButton("Pesquisa de cliente", Icons.search, context,
+          _botaoDialogVenda(
+              "Venda", "assets/images/buy_shop_icon.png", context),
+          _floatingActionButton(
+              "Pesquisa de cliente",
+              "assets/images/find_search_icon.png",
+              context,
               "/pesquisa_cliente"),
         ],
       ),
     );
   }
 
-  _botaoDialogVenda(String tooltip, IconData iconData, BuildContext context) {
+  _botaoDialogVenda(String tooltip, String icon, BuildContext context) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
-      backgroundColor: const Color(0xff910029),
+      backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        borderRadius: BorderRadius.circular(100),
+      ),
       onPressed: () => _onTapDialog(context),
-      child: Icon(iconData),
+      child: Image.asset(
+        icon,
+        height: MediaQuery.of(context).size.height * 0.06,
+      ),
     );
   }
 
-  _floatingActionButton(String tooltip, IconData iconData, BuildContext context,
-      String routeName) {
+  _floatingActionButton(
+      String tooltip, String icon, BuildContext context, String routeName) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
-      backgroundColor: const Color(0xff910029),
+      backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
       onPressed: () => pushNamed(context, routeName),
-      child: Icon(iconData),
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Image.asset(
+        icon,
+        height: MediaQuery.of(context).size.height * 0.06,
+      ),
     );
   }
 

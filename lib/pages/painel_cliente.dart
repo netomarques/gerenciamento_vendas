@@ -9,11 +9,11 @@ class PainelCliente extends StatefulWidget {
 }
 
 class _PainelClienteState extends State<PainelCliente> {
-  Size size = const Size(0, 0);
+  Size _size = const Size(0, 0);
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    _size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +34,7 @@ class _PainelClienteState extends State<PainelCliente> {
             Opacity(
               opacity: 0.5,
               child: Container(
-                height: size.height * 0.075,
+                height: _size.height * 0.075,
                 margin: const EdgeInsets.only(
                     left: 16, top: 20, right: 32, bottom: 16),
                 decoration: BoxDecoration(
@@ -63,18 +63,18 @@ class _PainelClienteState extends State<PainelCliente> {
     return Stack(
       children: <Widget>[
         Container(
-          width: size.width,
-          height: 160,
+          width: _size.width,
+          height: _size.height * 0.23,
           color: const Color(0xFF910029),
           child: Column(
             children: <Widget>[
               Container(
                 color: const Color(0xFF006940),
-                width: size.width,
-                height: 60,
+                width: _size.width,
+                height: _size.height * 0.075,
               ),
               Container(
-                height: 80,
+                height: _size.height * 0.085,
                 margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -97,11 +97,10 @@ class _PainelClienteState extends State<PainelCliente> {
           ),
         ),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: size.width * 0.35),
-          child: const Icon(
-            Icons.person_pin_outlined,
-            size: 100,
-            color: Color(0xffEB710A),
+          margin: EdgeInsets.only(top: 8, left: _size.width * 0.40),
+          child: Image.asset(
+            "assets/images/client_avatar_icon.png",
+            height: _size.height * 0.1,
           ),
         ),
       ],
@@ -110,7 +109,7 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _containerText() {
     return Container(
-      height: size.height * 0.075,
+      height: _size.height * 0.076,
       margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
       child: _textForm("Data", "Informe a data"),
     );
@@ -120,16 +119,19 @@ class _PainelClienteState extends State<PainelCliente> {
     return Container(
       padding: const EdgeInsets.only(left: 12),
       decoration: BoxDecoration(
-        color: null,
+        color: const Color(0xFF006940).withOpacity(0.5),
         borderRadius: BorderRadius.circular(32),
       ),
       child: TextFormField(
         style: const TextStyle(
           fontSize: 14,
-          color: Color(0xff910029),
+          color: Color(0xFF910029),
         ),
         decoration: InputDecoration(
-          icon: const Icon(Icons.find_in_page_sharp, size: 40),
+          icon: Image.asset(
+            "assets/images/find_search_icon.png",
+            height: _size.height * 0.05,
+          ),
           labelText: labelText,
           labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
           hintText: hintText,
@@ -145,8 +147,8 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _textoInformacao() {
     return Container(
-      width: size.width,
-      height: size.height * 0.07,
+      width: _size.width,
+      height: _size.height * 0.07,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
       child: const Opacity(
@@ -166,8 +168,8 @@ class _PainelClienteState extends State<PainelCliente> {
       onTap: () => pushNamed(context, "/lista_pagamento"),
       child: Container(
         margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: size.width,
-        height: size.height * 0.155,
+        width: _size.width,
+        height: _size.height * 0.155,
         color: const Color(0xFF006940),
         child: Row(
           children: <Widget>[
@@ -186,8 +188,8 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _vendaData() {
     return Container(
-      width: size.width * 0.26,
-      height: size.height * 0.03,
+      width: _size.width * 0.26,
+      height: _size.height * 0.03,
       margin: const EdgeInsets.only(left: 8, top: 8),
       decoration: BoxDecoration(
         color: const Color(0xffFDFFFF),
@@ -205,14 +207,14 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _vendaQuantidadePrecoPorKG() {
     return Container(
-      width: size.width * 0.5,
+      width: _size.width * 0.5,
       height: 61,
       margin: const EdgeInsets.only(left: 8, top: 8),
       child: Row(children: <Widget>[
-        const Icon(
-          Icons.monetization_on,
-          color: Color(0xffEB710A),
-          size: 60,
+        Image.asset(
+          "assets/images/checkout_price_icon.png",
+          height: _size.height * 0.08,
+          //color: const Color(0xffEB710A),
         ),
         Container(
           padding: const EdgeInsets.only(top: 8, bottom: 8),

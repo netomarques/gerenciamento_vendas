@@ -129,10 +129,9 @@ class _HomePainelState extends State<HomePainel> {
           Container(
             padding: const EdgeInsets.only(left: 8),
             width: size.width * 0.4 * 0.3,
-            child: const Icon(
-              Icons.auto_graph,
-              color: Color(0xffEB710A),
-              size: 36.0,
+            child: Image.asset(
+              "assets/images/financial_graphic_icon.png",
+              // height: size.height * 0.05,
             ),
           ),
           SizedBox(
@@ -288,10 +287,8 @@ class _HomePainelState extends State<HomePainel> {
       height: 61,
       margin: const EdgeInsets.only(left: 8, top: 8),
       child: Row(children: <Widget>[
-        const Icon(
-          Icons.monetization_on,
-          color: Color(0xffEB710A),
-          size: 60,
+        Image.asset(
+          "assets/images/checkout_price_icon.png",
         ),
         Container(
           padding: const EdgeInsets.only(top: 8, bottom: 8),

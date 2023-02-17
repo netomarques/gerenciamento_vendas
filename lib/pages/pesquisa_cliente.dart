@@ -10,11 +10,11 @@ class PesquisaCliente extends StatefulWidget {
 }
 
 class _PesquisaClienteState extends State<PesquisaCliente> {
-  Size size = const Size(0, 0);
+  Size _size = const Size(0, 0);
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    _size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -55,8 +55,8 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
 
   _tituloForm() {
     return Container(
-      width: size.width,
-      height: size.height * 0.1,
+      width: _size.width,
+      height: _size.height * 0.1,
       color: const Color(0xff910029),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: const Text(
@@ -71,7 +71,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
 
   _containerText() {
     return Container(
-      height: size.height * 0.075,
+      height: _size.height * 0.08,
       margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
       child: _textForm("Nome", "Nome do cliente"),
     );
@@ -81,16 +81,19 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
     return Container(
       padding: const EdgeInsets.only(left: 12),
       decoration: BoxDecoration(
-        color: const Color(0xffFDFFFF),
+        color: const Color(0xFFFDFFFF),
         borderRadius: BorderRadius.circular(32),
       ),
       child: TextFormField(
         style: const TextStyle(
           fontSize: 14,
-          color: Color(0xff910029),
+          color: Color(0xFF910029),
         ),
         decoration: InputDecoration(
-          icon: const Icon(Icons.find_in_page_sharp, size: 40),
+          icon: Image.asset(
+            "assets/images/find_search_icon.png",
+            height: _size.height * 0.05,
+          ),
           labelText: labelText,
           labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
           hintText: hintText,

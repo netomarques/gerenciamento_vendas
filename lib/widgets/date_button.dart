@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateButton extends StatelessWidget {
-  final String _dateStart;
-  final String _dateEnd;
+  late String _dateStart;
+  late String _dateEnd;
   final Function carregarVendas;
 
   late final ValueNotifier<String> _dateStartNotifier;
@@ -95,15 +95,15 @@ class DateButton extends StatelessWidget {
     if (picked != null &&
         (_dateFormat.format(picked.start) != _dateStart ||
             _dateFormat.format(picked.end) != _dateEnd)) {
-      String dateStart = _dateFormat.format(picked.start);
-      String dateEnd = _dateFormat.format(picked.end);
+      _dateStart = _dateFormat.format(picked.start);
+      _dateEnd = _dateFormat.format(picked.end);
 
-      _dateStartNotifier.value = dateStart;
-      _dateEndNotifier.value = dateEnd;
+      _dateStartNotifier.value = _dateStart;
+      _dateEndNotifier.value = _dateEnd;
 
       _isVisible = picked.start != picked.end ? true : false;
 
-      carregarVendas(dateStart, dateEnd);
+      carregarVendas(_dateStart, _dateEnd);
     }
   }
 

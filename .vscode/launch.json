@@ -12,6 +12,12 @@
             "deviceId": "192.168.0.122:5555"
         },
         {
+            "name": "Moto G 5 Plus cabo",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "0032259906"
+        },
+        {
             "name": "sdk gphone x86 64",
             "request": "launch",
             "type": "dart",

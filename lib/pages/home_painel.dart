@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/model/venda.dart';
+import 'package:vendas_gerenciamento/model/vendas.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
+import 'package:intl/intl.dart';
 
 class HomePainel extends StatefulWidget {
   const HomePainel({super.key});
@@ -9,10 +16,26 @@ class HomePainel extends StatefulWidget {
 }
 
 class _HomePainelState extends State<HomePainel> {
-  Size size = const Size(0, 0);
+  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
+  final DateTime _now = DateTime.now();
+  late final TextEditingController _dateStartController =
+      TextEditingController(text: _dateFormat.format(_now));
+  late final TextEditingController _dateEndController =
+      TextEditingController(text: _dateFormat.format(_now));
+  Size _size = const Size(0, 0);
+  final _vendasStreamController = StreamController<Map<String, Venda>>();
+  final _totalStreamController = StreamController<double>();
+
+  @override
+  void initState() {
+    super.initState();
+    String now =_dateFormat.format(_now);
+    carregarVendas(now, now);
+  }
+
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    _size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -27,14 +50,33 @@ class _HomePainelState extends State<HomePainel> {
       children: [
         _painel(),
         _textoInformacao(),
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return _containerVenda();
-            },
-            itemCount: 7,
-          ),
+        StreamBuilder<Map<String, Venda>>(
+          stream: _vendasStreamController.stream,
+          builder: ((context, snapshot) {
+            if (snapshot.hasError) {
+              return Expanded(
+                child: Text('Erro: ${snapshot.error}'),
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return const CircularProgressIndicator();
+            }
+
+            final vendas = snapshot.data!;
+
+            return Expanded(
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  Venda venda = vendas.values.elementAt(index);
+                  return _containerVenda(
+                      venda.data, venda.quantidade, venda.preco);
+                },
+              ),
+            );
+          }),
         ),
         const NavButtonsFloating(),
       ],
@@ -43,8 +85,8 @@ class _HomePainelState extends State<HomePainel> {
 
   _painel() {
     return Container(
-      width: size.width,
-      height: size.height * 0.25,
+      width: _size.width,
+      height: _size.height * 0.25,
       color: const Color(0xff910029),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -58,7 +100,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelResumo() {
     return SizedBox(
-      width: size.width,
+      width: _size.width,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +114,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelTotal() {
     return SizedBox(
-      width: size.width * 0.5,
+      width: _size.width * 0.5,
       child: Column(
         children: <Widget>[
           Container(
@@ -84,10 +126,30 @@ class _HomePainelState extends State<HomePainel> {
           ),
           Container(
             alignment: Alignment.topLeft,
-            child: const Text(
-              'R\$ 30000,00',
-              style: TextStyle(color: Colors.white, fontSize: 32),
+            child: StreamBuilder<double>(
+              stream: _totalStreamController.stream,
+              builder: ((context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Text(
+                    'Erro:',
+                    style: TextStyle(color: Colors.white, fontSize: 2),
+                  );
+                }
+
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
+
+                return Text(
+                  snapshot.data!.toStringAsFixed(2),
+                  style: const TextStyle(color: Colors.white, fontSize: 32),
+                );
+              }),
             ),
+            // child: Text(
+            //   'R\$ ${_somaTotal.toStringAsFixed(2)}',
+            //   style: const TextStyle(color: Colors.white, fontSize: 32),
+            // ),
           ),
         ],
       ),
@@ -96,22 +158,16 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelFiltroData() {
     return Container(
-      width: size.width * 0.35,
+      width: _size.width * 0.35,
       alignment: Alignment.topCenter,
-      decoration: BoxDecoration(
-        color: const Color(0xff486153),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: const Text(
-        '24 JAN 2023',
-        style: TextStyle(fontSize: 20, color: Colors.white),
-      ),
+      child: DateButton(
+          _dateStartController.text, _dateEndController.text, carregarVendas),
     );
   }
 
   _painelDados() {
     return SizedBox(
-      width: size.width,
+      width: _size.width,
       child: Row(
         children: <Widget>[
           _painelDadosIcon(),
@@ -123,19 +179,19 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelDadosIcon() {
     return SizedBox(
-      width: size.width * 0.4,
+      width: _size.width * 0.4,
       child: Row(
         children: <Widget>[
           Container(
             padding: const EdgeInsets.only(left: 8),
-            width: size.width * 0.4 * 0.3,
+            width: _size.width * 0.4 * 0.3,
             child: Image.asset(
               "assets/images/financial_graphic_icon.png",
-              // height: size.height * 0.05,
+              height: _size.height * 0.03,
             ),
           ),
           SizedBox(
-            width: size.width * 0.4 * 0.7,
+            width: _size.width * 0.4 * 0.7,
             child: Column(
               children: <Widget>[
                 Container(
@@ -167,11 +223,11 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelDadosValorQuantidade() {
     return SizedBox(
-      width: size.width * 0.6,
+      width: _size.width * 0.6,
       child: Row(
         children: <Widget>[
           SizedBox(
-            width: size.width * 0.6 * 0.5,
+            width: _size.width * 0.6 * 0.5,
             child: Column(
               children: <Widget>[
                 Container(
@@ -195,7 +251,7 @@ class _HomePainelState extends State<HomePainel> {
             ),
           ),
           SizedBox(
-            width: size.width * 0.6 * 0.5,
+            width: _size.width * 0.6 * 0.5,
             child: Column(
               children: <Widget>[
                 Container(
@@ -225,7 +281,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _textoInformacao() {
     return Container(
-      width: size.width,
+      width: _size.width,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
       child: const Opacity(
@@ -239,51 +295,53 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  _containerVenda() {
+  _containerVenda(data, quantidade, preco) {
     return GestureDetector(
-      onTap: () => {print("Foi")},
+      onTap: () => {pushNamed(context, "/lista_pagamento")},
       child: Container(
         margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: size.width,
-        height: size.height * 0.155,
+        width: _size.width,
+        height: _size.height * 0.155,
         color: const Color(0xFF006940),
         child: Row(
           children: <Widget>[
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _vendaData(),
-                  _vendaQuantidadePrecoPorKG(),
+                  _vendaData(data),
+                  _vendaQuantidadePrecoPorKG(quantidade, preco),
                 ]),
-            _vendaValorTotal(),
+            _vendaValorTotal(quantidade * preco),
           ],
         ),
       ),
     );
   }
 
-  _vendaData() {
+  _vendaData(data) {
     return Container(
-      width: size.width * 0.26,
-      height: size.height * 0.03,
+      width: _size.width * 0.26,
+      height: _size.height * 0.03,
       margin: const EdgeInsets.only(left: 8, top: 8),
       decoration: BoxDecoration(
         color: const Color(0xffFDFFFF),
         borderRadius: BorderRadius.circular(5),
       ),
-      child: const Text(
-        '24 JAN 2023',
-        style: TextStyle(
-          fontSize: 16,
-          color: Color(0xff969CAF),
+      child: Center(
+        child: Text(
+          _dateFormat.format(data),
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color(0xFF969CAF),
+          ),
         ),
       ),
     );
   }
 
-  _vendaQuantidadePrecoPorKG() {
+  _vendaQuantidadePrecoPorKG(quantidade, preco) {
     return Container(
-      width: size.width * 0.5,
+      width: _size.width * 0.5,
       height: 61,
       margin: const EdgeInsets.only(left: 8, top: 8),
       child: Row(children: <Widget>[
@@ -318,10 +376,10 @@ class _HomePainelState extends State<HomePainel> {
           padding: const EdgeInsets.only(top: 8, bottom: 8),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
+              children: <Widget>[
                 Text(
-                  '80 Kg',
-                  style: TextStyle(
+                  '${quantidade.toString()} Kg',
+                  style: const TextStyle(
                     fontSize: 20,
                     color: Color(0xfffdffff),
                   ),
@@ -329,8 +387,8 @@ class _HomePainelState extends State<HomePainel> {
                 Opacity(
                   opacity: 0.6,
                   child: Text(
-                    'R\$ 12,00',
-                    style: TextStyle(
+                    'R\$ ${preco.toString()}',
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xfffdffff),
                     ),
@@ -342,15 +400,38 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  _vendaValorTotal() {
-    return Container(
-      margin: const EdgeInsets.only(right: 6),
-      padding: const EdgeInsets.only(top: 8),
-      alignment: Alignment.topRight,
-      child: const Text(
-        "R\$ 18000,00",
-        style: TextStyle(color: Colors.white, fontSize: 24),
+  _vendaValorTotal(total) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.only(top: 8),
+        alignment: Alignment.topRight,
+        child: Text(
+          "R\$ ${total.toStringAsFixed(2)}",
+          style: const TextStyle(color: Colors.white, fontSize: 24),
+        ),
       ),
     );
+  }
+
+  void carregarVendas(String dateStart, String dateEnd) {
+    _dateStartController.text = dateStart;
+    _dateEndController.text = dateEnd;
+    
+    Map<String, Venda> vendasFiltradas =
+        ordenarListaPorDataDecrescente(_dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
+    _vendasStreamController.add(vendasFiltradas);
+
+    double totalVendas = calcularTotal(vendasFiltradas);
+    _totalStreamController.add(totalVendas);
+  }
+
+  @override
+  void dispose() {
+    _vendasStreamController.close();
+    _totalStreamController.close();
+    _dateStartController.dispose();
+    _dateEndController.dispose();
+    super.dispose();
   }
 }

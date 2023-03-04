@@ -24,12 +24,13 @@ class _HomePainelState extends State<HomePainel> {
       TextEditingController(text: _dateFormat.format(_now));
   Size _size = const Size(0, 0);
   final _vendasStreamController = StreamController<Map<String, Venda>>();
-  final _totalStreamController = StreamController<double>();
+  final _resumoStreamController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   @override
   void initState() {
     super.initState();
-    String now =_dateFormat.format(_now);
+    String now = _dateFormat.format(_now);
     carregarVendas(now, now);
   }
 
@@ -126,8 +127,8 @@ class _HomePainelState extends State<HomePainel> {
           ),
           Container(
             alignment: Alignment.topLeft,
-            child: StreamBuilder<double>(
-              stream: _totalStreamController.stream,
+            child: StreamBuilder<Map<String, dynamic>>(
+              stream: _resumoStreamController.stream,
               builder: ((context, snapshot) {
                 if (snapshot.hasError) {
                   return const Text(
@@ -141,15 +142,12 @@ class _HomePainelState extends State<HomePainel> {
                 }
 
                 return Text(
-                  snapshot.data!.toStringAsFixed(2),
+                  '${snapshot.data!["Vendas"]["Total"].toStringAsFixed(2)}',
+                  // snapshot.data!.toStringAsFixed(2),
                   style: const TextStyle(color: Colors.white, fontSize: 32),
                 );
               }),
             ),
-            // child: Text(
-            //   'R\$ ${_somaTotal.toStringAsFixed(2)}',
-            //   style: const TextStyle(color: Colors.white, fontSize: 32),
-            // ),
           ),
         ],
       ),
@@ -170,14 +168,14 @@ class _HomePainelState extends State<HomePainel> {
       width: _size.width,
       child: Row(
         children: <Widget>[
-          _painelDadosIcon(),
+          _painelTotalVendas(),
           _painelDadosValorQuantidade(),
         ],
       ),
     );
   }
 
-  _painelDadosIcon() {
+  _painelTotalVendas() {
     return SizedBox(
       width: _size.width * 0.4,
       child: Row(
@@ -187,7 +185,7 @@ class _HomePainelState extends State<HomePainel> {
             width: _size.width * 0.4 * 0.3,
             child: Image.asset(
               "assets/images/financial_graphic_icon.png",
-              height: _size.height * 0.03,
+              height: _size.height * 0.05,
             ),
           ),
           SizedBox(
@@ -197,9 +195,28 @@ class _HomePainelState extends State<HomePainel> {
                 Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 8),
-                  child: const Text(
-                    '04',
-                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
+                  child: StreamBuilder<Map<String, dynamic>>(
+                    stream: _resumoStreamController.stream,
+                    builder: ((context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const Text(
+                          'Erro:',
+                          style: TextStyle(color: Colors.white, fontSize: 2),
+                        );
+                      }
+
+                      if (!snapshot.hasData) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      return Text(
+                        snapshot.data!["Vendas"]["Quantidade"]
+                            .toString()
+                            .padLeft(2, '0'),
+                        style: const TextStyle(
+                            color: Color(0xfffdffff), fontSize: 16),
+                      );
+                    }),
                   ),
                 ),
                 Container(
@@ -224,57 +241,77 @@ class _HomePainelState extends State<HomePainel> {
   _painelDadosValorQuantidade() {
     return SizedBox(
       width: _size.width * 0.6,
-      child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: _size.width * 0.6 * 0.5,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    'R\$ 21690,00',
-                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: const Opacity(
-                    opacity: 0.5,
-                    child: Text(
-                      '02 Rua',
-                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
+      child: StreamBuilder<Map<String, dynamic>>(
+        stream: _resumoStreamController.stream,
+        builder: ((context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text(
+              'Erro:',
+              style: TextStyle(color: Colors.white, fontSize: 2),
+            );
+          }
+
+          if (!snapshot.hasData) {
+            return const CircularProgressIndicator();
+          }
+
+          return Row(
+            children: <Widget>[
+              SizedBox(
+                width: _size.width * 0.6 * 0.5,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        'R\$ ${snapshot.data!["Rua"]["Total"].toStringAsFixed(2)}',
+                        style: const TextStyle(
+                            color: Color(0xfffdffff), fontSize: 16),
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: _size.width * 0.6 * 0.5,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: const Text(
-                    'R\$ 36000,00',
-                    style: TextStyle(color: Color(0xfffdffff), fontSize: 16),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: const Opacity(
-                    opacity: 0.5,
-                    child: Text(
-                      '02 Fiados',
-                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Opacity(
+                        opacity: 0.5,
+                        child: Text(
+                          '${snapshot.data!["Rua"]["Quantidade"].toString().padLeft(2, '0')} Rua',
+                          style: const TextStyle(
+                              color: Color(0xfffdffff), fontSize: 12),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+              SizedBox(
+                width: _size.width * 0.6 * 0.5,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        'R\$ ${snapshot.data!["Fiado"]["Total"].toStringAsFixed(2)}',
+                        style: const TextStyle(
+                            color: Color(0xfffdffff), fontSize: 16),
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Opacity(
+                        opacity: 0.5,
+                        child: Text(
+                          '${snapshot.data!["Fiado"]["Quantidade"].toString().padLeft(2, '0')} Fiados',
+                          style: const TextStyle(
+                              color: Color(0xfffdffff), fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -344,13 +381,14 @@ class _HomePainelState extends State<HomePainel> {
       width: _size.width * 0.5,
       height: 61,
       margin: const EdgeInsets.only(left: 8, top: 8),
-      child: Row(children: <Widget>[
-        Image.asset(
-          "assets/images/checkout_price_icon.png",
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            "assets/images/checkout_price_icon.png",
+          ),
+          Container(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: const <Widget>[
                 Text(
@@ -370,41 +408,44 @@ class _HomePainelState extends State<HomePainel> {
                     ),
                   ),
                 ),
-              ]),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Text(
-                  '${quantidade.toString()} Kg',
+                  '${quantidade.toStringAsFixed(2)} Kg',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     color: Color(0xfffdffff),
                   ),
                 ),
                 Opacity(
                   opacity: 0.6,
                   child: Text(
-                    'R\$ ${preco.toString()}',
+                    'R\$ ${preco.toStringAsFixed(2)}',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Color(0xfffdffff),
                     ),
                   ),
                 ),
-              ]),
-        ),
-      ]),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   _vendaValorTotal(total) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.only(right: 6),
-        padding: const EdgeInsets.only(top: 8),
+        // margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.only(right: 6, top: 8),
         alignment: Alignment.topRight,
         child: Text(
           "R\$ ${total.toStringAsFixed(2)}",
@@ -414,22 +455,22 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  void carregarVendas(String dateStart, String dateEnd) {
+  void carregarVendas(String dateStart, String dateEnd) async {
     _dateStartController.text = dateStart;
     _dateEndController.text = dateEnd;
-    
-    Map<String, Venda> vendasFiltradas =
-        ordenarListaPorDataDecrescente(_dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
-    _vendasStreamController.add(vendasFiltradas);
 
-    double totalVendas = calcularTotal(vendasFiltradas);
-    _totalStreamController.add(totalVendas);
+    Map<String, Venda> vendasFiltradas = await ordenarListaPorDataDecrescente(
+        _dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
+    Map<String, dynamic> resumo = await resumoVendas(vendasFiltradas);
+
+    _vendasStreamController.add(vendasFiltradas);
+    _resumoStreamController.add(resumo);
   }
 
   @override
   void dispose() {
     _vendasStreamController.close();
-    _totalStreamController.close();
+    _resumoStreamController.close();
     _dateStartController.dispose();
     _dateEndController.dispose();
     super.dispose();

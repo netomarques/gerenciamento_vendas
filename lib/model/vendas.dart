@@ -95,17 +95,8 @@ final Map<String, Venda> vendas = {
   ),
 };
 
-double calcularTotal(Map<String, Venda> vendas) {
-  double somaTotal = 0.0;
-  vendas.forEach((key, venda) {
-    somaTotal = (venda.quantidade * venda.preco) + somaTotal;
-  });
-
-  return somaTotal;
-}
-
-Map<String, Venda> ordenarListaPorDataDecrescente(
-    DateTime start, DateTime end) {
+Future<Map<String, Venda>> ordenarListaPorDataDecrescente(
+    DateTime start, DateTime end) async {
   final DateFormat dateFormatBanco = DateFormat('dd/MM/yyyy');
 
   String startText = dateFormatBanco.format(start);
@@ -130,4 +121,37 @@ Map<String, Venda> ordenarListaPorDataDecrescente(
   vendasFiltradas = {for (var key in sortedKeys) key: copiaVendas[key]!};
 
   return vendasFiltradas;
+}
+
+Future<Map<String, dynamic>> resumoVendas(Map<String, Venda> vendas) async {
+  int quantVendaRua, quantVendaFiado;
+  double totalVendaRua, totalVendaFiado;
+  // NumberFormat numberFormat = NumberFormat('##');
+
+  quantVendaRua = quantVendaFiado = 0;
+  totalVendaRua = totalVendaFiado = 0.0;
+
+  for (Venda venda in vendas.values) {
+    switch (venda.isFiado()) {
+      case true:
+        quantVendaFiado = quantVendaFiado + 1;
+        totalVendaFiado = totalVendaFiado + venda.preco * venda.quantidade;
+        break;
+      case false:
+        quantVendaRua = quantVendaRua + 1;
+        totalVendaRua = totalVendaRua + venda.preco * venda.quantidade;
+        break;
+    }
+  }
+
+  Map<String, dynamic> resumo = <String, dynamic>{
+    "Fiado": {"Total": totalVendaFiado, "Quantidade": quantVendaFiado},
+    "Rua": {"Total": totalVendaRua, "Quantidade": quantVendaRua},
+    "Vendas": {
+      "Total": totalVendaRua + totalVendaFiado,
+      "Quantidade": quantVendaRua + quantVendaFiado,
+    },
+  };
+
+  return resumo;
 }

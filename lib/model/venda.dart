@@ -11,4 +11,8 @@ class Venda {
       required this.preco,
       required this.data,
       required this.cliente});
+
+  bool isFiado() {
+    return cliente.id != 1 ? true : false;
+  }
 }

@@ -68,12 +68,16 @@ class _HomePainelState extends State<HomePainel> {
 
             return Expanded(
               child: ListView.builder(
-                itemCount: snapshot.data!.length,
+                itemCount: vendas.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
+                  Color cor;
                   Venda venda = vendas.values.elementAt(index);
-                  return _containerVenda(
-                      venda.data, venda.quantidade, venda.preco);
+                  venda.isFiado() == false || venda.isOpen() == false
+                      ? cor = const Color(0xFF006940)
+                      : cor = const Color(0xff910029);
+                  return _containerVenda(venda.data, venda.quantidade,
+                      venda.preco, cor, venda.cliente.nome);
                 },
               ),
             );
@@ -142,8 +146,7 @@ class _HomePainelState extends State<HomePainel> {
                 }
 
                 return Text(
-                  '${snapshot.data!["Vendas"]["Total"].toStringAsFixed(2)}',
-                  // snapshot.data!.toStringAsFixed(2),
+                  'R\$ ${snapshot.data!["Vendas"]["Total"].toStringAsFixed(2)}',
                   style: const TextStyle(color: Colors.white, fontSize: 32),
                 );
               }),
@@ -332,14 +335,14 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  _containerVenda(data, quantidade, preco) {
+  _containerVenda(data, quantidade, preco, cor, cliente) {
     return GestureDetector(
       onTap: () => {pushNamed(context, "/lista_pagamento")},
       child: Container(
         margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
         width: _size.width,
         height: _size.height * 0.155,
-        color: const Color(0xFF006940),
+        color: cor,
         child: Row(
           children: <Widget>[
             Column(
@@ -348,7 +351,7 @@ class _HomePainelState extends State<HomePainel> {
                   _vendaData(data),
                   _vendaQuantidadePrecoPorKG(quantidade, preco),
                 ]),
-            _vendaValorTotal(quantidade * preco),
+            _vendaValorTotal(quantidade * preco, cliente),
           ],
         ),
       ),
@@ -395,7 +398,7 @@ class _HomePainelState extends State<HomePainel> {
                   'Quant: ',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xffffffff),
+                    color: Color(0xFFFDFFFF),
                   ),
                 ),
                 Opacity(
@@ -404,7 +407,7 @@ class _HomePainelState extends State<HomePainel> {
                     'Preço/kg: ',
                     style: TextStyle(
                       fontSize: 8,
-                      color: Color(0xffffffff),
+                      color: Color(0xFFFDFFFF),
                     ),
                   ),
                 ),
@@ -420,7 +423,7 @@ class _HomePainelState extends State<HomePainel> {
                   '${quantidade.toStringAsFixed(2)} Kg',
                   style: const TextStyle(
                     fontSize: 18,
-                    color: Color(0xfffdffff),
+                    color: Color(0xFFFDFFFF),
                   ),
                 ),
                 Opacity(
@@ -429,7 +432,7 @@ class _HomePainelState extends State<HomePainel> {
                     'R\$ ${preco.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Color(0xfffdffff),
+                      color: Color(0xFFFDFFFF),
                     ),
                   ),
                 ),
@@ -441,15 +444,35 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  _vendaValorTotal(total) {
+  _vendaValorTotal(total, cliente) {
     return Expanded(
       child: Container(
-        // margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.only(right: 6, top: 8),
         alignment: Alignment.topRight,
-        child: Text(
-          "R\$ ${total.toStringAsFixed(2)}",
-          style: const TextStyle(color: Colors.white, fontSize: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text(
+                  "Total",
+                  style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
+                ),
+                Text(
+                  "R\$ ${total.toStringAsFixed(2)}",
+                  style:
+                      const TextStyle(color: Color(0xFFFDFFFF), fontSize: 24),
+                ),
+              ],
+            ),
+            Text(
+              cliente,
+              style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
+            ),
+          ],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_fiado.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_rua.dart';
@@ -16,15 +17,26 @@ routes() {
     '/cadastro_venda_fiado': (context) => const CadastroVendaFiado(),
     '/cadastro_venda_rua': (context) => const CadastroVendaRua(),
     '/pesquisa_cliente': (context) => const PesquisaCliente(),
-    '/painel_cliente': (context) => const PainelCliente(),
+    '/painel_cliente': (context) {
+      final Map<String, dynamic> argumnets =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+      final Cliente cliente = argumnets['cliente'] as Cliente;
+
+      return PainelCliente(cliente);
+    },
     '/lista_pagamento': (context) => const ListaPagamento(),
   };
   return routes;
 }
 
-Future pushNamed(BuildContext context, String routeName) {
+Future pushNamed(
+  BuildContext context,
+  String routeName, {
+  Object? arguments,
+}) {
   route = routeName;
-  return Navigator.pushNamed(context, routeName);
+  return Navigator.pushNamed(context, routeName, arguments: arguments);
 }
 
 Future pushReplacementNamed(BuildContext context, String routeName) {

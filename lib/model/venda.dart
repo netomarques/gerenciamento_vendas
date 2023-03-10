@@ -36,14 +36,28 @@ class Venda {
     if (abatimentosVenda.isEmpty) {
       isOpen = true;
     } else {
-      double total = 0.0;
+      double totalAbatido = 0.0;
       for (Abatimento abatimento in abatimentosVenda) {
-        total = abatimento.valor + total;
+        totalAbatido = abatimento.valor + totalAbatido;
       }
 
-      total == preco * quantidade ? isOpen = false : isOpen = true;
+      totalAbatido == preco * quantidade ? isOpen = false : isOpen = true;
     }
 
     return isOpen;
+  }
+
+  double totalEmAberto() {
+    double valorAberto = 0.0;
+    double totalAbatido = 0.0;
+
+    List<Abatimento> abatimentosVenda = this.abatimentosVenda();
+    for (Abatimento abatimento in abatimentosVenda) {
+      totalAbatido = abatimento.valor + totalAbatido;
+    }
+
+    valorAberto = preco * quantidade - totalAbatido;
+
+    return valorAberto;
   }
 }

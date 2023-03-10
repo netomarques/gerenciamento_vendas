@@ -36,3 +36,10 @@ final Map<String, Cliente> clientes = {
     cpf: "12345678900",
   ),
 };
+
+Cliente getCliente(int id) {
+  Cliente cliente;
+  cliente = clientes.values.where((cli) => cli.id == id) as Cliente;
+
+  return cliente;
+}

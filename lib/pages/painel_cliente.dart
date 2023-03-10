@@ -1,19 +1,38 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:vendas_gerenciamento/api/vendas_api.dart';
+import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/model/venda.dart';
+import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
+import 'package:vendas_gerenciamento/widgets/date_input_widget.dart';
+import 'package:intl/intl.dart';
 
 class PainelCliente extends StatefulWidget {
-  const PainelCliente({super.key});
+  final Cliente _cliente;
+  const PainelCliente(this._cliente, {super.key});
 
   @override
   State<PainelCliente> createState() => _PainelClienteState();
 }
 
 class _PainelClienteState extends State<PainelCliente> {
-  Size _size = const Size(0, 0);
+  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
+  final _vendasStreamController = StreamController<List<Venda>>();
+  double _altura = 0.0;
+  double _largura = 0.0;
+  late final Future<double> _totalAReceber;
+
+  @override
+  void initState() {
+    super.initState();
+    _totalAReceber = _carregarDados();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _size = MediaQuery.of(context).size;
+    _largura = MediaQuery.of(context).size.width;
+    _altura = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -29,32 +48,25 @@ class _PainelClienteState extends State<PainelCliente> {
       children: <Widget>[
         _head(),
         _textoInformacao(),
-        Stack(
-          children: <Widget>[
-            Opacity(
-              opacity: 0.5,
-              child: Container(
-                height: _size.height * 0.075,
-                margin: const EdgeInsets.only(
-                    left: 16, top: 20, right: 32, bottom: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF006940),
-                  borderRadius: BorderRadius.circular(32),
-                ),
-              ),
-            ),
-            _containerText(),
-          ],
+        DateInputWidget(_carregarVendas),
+        StreamBuilder<List<Venda>>(
+          stream: _vendasStreamController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Expanded(
+                child: Center(child: Text('Erro: ${snapshot.error}')),
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final List<Venda> vendas = snapshot.data!;
+
+            return VendasWidget(vendas, "/lista_pagamento");
+          },
         ),
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return _containerVenda();
-            },
-            itemCount: 7,
-          ),
-        )
       ],
     );
   }
@@ -63,29 +75,30 @@ class _PainelClienteState extends State<PainelCliente> {
     return Stack(
       children: <Widget>[
         Container(
-          width: _size.width,
-          height: _size.height * 0.23,
+          width: _largura,
+          height: _altura * 0.23,
           color: const Color(0xFF910029),
           child: Column(
             children: <Widget>[
               Container(
                 color: const Color(0xFF006940),
-                width: _size.width,
-                height: _size.height * 0.075,
+                width: _largura,
+                height: _altura * 0.075,
               ),
               Container(
-                height: _size.height * 0.085,
+                height: _altura * 0.085,
                 margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const <Widget>[
+                  children: <Widget>[
                     Text(
-                      "Jose Costa Larga",
-                      style: TextStyle(color: Color(0xffFDFFFF), fontSize: 16),
+                      widget._cliente.nome,
+                      style: const TextStyle(
+                          color: Color(0xffFDFFFF), fontSize: 16),
                     ),
                     Text(
-                      "92991235963",
-                      style: TextStyle(
+                      widget._cliente.telefone,
+                      style: const TextStyle(
                         color: Color(0xffFDFFFF),
                         fontSize: 16,
                       ),
@@ -97,186 +110,67 @@ class _PainelClienteState extends State<PainelCliente> {
           ),
         ),
         Container(
-          margin: EdgeInsets.only(top: 8, left: _size.width * 0.40),
+          margin: EdgeInsets.only(top: 8, left: _largura * 0.40),
           child: Image.asset(
             "assets/images/client_avatar_icon.png",
-            height: _size.height * 0.1,
+            height: _altura * 0.1,
           ),
         ),
       ],
     );
   }
 
-  _containerText() {
-    return Container(
-      height: _size.height * 0.076,
-      margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
-      child: _textForm("Data", "Informe a data"),
-    );
-  }
-
-  _textForm(labelText, hintText) {
-    return Container(
-      padding: const EdgeInsets.only(left: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF006940).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: TextFormField(
-        style: const TextStyle(
-          fontSize: 14,
-          color: Color(0xFF910029),
-        ),
-        decoration: InputDecoration(
-          icon: Image.asset(
-            "assets/images/find_search_icon.png",
-            height: _size.height * 0.05,
-          ),
-          labelText: labelText,
-          labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            fontSize: 14,
-            color: Color(0xff910029),
-          ),
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
-
   _textoInformacao() {
     return Container(
-      width: _size.width,
-      height: _size.height * 0.07,
+      width: _largura,
+      height: _altura * 0.07,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
-      child: const Opacity(
+      child: Opacity(
         opacity: 0.65,
         child: Center(
-          child: Text(
-            "Total a receber: R\$ 3009,00",
-            style: TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
+          child: FutureBuilder<double>(
+            future: _totalAReceber,
+            builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Text(
+                  "Total a receber: R\$ ${snapshot.data!.toStringAsFixed(2)}",
+                  style:
+                      const TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
           ),
         ),
       ),
     );
   }
 
-  _containerVenda() {
-    return GestureDetector(
-      onTap: () => pushNamed(context, "/lista_pagamento"),
-      child: Container(
-        margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: _size.width,
-        height: _size.height * 0.155,
-        color: const Color(0xFF006940),
-        child: Row(
-          children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _vendaData(),
-                  _vendaQuantidadePrecoPorKG(),
-                ]),
-            _vendaValorTotal(),
-          ],
-        ),
-      ),
+  void _carregarVendas(String dateStart, String dateEnd) async {
+    List<Venda> vendasCliente = await VendasApi().vendasCliente(
+      widget._cliente.id,
+      _dateFormat.parse(dateStart),
+      _dateFormat.parse(dateEnd),
     );
+
+    _vendasStreamController.add(vendasCliente);
   }
 
-  _vendaData() {
-    return Container(
-      width: _size.width * 0.26,
-      height: _size.height * 0.03,
-      margin: const EdgeInsets.only(left: 8, top: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xffFDFFFF),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: const Text(
-        '24 JAN 2023',
-        style: TextStyle(
-          fontSize: 16,
-          color: Color(0xff969CAF),
-        ),
-      ),
-    );
+  Future<double> _carregarDados() async {
+    List<Venda> vendasCliente = await VendasApi().vendasCliente(
+        widget._cliente.id,
+        _dateFormat.parse(_dateFormat.format(DateTime(1900))),
+        _dateFormat.parse(_dateFormat.format(DateTime.now())));
+
+    _vendasStreamController.add(vendasCliente);
+    return VendasApi().valorTotalEmAbertoPorCliente(vendasCliente);
   }
 
-  _vendaQuantidadePrecoPorKG() {
-    return Container(
-      width: _size.width * 0.5,
-      height: 61,
-      margin: const EdgeInsets.only(left: 8, top: 8),
-      child: Row(children: <Widget>[
-        Image.asset(
-          "assets/images/checkout_price_icon.png",
-          height: _size.height * 0.08,
-          //color: const Color(0xffEB710A),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Text(
-                  'Quant: ',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xffffffff),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    'Preço/kg: ',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Color(0xffffffff),
-                    ),
-                  ),
-                ),
-              ]),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Text(
-                  '80 Kg',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Color(0xfffdffff),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    'R\$ 12,00',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xfffdffff),
-                    ),
-                  ),
-                ),
-              ]),
-        ),
-      ]),
-    );
-  }
-
-  _vendaValorTotal() {
-    return Container(
-      margin: const EdgeInsets.only(right: 6),
-      padding: const EdgeInsets.only(top: 8),
-      alignment: Alignment.topRight,
-      child: const Text(
-        "R\$ 18000,00",
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
-    );
+  @override
+  void dispose() {
+    _vendasStreamController.close();
+    super.dispose();
   }
 }

@@ -1,32 +1,50 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class DateButton extends StatelessWidget {
+class DateButton extends StatefulWidget {
   late String _dateStart;
   late String _dateEnd;
   final Function carregarVendas;
 
-  late final ValueNotifier<String> _dateStartNotifier;
-  late final ValueNotifier<String> _dateEndNotifier;
-
-  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  final _now = DateTime.now();
-  bool _isVisible = false;
-
   DateButton(this._dateStart, this._dateEnd, this.carregarVendas, {super.key});
 
   @override
-  Widget build(BuildContext context) {
-    _dateStartNotifier = ValueNotifier<String>(_dateStart);
-    _dateEndNotifier = ValueNotifier<String>(_dateEnd);
+  State<DateButton> createState() => _DateButtonState();
+}
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        ValueListenableBuilder<String>(
-          valueListenable: _dateEndNotifier,
-          builder: (context, value, child) {
-            return ElevatedButton(
+class _DateButtonState extends State<DateButton> {
+  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
+  final _now = DateTime.now();
+  late final StreamController<Map<String, dynamic>> _streamController;
+
+  @override
+  void initState() {
+    super.initState();
+    _streamController = StreamController();
+    _streamController.add({
+      "dateStart": widget._dateStart,
+      "dateEnd": widget._dateEnd,
+      "isVisible": false
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: _streamController.stream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const CircularProgressIndicator();
+        }
+
+        Map<String, dynamic> datas = snapshot.data!;
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            ElevatedButton(
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
@@ -36,17 +54,12 @@ class DateButton extends StatelessWidget {
               ),
               onPressed: () => _showDateRangePicker(context),
               child: Text(
-                value,
+                datas["dateEnd"],
                 style: const TextStyle(fontSize: 20, color: Color(0xFFFDFFFF)),
               ),
-            );
-          },
-        ),
-        ValueListenableBuilder<String>(
-          valueListenable: _dateStartNotifier,
-          builder: (context, value, child) {
-            return Visibility(
-              visible: _isVisible,
+            ),
+            Visibility(
+              visible: datas["isVisible"],
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -57,15 +70,15 @@ class DateButton extends StatelessWidget {
                 ),
                 onPressed: () => _showDateRangePicker(context),
                 child: Text(
-                  value,
+                  datas["dateStart"],
                   style:
                       const TextStyle(fontSize: 20, color: Color(0xFFFDFFFF)),
                 ),
               ),
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -75,8 +88,8 @@ class DateButton extends StatelessWidget {
       firstDate: DateTime(1900),
       lastDate: _now,
       initialDateRange: DateTimeRange(
-        end: _dateFormat.parse(_dateEnd),
-        start: _dateFormat.parse(_dateStart),
+        end: _dateFormat.parse(widget._dateEnd),
+        start: _dateFormat.parse(widget._dateStart),
       ),
       builder: (context, child) {
         return Column(
@@ -93,22 +106,25 @@ class DateButton extends StatelessWidget {
     );
 
     if (picked != null &&
-        (_dateFormat.format(picked.start) != _dateStart ||
-            _dateFormat.format(picked.end) != _dateEnd)) {
-      _dateStart = _dateFormat.format(picked.start);
-      _dateEnd = _dateFormat.format(picked.end);
+        (_dateFormat.format(picked.start) != widget._dateStart ||
+            _dateFormat.format(picked.end) != widget._dateEnd)) {
+      widget._dateStart = _dateFormat.format(picked.start);
+      widget._dateEnd = _dateFormat.format(picked.end);
 
-      _dateStartNotifier.value = _dateStart;
-      _dateEndNotifier.value = _dateEnd;
+      Map<String, dynamic> datas = {};
+      datas["dateStart"] = widget._dateStart;
+      datas["dateEnd"] = widget._dateEnd;
+      datas["isVisible"] = picked.start != picked.end ? true : false;
 
-      _isVisible = picked.start != picked.end ? true : false;
+      _streamController.add(datas);
 
-      carregarVendas(_dateStart, _dateEnd);
+      widget.carregarVendas(widget._dateStart, widget._dateEnd);
     }
   }
 
+  @override
   void dispose() {
-    _dateStartNotifier.dispose();
-    _dateEndNotifier.dispose();
+    _streamController.close();
+    super.dispose();
   }
 }

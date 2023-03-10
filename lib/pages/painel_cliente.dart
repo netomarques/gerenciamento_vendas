@@ -5,7 +5,7 @@ import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/model/venda.dart';
 import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
-import 'package:vendas_gerenciamento/widgets/date_input_widget.dart';
+import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:intl/intl.dart';
 
 class PainelCliente extends StatefulWidget {
@@ -48,7 +48,13 @@ class _PainelClienteState extends State<PainelCliente> {
       children: <Widget>[
         _head(),
         _textoInformacao(),
-        DateInputWidget(_carregarVendas),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: SizedBox(
+              width: _largura * 0.35,
+              child: DateButton(_dateFormat.format(DateTime.now()),
+                  _dateFormat.format(DateTime.now()), _carregarVendas)),
+        ),
         StreamBuilder<List<Venda>>(
           stream: _vendasStreamController.stream,
           builder: (context, snapshot) {

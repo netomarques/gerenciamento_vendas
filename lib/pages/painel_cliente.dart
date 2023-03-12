@@ -130,7 +130,7 @@ class _PainelClienteState extends State<PainelCliente> {
     return Container(
       width: _largura,
       height: _altura * 0.07,
-      color: const Color(0xff3B7554),
+      color: const Color(0xFF3B7554),
       padding: const EdgeInsets.all(3.0),
       child: Opacity(
         opacity: 0.65,
@@ -142,7 +142,7 @@ class _PainelClienteState extends State<PainelCliente> {
                 return Text(
                   "Total a receber: R\$ ${snapshot.data!.toStringAsFixed(2)}",
                   style:
-                      const TextStyle(color: Color(0xffFDFFFF), fontSize: 20),
+                      const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
                 );
               } else {
                 return const CircularProgressIndicator();

@@ -4,15 +4,14 @@ import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:intl/intl.dart';
 
 class VendasWidget extends StatelessWidget {
-  final List<Venda> vendas;
-  final String route;
+  final List<Venda> _vendas;
+  final String _route;
 
-  VendasWidget(this.vendas, this.route, {super.key});
+  VendasWidget(this._vendas, this._route, {super.key});
 
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
   double _altura = 0.0;
   double _largura = 0.0;
-  late Venda _venda;
 
   @override
   Widget build(BuildContext context) {
@@ -21,39 +20,42 @@ class VendasWidget extends StatelessWidget {
 
     return Expanded(
       child: ListView.builder(
-        itemCount: vendas.length,
+        itemCount: _vendas.length,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           Color cor;
-          _venda = vendas[index];
-          _venda.isFiado() == false || _venda.isOpen() == false
+          Venda venda = _vendas[index];
+          venda.isFiado() == false || venda.isOpen() == false
               ? cor = const Color(0xFF006940)
-              : cor = const Color(0xff910029);
-          return _containerVenda(context, cor);
-        },
-      ),
-    );
-  }
-
-  _containerVenda(context, Color cor) {
-    return GestureDetector(
-      onTap: () => pushNamed(context, route),
-      child: Container(
-        margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: _largura,
-        height: _altura * 0.155,
-        color: cor,
-        child: Row(
-          children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              : cor = const Color(0xFF910029);
+          return GestureDetector(
+            onTap: () => pushNamed(
+              context,
+              _route,
+              arguments: {"venda": venda},
+            ),
+            child: Container(
+              margin:
+                  const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
+              width: _largura,
+              height: _altura * 0.155,
+              color: cor,
+              child: Row(
                 children: <Widget>[
-                  _vendaData(_venda.data),
-                  _vendaQuantidadePrecoPorKG(_venda.quantidade, _venda.preco),
-                ]),
-            _vendaValorTotal(),
-          ],
-        ),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _vendaData(venda.data),
+                        _vendaQuantidadePrecoPorKG(
+                            venda.quantidade, venda.preco),
+                      ]),
+                  _vendaValorTotal(
+                      venda.quantidade, venda.preco, venda.cliente.nome),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -64,7 +66,7 @@ class VendasWidget extends StatelessWidget {
       height: _altura * 0.03,
       margin: const EdgeInsets.only(left: 8, top: 8),
       decoration: BoxDecoration(
-        color: const Color(0xffFDFFFF),
+        color: const Color(0xFFFDFFFF),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Center(
@@ -144,7 +146,7 @@ class VendasWidget extends StatelessWidget {
     );
   }
 
-  _vendaValorTotal() {
+  _vendaValorTotal(quantidade, preco, cliente) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.only(right: 6, top: 8),
@@ -162,14 +164,14 @@ class VendasWidget extends StatelessWidget {
                   style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                 ),
                 Text(
-                  "R\$ ${(_venda.quantidade * _venda.preco).toStringAsFixed(2)}",
+                  "R\$ ${(quantidade * preco).toStringAsFixed(2)}",
                   style:
                       const TextStyle(color: Color(0xFFFDFFFF), fontSize: 24),
                 ),
               ],
             ),
             Text(
-              _venda.cliente.nome,
+              cliente,
               style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
             ),
           ],

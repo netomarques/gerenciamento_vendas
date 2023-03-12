@@ -1,3 +1,4 @@
+import 'package:vendas_gerenciamento/api/abatimentos_api.dart';
 import 'package:vendas_gerenciamento/model/abatimento.dart';
 import 'package:vendas_gerenciamento/model/abatimentos.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
@@ -29,6 +30,10 @@ class Venda {
     return abatimentosCopia;
   }
 
+  List<Abatimento> getAbatimentosVenda() {
+    return AbatimentosApi().abatimentosVenda(id);
+  }
+
   bool isOpen() {
     bool isOpen;
     List<Abatimento> abatimentosVenda = this.abatimentosVenda();
@@ -47,6 +52,21 @@ class Venda {
     return isOpen;
   }
 
+  double getTotalEmAberto() {
+    double valorAberto = 0.0;
+    double totalAbatido = 0.0;
+
+    List<Abatimento> abatimentosVenda = getAbatimentosVenda();
+
+    for (Abatimento abatimento in abatimentosVenda) {
+      totalAbatido = abatimento.valor + totalAbatido;
+    }
+
+    valorAberto = preco * quantidade - totalAbatido;
+
+    return valorAberto;
+  }
+
   double totalEmAberto() {
     double valorAberto = 0.0;
     double totalAbatido = 0.0;
@@ -59,5 +79,9 @@ class Venda {
     valorAberto = preco * quantidade - totalAbatido;
 
     return valorAberto;
+  }
+
+  double getTotal() {
+    return preco * quantidade;
   }
 }

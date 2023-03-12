@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/model/venda.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_cliente.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_fiado.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_venda_rua.dart';
@@ -25,7 +26,14 @@ routes() {
 
       return PainelCliente(cliente);
     },
-    '/lista_pagamento': (context) => const ListaPagamento(),
+    '/lista_pagamento': (context) {
+      final Map<String, dynamic> argumnets =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+      final Venda venda = argumnets['venda'] as Venda;
+
+      return ListaPagamento(venda);
+    },
   };
   return routes;
 }

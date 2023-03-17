@@ -49,8 +49,7 @@ class VendasWidget extends StatelessWidget {
                         _vendaQuantidadePrecoPorKG(
                             venda.quantidade, venda.preco),
                       ]),
-                  _vendaValorTotal(
-                      venda.quantidade, venda.preco, venda.cliente.nome),
+                  _vendaValorTotal(venda.total(), venda.cliente.nome),
                 ],
               ),
             ),
@@ -146,7 +145,7 @@ class VendasWidget extends StatelessWidget {
     );
   }
 
-  _vendaValorTotal(quantidade, preco, cliente) {
+  _vendaValorTotal(total, cliente) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.only(right: 6, top: 8),
@@ -164,7 +163,7 @@ class VendasWidget extends StatelessWidget {
                   style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                 ),
                 Text(
-                  "R\$ ${(quantidade * preco).toStringAsFixed(2)}",
+                  "R\$ ${total.toStringAsFixed(2)}",
                   style:
                       const TextStyle(color: Color(0xFFFDFFFF), fontSize: 24),
                 ),

@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/venda.dart';
-import 'package:vendas_gerenciamento/model/vendas.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 import 'package:intl/intl.dart';
@@ -17,26 +17,24 @@ class HomePainel extends StatefulWidget {
 
 class _HomePainelState extends State<HomePainel> {
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  final DateTime _now = DateTime.now();
-  late final TextEditingController _dateStartController =
-      TextEditingController(text: _dateFormat.format(_now));
-  late final TextEditingController _dateEndController =
-      TextEditingController(text: _dateFormat.format(_now));
-  Size _size = const Size(0, 0);
-  final _vendasStreamController = StreamController<Map<String, Venda>>();
-  final _resumoStreamController =
-      StreamController<Map<String, dynamic>>.broadcast();
+  late final TextEditingController _dateStartController;
+  late final TextEditingController _dateEndController;
+  late final StreamController<List<Venda>> _vendasStreamController;
+  late final StreamController<Map<String, dynamic>> _resumoStreamController;
+  late final VendasApi vendasApi;
+  late double _largura;
+  late double _altura;
 
   @override
   void initState() {
     super.initState();
-    String now = _dateFormat.format(_now);
-    carregarVendas(now, now);
+    _carregarDados();
   }
 
   @override
   Widget build(BuildContext context) {
-    _size = MediaQuery.of(context).size;
+    _largura = MediaQuery.of(context).size.width;
+    _altura = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -51,37 +49,23 @@ class _HomePainelState extends State<HomePainel> {
       children: [
         _painel(),
         _textoInformacao(),
-        StreamBuilder<Map<String, Venda>>(
+        StreamBuilder<List<Venda>>(
           stream: _vendasStreamController.stream,
-          builder: ((context, snapshot) {
+          builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Expanded(
-                child: Text('Erro: ${snapshot.error}'),
+                child: Center(child: Text('Erro: ${snapshot.error}')),
               );
             }
 
             if (!snapshot.hasData) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
 
-            final vendas = snapshot.data!;
+            final List<Venda> vendas = snapshot.data!;
 
-            return Expanded(
-              child: ListView.builder(
-                itemCount: vendas.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  Color cor;
-                  Venda venda = vendas.values.elementAt(index);
-                  venda.isFiado() == false || venda.isOpen() == false
-                      ? cor = const Color(0xFF006940)
-                      : cor = const Color(0xff910029);
-                  return _containerVenda(venda.data, venda.quantidade,
-                      venda.preco, cor, venda.cliente.nome);
-                },
-              ),
-            );
-          }),
+            return VendasWidget(vendas, "/lista_pagamento");
+          },
         ),
         const NavButtonsFloating(),
       ],
@@ -90,8 +74,8 @@ class _HomePainelState extends State<HomePainel> {
 
   _painel() {
     return Container(
-      width: _size.width,
-      height: _size.height * 0.25,
+      width: _largura,
+      height: _altura * 0.25,
       color: const Color(0xff910029),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,7 +89,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelResumo() {
     return SizedBox(
-      width: _size.width,
+      width: _largura,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +103,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelTotal() {
     return SizedBox(
-      width: _size.width * 0.5,
+      width: _largura * 0.5,
       child: Column(
         children: <Widget>[
           Container(
@@ -159,7 +143,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelFiltroData() {
     return Container(
-      width: _size.width * 0.35,
+      width: _largura * 0.35,
       alignment: Alignment.topCenter,
       child: DateButton(
           _dateStartController.text, _dateEndController.text, carregarVendas),
@@ -168,7 +152,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelDados() {
     return SizedBox(
-      width: _size.width,
+      width: _largura,
       child: Row(
         children: <Widget>[
           _painelTotalVendas(),
@@ -180,19 +164,19 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelTotalVendas() {
     return SizedBox(
-      width: _size.width * 0.4,
+      width: _largura * 0.4,
       child: Row(
         children: <Widget>[
           Container(
             padding: const EdgeInsets.only(left: 8),
-            width: _size.width * 0.4 * 0.3,
+            width: _largura * 0.4 * 0.3,
             child: Image.asset(
               "assets/images/financial_graphic_icon.png",
-              height: _size.height * 0.05,
+              height: _altura * 0.05,
             ),
           ),
           SizedBox(
-            width: _size.width * 0.4 * 0.7,
+            width: _largura * 0.4 * 0.7,
             child: Column(
               children: <Widget>[
                 Container(
@@ -243,7 +227,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelDadosValorQuantidade() {
     return SizedBox(
-      width: _size.width * 0.6,
+      width: _largura * 0.6,
       child: StreamBuilder<Map<String, dynamic>>(
         stream: _resumoStreamController.stream,
         builder: ((context, snapshot) {
@@ -261,7 +245,7 @@ class _HomePainelState extends State<HomePainel> {
           return Row(
             children: <Widget>[
               SizedBox(
-                width: _size.width * 0.6 * 0.5,
+                width: _largura * 0.6 * 0.5,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -287,7 +271,7 @@ class _HomePainelState extends State<HomePainel> {
                 ),
               ),
               SizedBox(
-                width: _size.width * 0.6 * 0.5,
+                width: _largura * 0.6 * 0.5,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -321,7 +305,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _textoInformacao() {
     return Container(
-      width: _size.width,
+      width: _largura,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
       child: const Opacity(
@@ -335,156 +319,37 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  _containerVenda(data, quantidade, preco, cor, cliente) {
-    return GestureDetector(
-      onTap: () => {pushNamed(context, "/lista_pagamento")},
-      child: Container(
-        margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
-        width: _size.width,
-        height: _size.height * 0.155,
-        color: cor,
-        child: Row(
-          children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _vendaData(data),
-                  _vendaQuantidadePrecoPorKG(quantidade, preco),
-                ]),
-            _vendaValorTotal(quantidade * preco, cliente),
-          ],
-        ),
-      ),
-    );
-  }
-
-  _vendaData(data) {
-    return Container(
-      width: _size.width * 0.26,
-      height: _size.height * 0.03,
-      margin: const EdgeInsets.only(left: 8, top: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xffFDFFFF),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Center(
-        child: Text(
-          _dateFormat.format(data),
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF969CAF),
-          ),
-        ),
-      ),
-    );
-  }
-
-  _vendaQuantidadePrecoPorKG(quantidade, preco) {
-    return Container(
-      width: _size.width * 0.5,
-      height: 61,
-      margin: const EdgeInsets.only(left: 8, top: 8),
-      child: Row(
-        children: <Widget>[
-          Image.asset(
-            "assets/images/checkout_price_icon.png",
-          ),
-          Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Text(
-                  'Quant: ',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFFDFFFF),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    'Preço/kg: ',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Color(0xFFFDFFFF),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text(
-                  '${quantidade.toStringAsFixed(2)} Kg',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Color(0xFFFDFFFF),
-                  ),
-                ),
-                Opacity(
-                  opacity: 0.6,
-                  child: Text(
-                    'R\$ ${preco.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFFDFFFF),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  _vendaValorTotal(total, cliente) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.only(right: 6, top: 8),
-        alignment: Alignment.topRight,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  "Total",
-                  style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
-                ),
-                Text(
-                  "R\$ ${total.toStringAsFixed(2)}",
-                  style:
-                      const TextStyle(color: Color(0xFFFDFFFF), fontSize: 24),
-                ),
-              ],
-            ),
-            Text(
-              cliente,
-              style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void carregarVendas(String dateStart, String dateEnd) async {
     _dateStartController.text = dateStart;
     _dateEndController.text = dateEnd;
 
-    Map<String, Venda> vendasFiltradas = await ordenarListaPorDataDecrescente(
-        _dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
-    Map<String, dynamic> resumo = await resumoVendas(vendasFiltradas);
+    List<Venda> vendasFiltradas =
+        await vendasApi.ordenarListaPorDataDecrescente(
+            _dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
+    Map<String, dynamic> resumo = await vendasApi.resumoVendas(vendasFiltradas);
+
+    _vendasStreamController.add(vendasFiltradas);
+    _resumoStreamController.add(resumo);
+  }
+
+  void _carregarDados() async {
+    vendasApi = VendasApi();
+
+    DateTime now = DateTime.now();
+    _dateStartController = TextEditingController(text: _dateFormat.format(now));
+    _dateEndController = TextEditingController(text: _dateFormat.format(now));
+
+    _vendasStreamController = StreamController<List<Venda>>();
+    _resumoStreamController =
+        StreamController<Map<String, dynamic>>.broadcast();
+
+    // DateTime startData = _dateFormat.parse('00/00/0000');
+    List<Venda> vendasFiltradas =
+        await vendasApi.ordenarListaPorDataDecrescente(
+            _dateFormat.parse(_dateFormat.format(now)),
+            _dateFormat.parse(_dateFormat.format(now)));
+
+    Map<String, dynamic> resumo = await vendasApi.resumoVendas(vendasFiltradas);
 
     _vendasStreamController.add(vendasFiltradas);
     _resumoStreamController.add(resumo);

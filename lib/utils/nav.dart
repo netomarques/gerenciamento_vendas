@@ -9,7 +9,7 @@ import 'package:vendas_gerenciamento/pages/lista_pagamento.dart';
 import 'package:vendas_gerenciamento/pages/painel_cliente.dart';
 import 'package:vendas_gerenciamento/pages/pesquisa_cliente.dart';
 
-String route = "";
+String _route = "";
 
 routes() {
   Map<String, WidgetBuilder> routes = {
@@ -43,11 +43,12 @@ Future pushNamed(
   String routeName, {
   Object? arguments,
 }) {
-  route = routeName;
+  _route = routeName;
   return Navigator.pushNamed(context, routeName, arguments: arguments);
 }
 
 Future pushReplacementNamed(BuildContext context, String routeName) {
+  _route = routeName;
   return Navigator.pushReplacementNamed(context, routeName);
 }
 

@@ -44,7 +44,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
                 Container(
                   margin: const EdgeInsets.only(
                       top: 134, left: 24, right: 24, bottom: 8),
-                  child: const AcoesTextButton(),
+                  child: AcoesTextButton(),
                 ),
               ],
             ),

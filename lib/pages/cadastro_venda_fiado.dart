@@ -48,7 +48,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
                 Container(
                   margin: const EdgeInsets.only(
                       top: 60, left: 24, right: 24, bottom: 8),
-                  child: const AcoesTextButton(),
+                  child: AcoesTextButton(),
                 ),
               ],
             ),

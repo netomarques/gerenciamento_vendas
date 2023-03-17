@@ -123,7 +123,7 @@ class NavButtonsFloating extends StatelessWidget {
       child: TextButton(
         onPressed: () => {
           Navigator.pop(context),
-          pushNamed(context, routeName),
+          pushReplacementNamed(context, routeName),
         },
         child: Text(
           botaoTexto,

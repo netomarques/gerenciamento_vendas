@@ -392,7 +392,7 @@ class _ListaPagamentoState extends State<ListaPagamento> {
                   style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                 ),
                 Text(
-                  "R\$ ${widget._venda.getTotal().toStringAsFixed(2)}",
+                  "R\$ ${widget._venda.total().toStringAsFixed(2)}",
                   style:
                       const TextStyle(color: Color(0xFFFDFFFF), fontSize: 24),
                 ),
@@ -415,7 +415,7 @@ class _ListaPagamentoState extends State<ListaPagamento> {
 
     _abatimentosStreamController.add(abatimentoVendas);
 
-    return widget._venda.getTotalEmAberto();
+    return widget._venda.totalEmAberto();
   }
 
   @override

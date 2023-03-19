@@ -15,7 +15,7 @@ routes() {
   Map<String, WidgetBuilder> routes = {
     '/': (context) => const HomePainel(),
     '/cadastro_cliente': (context) => const CadastroCliente(),
-    '/cadastro_venda_fiado': (context) => const CadastroVendaFiado(),
+    '/cadastro_venda_fiado': (context) => CadastroVendaFiado(),
     '/cadastro_venda_rua': (context) => const CadastroVendaRua(),
     '/pesquisa_cliente': (context) => const PesquisaCliente(),
     '/painel_cliente': (context) {

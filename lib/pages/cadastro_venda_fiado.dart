@@ -1,25 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/api/vendas_api.dart';
+import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/model/venda.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
-import 'package:vendas_gerenciamento/widgets/app_text_form_field.dart';
+import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
+import 'package:intl/intl.dart';
 
 class CadastroVendaFiado extends StatefulWidget {
-  const CadastroVendaFiado({super.key});
+  final Cliente cliente = VendasApi().clientes.values.elementAt(2);
+
+  CadastroVendaFiado({super.key});
 
   @override
   State<CadastroVendaFiado> createState() => _CadastroVendaFiadoState();
 }
 
 class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
-  Size size = const Size(0, 0);
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _valorTotalController;
+  late final TextEditingController _dataVendaController;
+  late final TextEditingController _descontoController;
+  late Venda _venda;
+
+  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
+
+  late double _largura;
+  late double _altura;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarDados();
+  }
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
+    _largura = MediaQuery.of(context).size.width;
+    _altura = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.dashboard,
+              color: Color(0xFFEB710A),
+            ),
+            onPressed: () {
+              pushReplacementNamed(context, '/');
+            },
+          ),
+        ],
       ),
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: _body(),
     );
   }
@@ -35,20 +69,67 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
             child: ListView(
               shrinkWrap: true,
               children: [
-                _containerText(
-                    const AppTextFormField("Paula Tejano", "Cliente")),
-                _containerText(
-                    const AppTextFormField("Informe o valor", "Valor R\$")),
-                _containerText(
-                    const AppTextFormField("Informe o data", "Data da venda")),
-                _containerText(const AppTextFormField(
-                    "Informe a quantidade", "Quantidade (Kg)")),
-                _containerText(
-                    const AppTextFormField("Informe o preço/Kg", "Preço/Kg")),
-                Container(
-                  margin: const EdgeInsets.only(
-                      top: 60, left: 24, right: 24, bottom: 8),
-                  child: AcoesTextButton(),
+                _containerCliente(),
+                _containerValorTotal(),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _containerTextForm(
+                        AppTextFormField2(
+                          '01/01/01',
+                          'Data',
+                          TextInputType.datetime,
+                          _validatorData,
+                          _onSavedData,
+                          onTap: _showDatePicker,
+                          controller: _dataVendaController,
+                          isReadOnly: true,
+                        ),
+                      ),
+                      _containerTextForm(
+                        AppTextFormField2(
+                          '0.00',
+                          'Quantidade(Kg)',
+                          TextInputType.number,
+                          _validatorQuantidade,
+                          _onSavedQuantidade,
+                          onChanged: _onChangedQuantidade,
+                        ),
+                      ),
+                      _containerTextForm(
+                        AppTextFormField2(
+                          '0.00',
+                          'Preço/Kg',
+                          TextInputType.number,
+                          _validatorPreco,
+                          _onSavedPreco,
+                          onChanged: _onChangedPreco,
+                        ),
+                      ),
+                      _containerTextForm(
+                        AppTextFormField2(
+                          '0.00',
+                          'Desconto',
+                          TextInputType.number,
+                          _validatorDesconto,
+                          _onSavedDesconto,
+                          onChanged: _onChangedDesconto,
+                          controller: _descontoController,
+                        ),
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 60, bottom: 8),
+                          child: AcoesTextButton(
+                            onFunction: _submitForm,
+                            text: 'Cadastrar Venda',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -58,19 +139,80 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
     );
   }
 
-  _containerText(widget) {
-    return Container(
-      height: size.height * 0.075,
-      margin: const EdgeInsets.only(left: 16, top: 20, right: 32),
-      child: widget,
+  _containerValorTotal() {
+    return _containerTextForm(
+      TextField(
+        controller: _valorTotalController,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Color(0xFF006940),
+        ),
+        decoration: InputDecoration(
+          labelText: 'Total',
+          labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF910029)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 10.0,
+          ),
+          filled: true,
+          fillColor: const Color(0xFFFDFFFF).withOpacity(0.75),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(32.0),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(32.0),
+            borderSide: const BorderSide(
+              color: Color(0xFF006940),
+              width: 1.0,
+            ),
+          ),
+        ),
+        enabled: false,
+      ),
+    );
+  }
+
+  _containerCliente() {
+    return _containerTextForm(
+      TextField(
+        controller: TextEditingController(
+            text: "${widget.cliente.nome} - ${widget.cliente.telefone}"),
+        style: const TextStyle(
+          fontSize: 14,
+          color: Color(0xFF006940),
+        ),
+        decoration: InputDecoration(
+          labelText: 'Cliente',
+          labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF910029)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 10.0,
+          ),
+          filled: true,
+          fillColor: const Color(0xFFFDFFFF).withOpacity(0.75),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(32.0),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(32.0),
+            borderSide: const BorderSide(
+              color: Color(0xFF006940),
+              width: 1.0,
+            ),
+          ),
+        ),
+        enabled: false,
+      ),
     );
   }
 
   _tituloForm() {
     return Container(
-      width: size.width,
-      height: size.height * 0.1,
-      color: const Color(0xff910029),
+      width: _largura,
+      height: _altura * 0.1,
+      color: const Color(0xFF910029),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: const Text(
         'Venda (Fiado)',
@@ -80,5 +222,256 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
         ),
       ),
     );
+  }
+
+  _containerTextForm(widget) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
+      child: widget,
+    );
+  }
+
+  void _onSavedPreco(String value) {
+    _venda.preco = double.parse(value);
+  }
+
+  String? _validatorPreco(String? value) {
+    try {
+      if (value == null || value.isEmpty) {
+        return 'Por favor, informe o preço do quilo';
+      } else {
+        double.parse(value);
+      }
+    } on FormatException {
+      return 'Por favor, informe um valor numérico válido para o preço';
+    } catch (e) {
+      return 'Erro ao validar preço';
+    }
+
+    return null;
+  }
+
+  String? _onChangedPreco(String? value) {
+    String? error = _validatorPreco(value);
+
+    try {
+      if (error != null) {
+        return error;
+      } else {
+        _venda.preco = double.parse(value!);
+        _atualizaValorTotal();
+      }
+    } catch (e) {
+      return 'Erro não identificado';
+    }
+    return null;
+  }
+
+  void _onSavedQuantidade(String value) {
+    _venda.quantidade = double.parse(value);
+  }
+
+  String? _validatorQuantidade(String? value) {
+    try {
+      if (value == null || value.isEmpty) {
+        return 'Por favor, informe a quantidade vendida';
+      }
+      double.parse(value);
+    } on FormatException {
+      return 'Por favor, informe um valor numérico válido para a quantidade vendida';
+    } catch (e) {
+      return 'Erro ao validar Quantidade';
+    }
+
+    return null;
+  }
+
+  String? _onChangedQuantidade(String? value) {
+    String? error = _validatorQuantidade(value);
+
+    try {
+      if (error != null) {
+        return error;
+      } else {
+        _venda.quantidade = double.parse(value!);
+        _atualizaValorTotal();
+      }
+    } catch (e) {
+      return 'Erro não identificado';
+    }
+
+    return null;
+  }
+
+  void _onSavedData(String value) {
+    final DateFormat dateFormatBanco = DateFormat('yyyy/MM/dd');
+
+    _venda.data =
+        dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
+  }
+
+  String? _validatorData(String? value) {
+    final DateFormat dateFormatBanco = DateFormat('yyyy/MM/dd');
+
+    try {
+      if (value == null || value.isEmpty) {
+        return 'Por favor, informe a data da venda';
+      } else {
+        dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
+      }
+    } catch (e) {
+      return 'Por favor, verifique o formato da data da venda';
+    }
+
+    return null;
+  }
+
+  void _onSavedDesconto(String value) {
+    _venda.desconto = double.parse(value);
+  }
+
+  String? _validatorDesconto(String? value) {
+    try {
+      if (value == null || value.isEmpty) {
+        return 'Por favor, informe o desconto';
+      }
+
+      double.parse(value);
+    } on FormatException {
+      return 'Por favor, informe um valor numérico válido para o desconto';
+    } catch (e) {
+      return 'erro não identificado';
+    }
+
+    return null;
+  }
+
+  String? _onChangedDesconto(String? value) {
+    String? error = _validatorDesconto(value);
+
+    try {
+      if (error != null) {
+        return error;
+      }
+      _venda.desconto = double.parse(value!);
+      _atualizaValorTotal();
+    } on FormatException {
+      return 'Por favor, informe um valor numérico válido para o desconto';
+    } catch (e) {
+      return 'Erro não identificado';
+    }
+
+    return null;
+  }
+
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        Venda venda = Venda(
+            id: VendasApi().gerarId(),
+            quantidade: _venda.quantidade,
+            preco: _venda.preco,
+            data: _venda.data,
+            desconto: _venda.desconto,
+            cliente: _venda.cliente);
+        VendasApi().adicionarVenda(venda);
+        _exibirDialog('Venda cadastrada com sucesso');
+        _formKey.currentState!.reset();
+        _limparCampos();
+      } catch (e) {
+        print('Erro ao salvar venda: ${e.toString().toUpperCase()}');
+        _exibirDialog('Erro ao salvar venda');
+      }
+    }
+  }
+
+  _containerText(widget) {
+    return Container(
+      height: _altura * 0.075,
+      margin: const EdgeInsets.only(left: 16, top: 20, right: 32),
+      child: widget,
+    );
+  }
+
+  void _limparCampos() {
+    _venda = Venda(
+      id: 0,
+      quantidade: 0.0,
+      preco: 0.0,
+      data: DateTime.now(),
+      cliente: widget.cliente,
+      desconto: 0.0,
+    );
+    _dataVendaController.text = _dateFormat.format(_venda.data);
+    _descontoController.text = '${_venda.desconto}';
+    _atualizaValorTotal();
+  }
+
+  void _exibirDialog(String mensagem) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Mensagem'),
+          content: Text(mensagem),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _atualizaValorTotal() {
+    _valorTotalController.text = 'R\$ ${_venda.total().toStringAsFixed(2)}';
+  }
+
+  void _showDatePicker() async {
+    DateTime selectDate = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      initialDate: selectDate,
+      builder: (context, child) {
+        return Column(
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400.0,
+              ),
+              child: child,
+            )
+          ],
+        );
+      },
+    );
+
+    if (picked != null && picked != selectDate) {
+      _dataVendaController.text = _dateFormat.format(picked);
+    }
+  }
+
+  void _carregarDados() {
+    _venda = Venda(
+      id: 0,
+      quantidade: 0.0,
+      preco: 0.0,
+      data: DateTime.now(),
+      cliente: widget.cliente,
+      desconto: 0.0,
+    );
+
+    _valorTotalController = TextEditingController();
+    _descontoController = TextEditingController();
+    _dataVendaController =
+        TextEditingController(text: _dateFormat.format(_venda.data));
+
+    _atualizaValorTotal();
   }
 }

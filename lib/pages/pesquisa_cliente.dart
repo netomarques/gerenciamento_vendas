@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
-import 'package:vendas_gerenciamento/model/clientes.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 
@@ -14,15 +14,14 @@ class PesquisaCliente extends StatefulWidget {
 }
 
 class _PesquisaClienteState extends State<PesquisaCliente> {
-  final _clientesStreamController = StreamController<List<Cliente>>();
-  late List<Cliente> _clientesCopia;
-  double _largura = 0.0;
-  double _altura = 0.0;
+  late final StreamController<List<Cliente>> _clientesStreamController;
+  late double _largura;
+  late double _altura;
 
   @override
   void initState() {
     super.initState();
-    _carregarClientes();
+    _carregarDados();
   }
 
   @override
@@ -75,7 +74,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
                       ),
                     );
                   },
-                  itemCount: _clientesCopia.length,
+                  itemCount: snapshot.data!.length,
                 ),
               );
             }),
@@ -168,8 +167,15 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
   }
 
   void _carregarClientes() {
-    _clientesCopia = clientes.values.toList();
-    _clientesStreamController.add(_clientesCopia);
+    List<Cliente> clientes = VendasApi().clientes.values.toList();
+    _clientesStreamController.add(clientes);
+  }
+
+  void _carregarDados() {
+    _clientesStreamController = StreamController<List<Cliente>>();
+
+    List<Cliente> clientes = VendasApi().clientes.values.toList();
+    _clientesStreamController.add(clientes);
   }
 
   @override

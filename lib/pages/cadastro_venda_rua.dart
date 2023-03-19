@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/api/vendas_api.dart';
-import 'package:vendas_gerenciamento/model/clientes.dart';
+import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/model/venda.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 import 'package:intl/intl.dart';
-import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 
 class CadastroVendaRua extends StatefulWidget {
   const CadastroVendaRua({super.key});
@@ -21,6 +20,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   late final TextEditingController _dataVendaController;
   late final TextEditingController _descontoController;
   late Venda _venda;
+  late final Cliente _cliente;
 
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
 
@@ -379,12 +379,14 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _carregarDados() {
+    _cliente = VendasApi().clientes.values.elementAt(0);
+
     _venda = Venda(
       id: 0,
       quantidade: 0.0,
       preco: 0.0,
       data: DateTime.now(),
-      cliente: clientes.values.elementAt(0),
+      cliente: _cliente,
       desconto: 0.0,
     );
 
@@ -402,7 +404,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
       quantidade: 0.0,
       preco: 0.0,
       data: DateTime.now(),
-      cliente: clientes.values.elementAt(0),
+      cliente: _cliente,
       desconto: 0.0,
     );
     _dataVendaController.text = _dateFormat.format(_venda.data);

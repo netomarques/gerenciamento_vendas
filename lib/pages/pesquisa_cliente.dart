@@ -15,6 +15,7 @@ class PesquisaCliente extends StatefulWidget {
 
 class _PesquisaClienteState extends State<PesquisaCliente> {
   late final StreamController<List<Cliente>> _clientesStreamController;
+  late final List<Cliente> _clientes;
   late double _largura;
   late double _altura;
 
@@ -116,11 +117,12 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
         color: const Color(0xFFFDFFFF),
         borderRadius: BorderRadius.circular(32),
       ),
-      child: TextFormField(
+      child: TextField(
         style: const TextStyle(
           fontSize: 14,
           color: Color(0xFF910029),
         ),
+        onChanged: _carregarClientes,
         decoration: InputDecoration(
           icon: Image.asset(
             "assets/images/find_search_icon.png",
@@ -166,16 +168,18 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
     );
   }
 
-  void _carregarClientes() {
-    List<Cliente> clientes = VendasApi().clientes.values.toList();
-    _clientesStreamController.add(clientes);
+  void _carregarClientes(String nome) {
+    List<Cliente> clientesFiltrados = _clientes
+        .where((cliente) =>
+            cliente.nome.toLowerCase().startsWith(nome.toLowerCase()))
+        .toList();
+    _clientesStreamController.add(clientesFiltrados);
   }
 
   void _carregarDados() {
     _clientesStreamController = StreamController<List<Cliente>>();
-
-    List<Cliente> clientes = VendasApi().clientes.values.toList();
-    _clientesStreamController.add(clientes);
+    _clientes = VendasApi().clientes.values.toList();
+    _clientesStreamController.add(_clientes);
   }
 
   @override

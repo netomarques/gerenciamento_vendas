@@ -411,12 +411,20 @@ class VendasApi {
     _vendas[venda.id.toString()] = venda;
   }
 
+  void adicionarCliente(Cliente cliente) {
+    _clientes[cliente.id.toString()] = cliente;
+  }
+
   void removerVenda(int idVenda) {
     _vendas.remove(idVenda.toString());
   }
 
   int gerarId() {
     return _vendas.values.last.id + 1;
+  }
+
+  int gerarIdCliente() {
+    return _clientes.values.last.id + 1;
   }
 
   List<Abatimento> abatimentosVenda(int idVenda) {

@@ -20,7 +20,7 @@ class NavButtonsFloating extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButton(
+          _floatingActionButtonReplacement(
               "Cadastro de cliente",
               "assets/images/account_client_icon.png",
               context,
@@ -61,6 +61,24 @@ class NavButtonsFloating extends StatelessWidget {
       backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
       onPressed: () => pushNamed(context, routeName),
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Image.asset(
+        icon,
+        height: MediaQuery.of(context).size.height * 0.06,
+      ),
+    );
+  }
+  
+  _floatingActionButtonReplacement(
+      String tooltip, String icon, BuildContext context, String routeName) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: const Color(0xFF17CA84),
+      tooltip: tooltip,
+      onPressed: () => pushReplacementNamed(context, routeName),
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: Color(0xFF910029)),
         borderRadius: BorderRadius.circular(100),

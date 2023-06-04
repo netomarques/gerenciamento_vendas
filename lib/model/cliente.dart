@@ -1,8 +1,8 @@
 class Cliente {
-  final int id;
-  final String nome;
-  final String telefone;
-  final String cpf;
+  int id;
+  String nome;
+  String telefone;
+  String cpf;
 
   Cliente(
       {required this.id,

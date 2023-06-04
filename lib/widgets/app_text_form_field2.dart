@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTextFormField2 extends StatelessWidget {
   final String _hintText;
@@ -10,6 +11,7 @@ class AppTextFormField2 extends StatelessWidget {
   final Function()? onTap;
   final TextEditingController? controller;
   final bool? isReadOnly;
+  final List<TextInputFormatter>? formato;
 
   const AppTextFormField2(
     this._hintText,
@@ -21,6 +23,7 @@ class AppTextFormField2 extends StatelessWidget {
     this.onTap,
     this.controller,
     this.isReadOnly = false,
+    this.formato,
     Key? key,
   }) : super(key: key);
 
@@ -67,6 +70,7 @@ class AppTextFormField2 extends StatelessWidget {
       onChanged: (value) => onChanged?.call(value),
       readOnly: isReadOnly!,
       onTap: onTap,
+      inputFormatters: formato,
     );
   }
 }

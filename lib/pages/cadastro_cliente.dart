@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:vendas_gerenciamento/utils/telefone_formato.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 import 'package:intl/intl.dart';
@@ -87,6 +89,10 @@ class _CadastroClienteState extends State<CadastroCliente> {
                           TextInputType.number,
                           _validatorTelefone,
                           _onSavedTelefone,
+                          formato: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            TelefoneFormato(),
+                          ],
                         ),
                       ),
                       _containerTextForm(
@@ -165,6 +171,12 @@ class _CadastroClienteState extends State<CadastroCliente> {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o telefone';
+      }
+
+      int qtdeNumeroTelefone =
+          value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '').length;
+      if ((qtdeNumeroTelefone != 10 && qtdeNumeroTelefone != 11)) {
+        return 'Telefone incorreto, deve conter 10 ou 11 números';
       }
     } catch (e) {
       return 'erro não identificado';

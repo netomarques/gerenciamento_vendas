@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/pages/formatters/cnpj_formato.dart';
+import 'package:vendas_gerenciamento/pages/formatters/cpf_formato.dart';
+import 'package:vendas_gerenciamento/pages/formatters/cpf_ou_cnpj_formato.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
-import 'package:vendas_gerenciamento/utils/telefone_formato.dart';
+import 'package:vendas_gerenciamento/pages/formatters/telefone_formato.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 import 'package:intl/intl.dart';
@@ -97,11 +100,15 @@ class _CadastroClienteState extends State<CadastroCliente> {
                       ),
                       _containerTextForm(
                         AppTextFormField2(
-                          'Informe o CPF',
-                          'CPF',
+                          'Informe o CPF/CNPJ',
+                          'CPF/CNPJ',
                           TextInputType.number,
                           _validatorCpf,
                           _onSavedCpf,
+                          formato: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
+                          ],
                         ),
                       ),
                       Center(
@@ -164,7 +171,8 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _cliente.telefone = value;
+    print(value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
+    _cliente.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorTelefone(String? value) {
@@ -176,7 +184,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
       int qtdeNumeroTelefone =
           value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '').length;
       if ((qtdeNumeroTelefone != 10 && qtdeNumeroTelefone != 11)) {
-        return 'Telefone incorreto, deve conter 10 ou 11 números';
+        return 'Telefone deve ter 10 ou 11 números';
       }
     } catch (e) {
       return 'erro não identificado';
@@ -186,13 +194,19 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _cliente.cpf = value;
+    _cliente.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorCpf(String? value) {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o CPF';
+      }
+
+      int qtdeNumeroCpfOuCnpj =
+          value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '').length;
+      if ((qtdeNumeroCpfOuCnpj != 11 && qtdeNumeroCpfOuCnpj != 14)) {
+        return 'CPF deve ter 11 números ou CNPJ 14 números';
       }
     } catch (e) {
       return 'erro não identificado';

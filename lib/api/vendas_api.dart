@@ -415,6 +415,10 @@ class VendasApi {
     _clientes[cliente.id.toString()] = cliente;
   }
 
+  void alterarCliente(Cliente cliente) {
+    _clientes.update(cliente.id.toString(), (value) => cliente);
+  }
+
   void removerVenda(int idVenda) {
     _vendas.remove(idVenda.toString());
   }

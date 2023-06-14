@@ -5,27 +5,25 @@ import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cnpj_formato.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cpf_formato.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cpf_ou_cnpj_formato.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/pages/formatters/telefone_formato.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:intl/intl.dart';
 
-class CadastroCliente extends StatefulWidget {
-  const CadastroCliente({super.key});
+class AlterarCliente extends StatefulWidget {
+  final Cliente _cliente;
+  const AlterarCliente(this._cliente, {super.key});
 
   @override
-  State<CadastroCliente> createState() => _CadastroClienteState();
+  State<AlterarCliente> createState() => _AlterarClienteState();
 }
 
-class _CadastroClienteState extends State<CadastroCliente> {
+class _AlterarClienteState extends State<AlterarCliente> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _textNomeController;
+  late Cliente _clienteAlterado;
+  late TextEditingController _textNomeController;
   late final TextEditingController _textTelefoneController;
   late final TextEditingController _textCpfController;
-  late Cliente _cliente;
-
-  // final DateFormat _dateFormat = DateFormat('dd/MM/yy');
 
   late double _largura;
   late double _altura;
@@ -83,6 +81,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
                           TextInputType.text,
                           _validatorNome,
                           _onSavedNome,
+                          controller: _textNomeController,
                         ),
                       ),
                       _containerTextForm(
@@ -92,6 +91,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
                           TextInputType.number,
                           _validatorTelefone,
                           _onSavedTelefone,
+                          controller: _textTelefoneController,
                           formato: [
                             FilteringTextInputFormatter.digitsOnly,
                             TelefoneFormato(),
@@ -105,6 +105,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
                           TextInputType.number,
                           _validatorCpf,
                           _onSavedCpf,
+                          controller: _textCpfController,
                           formato: [
                             FilteringTextInputFormatter.digitsOnly,
                             CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
@@ -116,7 +117,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
                           padding: const EdgeInsets.only(top: 60, bottom: 8),
                           child: AcoesTextButton(
                             onFunction: _submitForm,
-                            text: 'Cadastrar Cliente',
+                            text: 'Salvar modificação',
                           ),
                         ),
                       ),
@@ -138,7 +139,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
       color: const Color(0xff910029),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: const Text(
-        'Cadastro de Cliente',
+        'Alterar Cliente',
         style: TextStyle(
           color: Color(0xffFDFFFF),
           fontSize: 30,
@@ -155,7 +156,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedNome(String value) {
-    _cliente.nome = value;
+    _clienteAlterado.nome = value;
   }
 
   String? _validatorNome(String? value) {
@@ -171,7 +172,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _cliente.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    _clienteAlterado.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorTelefone(String? value) {
@@ -193,7 +194,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _cliente.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    _clienteAlterado.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorCpf(String? value) {
@@ -218,17 +219,15 @@ class _CadastroClienteState extends State<CadastroCliente> {
     if (_formKey.currentState!.validate()) {
       try {
         _formKey.currentState!.save();
-        Cliente cliente = Cliente(
-          id: VendasApi().gerarIdCliente(),
-          nome: _cliente.nome,
-          telefone: _cliente.telefone,
-          cpf: _cliente.cpf,
-        );
-        VendasApi().adicionarCliente(cliente);
-        _exibirDialog('Cliente cadastrado com sucesso');
+        widget._cliente.nome = _clienteAlterado.nome;
+        widget._cliente.telefone = _clienteAlterado.telefone;
+        widget._cliente.cpf = _clienteAlterado.cpf;
+        VendasApi().alterarCliente(widget._cliente);
+        _exibirDialog('Cliente alterado com sucesso');
         _formKey.currentState!.reset();
-        _limparCampos();
+        //_limparCampos();
       } catch (e) {
+        print('Erro ao cadastrar cliente: ${e.toString().toUpperCase()}');
         _exibirDialog('Erro ao cadastrar cliente');
       }
     }
@@ -254,27 +253,34 @@ class _CadastroClienteState extends State<CadastroCliente> {
     );
   }
 
-  void _limparCampos() {
-    _cliente = Cliente(id: 0, nome: "nome", telefone: "92999999999");
+  void _carregarDados() {
+    _clienteAlterado = Cliente(
+        id: widget._cliente.id,
+        nome: widget._cliente.nome,
+        telefone: widget._cliente.telefone,
+        cpf: widget._cliente.cpf);
 
-    _textNomeController.text = _cliente.nome;
-    _textTelefoneController.text = _cliente.telefone;
-    _textCpfController.text = _cliente.cpf;
+    _textNomeController = TextEditingController(text: _clienteAlterado.nome);
+    _textTelefoneController = TextEditingController(
+        text: _formatarCampo(_clienteAlterado.telefone, TelefoneFormato()));
+    _textCpfController = TextEditingController(
+        text: _formatarCampo(_clienteAlterado.cpf,
+            CpfOuCnpjFormato([CpfFormato(), CnpjFormato()])));
   }
 
-  void _carregarDados() {
-    _cliente = Cliente(id: 0, nome: "nome", telefone: "92999999999");
-
-    _textNomeController = TextEditingController();
-    _textTelefoneController = TextEditingController();
-    _textCpfController = TextEditingController();
+  //Formatar campos ao carregar dados
+  String _formatarCampo(String text, TextInputFormatter formato) {
+    return formato
+        .formatEditUpdate(
+            TextEditingValue(text: text), TextEditingValue(text: text))
+        .text;
   }
 
   @override
   void dispose() {
-    _textNomeController.dispose();
-    _textTelefoneController.dispose();
     _textCpfController.dispose();
+    _textTelefoneController.dispose();
+    _textNomeController.dispose();
     super.dispose();
   }
 }

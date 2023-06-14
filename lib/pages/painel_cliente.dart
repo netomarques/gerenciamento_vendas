@@ -5,6 +5,7 @@ import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/model/venda.dart';
 import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
+import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:intl/intl.dart';
 
@@ -115,11 +116,15 @@ class _PainelClienteState extends State<PainelCliente> {
             ],
           ),
         ),
-        Container(
-          margin: EdgeInsets.only(top: 8, left: _largura * 0.40),
-          child: Image.asset(
-            "assets/images/client_avatar_icon.png",
-            height: _altura * 0.1,
+        GestureDetector(
+          onTap: () => pushNamed(context, "/alterar_cliente",
+              arguments: {"cliente": widget._cliente}),
+          child: Container(
+            margin: EdgeInsets.only(top: 8, left: _largura * 0.40),
+            child: Image.asset(
+              "assets/images/client_avatar_icon.png",
+              height: _altura * 0.1,
+            ),
           ),
         ),
       ],

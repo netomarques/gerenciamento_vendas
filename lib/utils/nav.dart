@@ -39,9 +39,9 @@ routes() {
       final Map<String, dynamic> argumnets =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-      final Venda venda = argumnets['venda'] as Venda;
+      final venda = argumnets['id_venda'] as int;
 
-      return ListaPagamento(venda);
+      return ListaPagamento(venda: venda as Venda);
     },
   };
   return routes;

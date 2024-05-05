@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class NavButtonsFloating extends StatelessWidget {
+class NavButtonsFloating extends ConsumerWidget {
+  static NavButtonsFloating builder(
+          BuildContext context, GoRouterState state) =>
+      const NavButtonsFloating();
+
   const NavButtonsFloating({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -20,11 +27,8 @@ class NavButtonsFloating extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButtonReplacement(
-              "Cadastro de cliente",
-              "assets/images/account_client_icon.png",
-              context,
-              "/cadastro_cliente"),
+          _floatingActionButtonReplacementRiver("Cadastro de cliente",
+              "assets/images/account_client_icon.png", context),
           _botaoDialogVenda(
               "Venda", "assets/images/buy_shop_icon.png", context),
           _floatingActionButton(
@@ -71,7 +75,7 @@ class NavButtonsFloating extends StatelessWidget {
       ),
     );
   }
-  
+
   _floatingActionButtonReplacement(
       String tooltip, String icon, BuildContext context, String routeName) {
     return FloatingActionButton(
@@ -79,6 +83,24 @@ class NavButtonsFloating extends StatelessWidget {
       backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
       onPressed: () => pushReplacementNamed(context, routeName),
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Image.asset(
+        icon,
+        height: MediaQuery.of(context).size.height * 0.06,
+      ),
+    );
+  }
+
+  _floatingActionButtonReplacementRiver(
+      String tooltip, String icon, BuildContext context) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: const Color(0xFF17CA84),
+      tooltip: tooltip,
+      onPressed: () => context.push(RouteLocation.pesquisaCliente),
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: Color(0xFF910029)),
         borderRadius: BorderRadius.circular(100),

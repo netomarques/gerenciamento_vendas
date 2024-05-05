@@ -156,7 +156,7 @@ class _AlterarClienteState extends State<AlterarCliente> {
   }
 
   void _onSavedNome(String value) {
-    _clienteAlterado.nome = value;
+    // _clienteAlterado.nome = value;
   }
 
   String? _validatorNome(String? value) {
@@ -172,7 +172,7 @@ class _AlterarClienteState extends State<AlterarCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _clienteAlterado.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    // _clienteAlterado.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorTelefone(String? value) {
@@ -194,7 +194,7 @@ class _AlterarClienteState extends State<AlterarCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _clienteAlterado.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    // _clienteAlterado.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorCpf(String? value) {
@@ -219,9 +219,9 @@ class _AlterarClienteState extends State<AlterarCliente> {
     if (_formKey.currentState!.validate()) {
       try {
         _formKey.currentState!.save();
-        widget._cliente.nome = _clienteAlterado.nome;
-        widget._cliente.telefone = _clienteAlterado.telefone;
-        widget._cliente.cpf = _clienteAlterado.cpf;
+        // widget._cliente.nome = _clienteAlterado.nome;
+        // widget._cliente.telefone = _clienteAlterado.telefone;
+        // widget._cliente.cpf = _clienteAlterado.cpf;
         VendasApi().alterarCliente(widget._cliente);
         _exibirDialog('Cliente alterado com sucesso');
         _formKey.currentState!.reset();

@@ -55,7 +55,7 @@ class VendasApi {
       quantidade: 24.60,
       preco: 12.00,
       desconto: 0.2,
-      data: DateTime.now(),
+      date: DateTime.now(),
       cliente: Cliente(
         id: 1,
         nome: "RUA",
@@ -67,7 +67,7 @@ class VendasApi {
       quantidade: 299.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 1, 1),
+      date: DateTime(2023, 1, 1),
       cliente: Cliente(
         id: 2,
         nome: "Jose Costa Larga",
@@ -80,7 +80,7 @@ class VendasApi {
       quantidade: 58.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 15),
+      date: DateTime(2023, 2, 15),
       cliente: Cliente(
         id: 1,
         nome: "RUA",
@@ -92,7 +92,7 @@ class VendasApi {
       quantidade: 81.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 1, 28),
+      date: DateTime(2023, 1, 28),
       cliente: Cliente(
         id: 1,
         nome: "RUA",
@@ -104,7 +104,7 @@ class VendasApi {
       quantidade: 80.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 5),
+      date: DateTime(2023, 2, 5),
       cliente: Cliente(
         id: 2,
         nome: "Jose Costa Larga",
@@ -117,7 +117,7 @@ class VendasApi {
       quantidade: 4.50,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 19),
+      date: DateTime(2023, 2, 19),
       cliente: Cliente(
         id: 4,
         nome: "Cuca Beludo",
@@ -129,7 +129,7 @@ class VendasApi {
       quantidade: 4.50,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 1, 31),
+      date: DateTime(2023, 1, 31),
       cliente: Cliente(
         id: 1,
         nome: "RUA",
@@ -140,7 +140,7 @@ class VendasApi {
       id: 8,
       quantidade: 150.00,
       preco: 12.00,
-      data: DateTime(2023, 2, 14),
+      date: DateTime(2023, 2, 14),
       desconto: 0.0,
       cliente: Cliente(
         id: 4,
@@ -152,7 +152,7 @@ class VendasApi {
       id: 9,
       quantidade: 48.00,
       preco: 12.00,
-      data: DateTime(2023, 2, 22),
+      date: DateTime(2023, 2, 22),
       desconto: 0.0,
       cliente: Cliente(
         id: 1,
@@ -165,7 +165,7 @@ class VendasApi {
       quantidade: 85.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 7),
+      date: DateTime(2023, 2, 7),
       cliente: Cliente(
         id: 5,
         nome: "Dayde Costa",
@@ -178,7 +178,7 @@ class VendasApi {
       quantidade: 26.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 19),
+      date: DateTime(2023, 2, 19),
       cliente: Cliente(
         id: 6,
         nome: "Melbi Lau",
@@ -191,7 +191,7 @@ class VendasApi {
       quantidade: 13.50,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 1, 27),
+      date: DateTime(2023, 1, 27),
       cliente: Cliente(
         id: 5,
         nome: "Dayde Costa",
@@ -204,7 +204,7 @@ class VendasApi {
       quantidade: 4.70,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 10),
+      date: DateTime(2023, 2, 10),
       cliente: Cliente(
         id: 5,
         nome: "Dayde Costa",
@@ -217,7 +217,7 @@ class VendasApi {
       quantidade: 8.70,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 1, 31),
+      date: DateTime(2023, 1, 31),
       cliente: Cliente(
         id: 6,
         nome: "Melbi Lau",
@@ -230,7 +230,7 @@ class VendasApi {
       quantidade: 67.00,
       preco: 12.00,
       desconto: 0.0,
-      data: DateTime(2023, 2, 15),
+      date: DateTime(2023, 2, 15),
       cliente: Cliente(
         id: 6,
         nome: "Melbi Lau",
@@ -347,13 +347,13 @@ class VendasApi {
         .add(const Duration(days: 1));
 
     var sortedKeys = _vendas.keys.toList(growable: false)
-      ..sort((k1, k2) => _vendas[k2]!.data.isAfter(_vendas[k1]!.data) ? 1 : -1);
+      ..sort((k1, k2) => _vendas[k2]!.date.isAfter(_vendas[k1]!.date) ? 1 : -1);
 
     Map<String, Venda> vendasFiltradas = <String, Venda>{};
     vendasFiltradas = {for (var key in sortedKeys) key: _vendas[key]!};
 
     return vendasFiltradas.values
-        .where((venda) => venda.data.isAfter(start) && venda.data.isBefore(end))
+        .where((venda) => venda.date.isAfter(start) && venda.date.isBefore(end))
         .toList();
   }
 
@@ -369,11 +369,11 @@ class VendasApi {
       switch (venda.isFiado()) {
         case true:
           quantVendaFiado += 1;
-          totalVendaFiado += venda.total();
+          // totalVendaFiado += venda.total!;
           break;
         case false:
           quantVendaRua += 1;
-          totalVendaRua += venda.total();
+          // totalVendaRua += venda.total!;
           break;
       }
     }
@@ -424,11 +424,11 @@ class VendasApi {
   }
 
   int gerarId() {
-    return _vendas.values.last.id + 1;
+    return _vendas.values.last.id! + 1;
   }
 
   int gerarIdCliente() {
-    return _clientes.values.last.id + 1;
+    return _clientes.values.last.id! + 1;
   }
 
   List<Abatimento> abatimentosVenda(int idVenda) {

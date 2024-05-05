@@ -1,23 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:vendas_gerenciamento/utils/extensions.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PesquisaCliente extends StatefulWidget {
+class PesquisaCliente extends ConsumerStatefulWidget {
+  static PesquisaCliente builder(BuildContext context, GoRouterState state) =>
+      const PesquisaCliente();
+
   const PesquisaCliente({super.key});
 
   @override
-  State<PesquisaCliente> createState() => _PesquisaClienteState();
+  ConsumerState<PesquisaCliente> createState() => _PesquisaClienteState();
 }
 
-class _PesquisaClienteState extends State<PesquisaCliente> {
+class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
   late final StreamController<List<Cliente>> _clientesStreamController;
   late final List<Cliente> _clientes;
-  late double _largura;
-  late double _altura;
+  late Size _deviceSize;
+  late ClienteState _clienteState;
 
   @override
   void initState() {
@@ -27,8 +33,9 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
-    _altura = MediaQuery.of(context).size.height;
+    _deviceSize = context.devicesize;
+    _clienteState = ref.watch(clienteProvider);
+    _carregarClientes();
 
     return Scaffold(
       appBar: AppBar(
@@ -88,8 +95,8 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
 
   _tituloForm() {
     return Container(
-      width: _largura,
-      height: _altura * 0.1,
+      width: _deviceSize.width,
+      height: _deviceSize.height * 0.1,
       color: const Color(0xff910029),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: const Text(
@@ -104,7 +111,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
 
   _containerText() {
     return Container(
-      height: _altura * 0.08,
+      height: _deviceSize.height * 0.08,
       margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
       child: _textForm("Nome", "Nome do cliente"),
     );
@@ -122,11 +129,11 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
           fontSize: 14,
           color: Color(0xFF910029),
         ),
-        onChanged: _carregarClientes,
+        onChanged: _pesquisarClientesPorNome,
         decoration: InputDecoration(
           icon: Image.asset(
             "assets/images/find_search_icon.png",
-            height: _altura * 0.05,
+            height: _deviceSize.height * 0.05,
           ),
           labelText: labelText,
           labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
@@ -144,7 +151,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
   _containerCliente(String nome, String telefone) {
     return Container(
       color: const Color(0xFFB6C5DE),
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: _deviceSize.height * 0.1,
       margin: const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -168,7 +175,7 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
     );
   }
 
-  void _carregarClientes(String nome) {
+  void _pesquisarClientesPorNome(String nome) {
     List<Cliente> clientesFiltrados = _clientes
         .where((cliente) =>
             cliente.nome.toLowerCase().startsWith(nome.toLowerCase()))
@@ -176,10 +183,19 @@ class _PesquisaClienteState extends State<PesquisaCliente> {
     _clientesStreamController.add(clientesFiltrados);
   }
 
+  void _carregarClientes() {
+    final clientes = _clienteState.list;
+    _clientesStreamController.add(
+      List.generate(
+        clientes.length,
+        (index) => Cliente.fromJson(clientes[index]),
+      ),
+    );
+  }
+
   void _carregarDados() {
     _clientesStreamController = StreamController<List<Cliente>>();
-    _clientes = VendasApi().clientes.values.toList();
-    _clientesStreamController.add(_clientes);
+    _clientesStreamController.add(_clientes = []);
   }
 
   @override

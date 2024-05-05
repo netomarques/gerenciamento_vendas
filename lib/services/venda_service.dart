@@ -1,0 +1,84 @@
+import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/services/service.dart';
+import 'package:vendas_gerenciamento/utils/keys/db_venda_keys.dart';
+
+class VendaService {
+  final VendaRepositoryImpl _repository;
+  final ClienteService _clienteService;
+
+  VendaService(this._repository, this._clienteService);
+
+  Future<List<Venda>> getVendas() async {
+    try {
+      final resultados = await _repository.getAllRecords();
+      final List<Venda> vendas = [];
+
+      for (var vendaJson in resultados) {
+        final Cliente cliente = await _clienteService
+            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda');
+    }
+  }
+
+  Future<List<Venda>> getVendasPorData(String startDate, String endDate) async {
+    try {
+      final resultados = await _repository.getVendasPorData(startDate, endDate);
+      final List<Venda> vendas = [];
+
+      for (var vendaJson in resultados) {
+        final Cliente cliente = await _clienteService
+            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda');
+    }
+  }
+
+  Future<Venda> getVendaId(int id) async {
+    try {
+      final resultado = await _repository.getByIdRecord(id);
+      final Cliente cliente = await _clienteService
+          .getClienteId(resultado.first[DbVendaKeys.idClienteColuna]);
+      Venda venda = List.generate(resultado.length,
+          (index) => Venda.fromJson(resultado[index], cliente)).first;
+      return venda;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda');
+    }
+  }
+
+  Future<List<Abatimento>> getAbatimentosPorVenda(idVenda) async {
+    try {
+      final resultado = await _repository.getAbatimentosPorVenda(idVenda);
+      final List<Abatimento> abatimentos = List.generate(
+          resultado.length, (index) => Abatimento.fromJson(resultado[index]));
+      return abatimentos;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Abatimentos');
+    }
+  }
+
+  Future<void> salvarVenda(Venda venda) async {
+    try {
+      final vendaJson = venda.toJson();
+      await _repository.insertRecord(vendaJson);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao salvar Venda');
+    }
+  }
+}

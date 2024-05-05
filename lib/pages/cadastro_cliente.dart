@@ -9,7 +9,6 @@ import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/pages/formatters/telefone_formato.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:intl/intl.dart';
 
 class CadastroCliente extends StatefulWidget {
   const CadastroCliente({super.key});
@@ -155,7 +154,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedNome(String value) {
-    _cliente.nome = value;
+    // _cliente.nome = value;
   }
 
   String? _validatorNome(String? value) {
@@ -171,7 +170,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _cliente.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    // _cliente.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorTelefone(String? value) {
@@ -193,7 +192,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _cliente.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    // _cliente.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
   }
 
   String? _validatorCpf(String? value) {

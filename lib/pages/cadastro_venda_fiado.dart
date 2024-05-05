@@ -79,7 +79,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
                       _containerTextForm(
                         AppTextFormField2(
                           '01/01/01',
-                          'Data',
+                          'date',
                           TextInputType.datetime,
                           _validatorData,
                           _onSavedData,
@@ -232,7 +232,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
   }
 
   void _onSavedPreco(String value) {
-    _venda.preco = double.parse(value);
+    // _venda.preco = double.parse(value);
   }
 
   String? _validatorPreco(String? value) {
@@ -258,7 +258,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
       if (error != null) {
         return error;
       } else {
-        _venda.preco = double.parse(value!);
+        // _venda.preco = double.parse(value!);
         _atualizaValorTotal();
       }
     } catch (e) {
@@ -268,7 +268,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
   }
 
   void _onSavedQuantidade(String value) {
-    _venda.quantidade = double.parse(value);
+    // _venda.quantidade = double.parse(value);
   }
 
   String? _validatorQuantidade(String? value) {
@@ -293,7 +293,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
       if (error != null) {
         return error;
       } else {
-        _venda.quantidade = double.parse(value!);
+        // _venda.quantidade = double.parse(value!);
         _atualizaValorTotal();
       }
     } catch (e) {
@@ -306,8 +306,8 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
   void _onSavedData(String value) {
     final DateFormat dateFormatBanco = DateFormat('yyyy/MM/dd');
 
-    _venda.data =
-        dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
+    // _venda.date =
+    //     dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
   }
 
   String? _validatorData(String? value) {
@@ -315,19 +315,19 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
 
     try {
       if (value == null || value.isEmpty) {
-        return 'Por favor, informe a data da venda';
+        return 'Por favor, informe a date da venda';
       } else {
         dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
       }
     } catch (e) {
-      return 'Por favor, verifique o formato da data da venda';
+      return 'Por favor, verifique o formato da date da venda';
     }
 
     return null;
   }
 
   void _onSavedDesconto(String value) {
-    _venda.desconto = double.parse(value);
+    // _venda.desconto = double.parse(value);
   }
 
   String? _validatorDesconto(String? value) {
@@ -353,7 +353,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
       if (error != null) {
         return error;
       }
-      _venda.desconto = double.parse(value!);
+      // _venda.desconto = double.parse(value!);
       _atualizaValorTotal();
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
@@ -371,7 +371,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
             id: VendasApi().gerarId(),
             quantidade: _venda.quantidade,
             preco: _venda.preco,
-            data: _venda.data,
+            date: _venda.date,
             desconto: _venda.desconto,
             cliente: _venda.cliente);
         VendasApi().adicionarVenda(venda);
@@ -398,11 +398,11 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
       id: 0,
       quantidade: 0.0,
       preco: 0.0,
-      data: DateTime.now(),
+      date: DateTime.now(),
       cliente: widget.cliente,
       desconto: 0.0,
     );
-    _dataVendaController.text = _dateFormat.format(_venda.data);
+    _dataVendaController.text = _dateFormat.format(_venda.date);
     _descontoController.text = '${_venda.desconto}';
     _atualizaValorTotal();
   }
@@ -428,7 +428,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
   }
 
   void _atualizaValorTotal() {
-    _valorTotalController.text = 'R\$ ${_venda.total().toStringAsFixed(2)}';
+    // _valorTotalController.text = 'R\$ ${_venda.total().toStringAsFixed(2)}';
   }
 
   void _showDatePicker() async {
@@ -462,7 +462,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
       id: 0,
       quantidade: 0.0,
       preco: 0.0,
-      data: DateTime.now(),
+      date: DateTime.now(),
       cliente: widget.cliente,
       desconto: 0.0,
     );
@@ -470,7 +470,7 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
     _valorTotalController = TextEditingController();
     _descontoController = TextEditingController();
     _dataVendaController =
-        TextEditingController(text: _dateFormat.format(_venda.data));
+        TextEditingController(text: _dateFormat.format(_venda.date));
 
     _atualizaValorTotal();
   }

@@ -172,7 +172,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _onSavedPreco(String value) {
-    _venda.preco = double.parse(value);
+    // _venda.preco = double.parse(value);
   }
 
   String? _validatorPreco(String? value) {
@@ -198,7 +198,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
       if (error != null) {
         return error;
       } else {
-        _venda.preco = double.parse(value!);
+        // _venda.preco = double.parse(value!);
         _atualizaValorTotal();
       }
     } catch (e) {
@@ -208,7 +208,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _onSavedQuantidade(String value) {
-    _venda.quantidade = double.parse(value);
+    // _venda.quantidade = double.parse(value);
   }
 
   String? _validatorQuantidade(String? value) {
@@ -233,7 +233,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
       if (error != null) {
         return error;
       } else {
-        _venda.quantidade = double.parse(value!);
+        // _venda.quantidade = double.parse(value!);
         _atualizaValorTotal();
       }
     } catch (e) {
@@ -246,8 +246,8 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   void _onSavedData(String value) {
     final DateFormat dateFormatBanco = DateFormat('yyyy/MM/dd');
 
-    _venda.data =
-        dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
+    // _venda.date =
+    //     dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
   }
 
   String? _validatorData(String? value) {
@@ -267,7 +267,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _onSavedDesconto(String value) {
-    _venda.desconto = double.parse(value);
+    // _venda.desconto = double.parse(value);
   }
 
   String? _validatorDesconto(String? value) {
@@ -293,7 +293,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
       if (error != null) {
         return error;
       }
-      _venda.desconto = double.parse(value!);
+      // _venda.desconto = double.parse(value!);
       _atualizaValorTotal();
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
@@ -308,13 +308,14 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
     if (_formKey.currentState!.validate()) {
       try {
         Venda venda = Venda(
-            id: VendasApi().gerarId(),
+            // id: VendasApi().gerarId(),
+            id: 0,
             quantidade: _venda.quantidade,
             preco: _venda.preco,
-            data: _venda.data,
+            date: _venda.date,
             desconto: _venda.desconto,
             cliente: _venda.cliente);
-        VendasApi().adicionarVenda(venda);
+        // VendasApi().adicionarVenda(venda);
         _exibirDialog('Venda cadastrada com sucesso');
         _formKey.currentState!.reset();
         _limparCampos();
@@ -349,7 +350,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _atualizaValorTotal() {
-    _valorTotalController.text = 'R\$ ${_venda.total().toStringAsFixed(2)}';
+    // _valorTotalController.text = 'R\$ ${_venda.total().toStringAsFixed(2)}';
   }
 
   void _showDatePicker() async {
@@ -379,13 +380,14 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
   }
 
   void _carregarDados() {
-    _cliente = VendasApi().clientes.values.elementAt(0);
+    // _cliente = VendasApi().clientes.values.elementAt(0);
+    _cliente = Cliente(nome: "nome", telefone: "telefone");
 
     _venda = Venda(
       id: 0,
       quantidade: 0.0,
       preco: 0.0,
-      data: DateTime.now(),
+      date: DateTime.now(),
       cliente: _cliente,
       desconto: 0.0,
     );
@@ -393,7 +395,7 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
     _valorTotalController = TextEditingController();
     _descontoController = TextEditingController();
     _dataVendaController =
-        TextEditingController(text: _dateFormat.format(_venda.data));
+        TextEditingController(text: _dateFormat.format(_venda.date));
 
     _atualizaValorTotal();
   }
@@ -403,11 +405,11 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
       id: 0,
       quantidade: 0.0,
       preco: 0.0,
-      data: DateTime.now(),
+      date: DateTime.now(),
       cliente: _cliente,
       desconto: 0.0,
     );
-    _dataVendaController.text = _dateFormat.format(_venda.data);
+    _dataVendaController.text = _dateFormat.format(_venda.date);
     _descontoController.text = '${_venda.desconto}';
     _atualizaValorTotal();
   }

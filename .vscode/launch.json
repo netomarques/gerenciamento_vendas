@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
     
         {
             "name": "Moto G 5 Plus",
@@ -28,6 +29,12 @@
             "request": "launch",
             "type": "dart",
             "deviceId": "ZF5236VJKV"
+        },
+        {
+            "name": "Moto e 7 wifi",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "192.168.0.210:5555"
         },
     ],
     "compounds": [

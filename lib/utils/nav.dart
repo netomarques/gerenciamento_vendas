@@ -15,7 +15,7 @@ import 'package:vendas_gerenciamento/pages/pesquisa_cliente.dart';
 routes() {
   Map<String, WidgetBuilder> routes = {
     '/': (context) => const HomePainel(),
-    '/cadastro_cliente': (context) => const CadastroCliente(),
+    // '/cadastro_cliente': (context) => const CadastroCliente(),
     '/alterar_cliente': (context) {
       final Map<String, dynamic> argumnets =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -26,7 +26,7 @@ routes() {
     },
     '/cadastro_venda_fiado': (context) => CadastroVendaFiado(),
     '/cadastro_venda_rua': (context) => const CadastroVendaRua(),
-    '/pesquisa_cliente': (context) => const PesquisaCliente(),
+    // '/pesquisa_cliente': (context) => const PesquisaCliente(),
     '/painel_cliente': (context) {
       final Map<String, dynamic> argumnets =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -39,9 +39,9 @@ routes() {
       final Map<String, dynamic> argumnets =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-      final Venda venda = argumnets['venda'] as Venda;
+      final venda = argumnets['id_venda'] as int;
 
-      return ListaPagamento(venda);
+      return ListaPagamento(venda: venda as Venda);
     },
   };
   return routes;

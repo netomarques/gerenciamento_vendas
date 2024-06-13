@@ -1,29 +1,34 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/api/vendas_api.dart';
-import 'package:vendas_gerenciamento/model/venda.dart';
-import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
+import 'package:vendas_gerenciamento/config/config.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/pages/widgets/venda_widget.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class HomePainel extends StatefulWidget {
+class HomePainel extends ConsumerStatefulWidget {
+  static HomePainel builder(BuildContext context, GoRouterState state) =>
+      const HomePainel();
   const HomePainel({super.key});
 
   @override
-  State<HomePainel> createState() => _HomePainelState();
+  ConsumerState<HomePainel> createState() => _HomePainelState();
 }
 
-class _HomePainelState extends State<HomePainel> {
+class _HomePainelState extends ConsumerState<HomePainel> {
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  late final TextEditingController _dateStartController;
-  late final TextEditingController _dateEndController;
+  late final TextEditingController startDateController;
+  late final TextEditingController endDateController;
   late final StreamController<List<Venda>> _vendasStreamController;
   late final StreamController<Map<String, dynamic>> _resumoStreamController;
-  late final VendasApi vendasApi;
-  late double _largura;
-  late double _altura;
+  late Size _deviceSize;
+  late VendaState _vendasState;
 
   @override
   void initState() {
@@ -33,8 +38,10 @@ class _HomePainelState extends State<HomePainel> {
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
-    _altura = MediaQuery.of(context).size.height;
+    _deviceSize = context.devicesize;
+    _vendasState = ref.watch(vendaProvider);
+    _vendasStreamController.add(_vendasState.list);
+    resumoVendas();
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +71,20 @@ class _HomePainelState extends State<HomePainel> {
 
             final List<Venda> vendas = snapshot.data!;
 
-            return VendasWidget(vendas, "/lista_pagamento");
+            return Expanded(
+              child: ListView.builder(
+                itemCount: vendas.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  Venda venda = vendas[index];
+                  return GestureDetector(
+                    onTap: () => context.push(RouteLocation.listarPagamentos,
+                        extra: venda),
+                    child: VendaWidget(venda: venda),
+                  );
+                },
+              ),
+            );
           },
         ),
         const NavButtonsFloating(),
@@ -74,8 +94,8 @@ class _HomePainelState extends State<HomePainel> {
 
   _painel() {
     return Container(
-      width: _largura,
-      height: _altura * 0.25,
+      width: _deviceSize.width,
+      height: _deviceSize.height * 0.25,
       color: const Color(0xff910029),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -89,7 +109,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelResumo() {
     return SizedBox(
-      width: _largura,
+      width: _deviceSize.width,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +123,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelTotal() {
     return SizedBox(
-      width: _largura * 0.5,
+      width: _deviceSize.width * 0.5,
       child: Column(
         children: <Widget>[
           Container(
@@ -143,16 +163,16 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelFiltroData() {
     return Container(
-      width: _largura * 0.35,
+      width: _deviceSize.width * 0.35,
       alignment: Alignment.topCenter,
-      child: DateButton(
-          _dateStartController.text, _dateEndController.text, carregarVendas),
+      child: DateButton(startDateController.text, endDateController.text,
+          pesquisarVendasPorData),
     );
   }
 
   _painelDados() {
     return SizedBox(
-      width: _largura,
+      width: _deviceSize.width,
       child: Row(
         children: <Widget>[
           _painelTotalVendas(),
@@ -164,19 +184,19 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelTotalVendas() {
     return SizedBox(
-      width: _largura * 0.4,
+      width: _deviceSize.width * 0.4,
       child: Row(
         children: <Widget>[
           Container(
             padding: const EdgeInsets.only(left: 8),
-            width: _largura * 0.4 * 0.3,
+            width: _deviceSize.width * 0.4 * 0.3,
             child: Image.asset(
               "assets/images/financial_graphic_icon.png",
-              height: _altura * 0.05,
+              height: _deviceSize.height * 0.05,
             ),
           ),
           SizedBox(
-            width: _largura * 0.4 * 0.7,
+            width: _deviceSize.width * 0.4 * 0.7,
             child: Column(
               children: <Widget>[
                 Container(
@@ -227,7 +247,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _painelDadosValorQuantidade() {
     return SizedBox(
-      width: _largura * 0.6,
+      width: _deviceSize.width * 0.6,
       child: StreamBuilder<Map<String, dynamic>>(
         stream: _resumoStreamController.stream,
         builder: ((context, snapshot) {
@@ -245,7 +265,7 @@ class _HomePainelState extends State<HomePainel> {
           return Row(
             children: <Widget>[
               SizedBox(
-                width: _largura * 0.6 * 0.5,
+                width: _deviceSize.width * 0.6 * 0.5,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -271,7 +291,7 @@ class _HomePainelState extends State<HomePainel> {
                 ),
               ),
               SizedBox(
-                width: _largura * 0.6 * 0.5,
+                width: _deviceSize.width * 0.6 * 0.5,
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -305,7 +325,7 @@ class _HomePainelState extends State<HomePainel> {
 
   _textoInformacao() {
     return Container(
-      width: _largura,
+      width: _deviceSize.width,
       color: const Color(0xff3B7554),
       padding: const EdgeInsets.all(3.0),
       child: const Opacity(
@@ -319,48 +339,66 @@ class _HomePainelState extends State<HomePainel> {
     );
   }
 
-  void carregarVendas(String dateStart, String dateEnd) async {
-    _dateStartController.text = dateStart;
-    _dateEndController.text = dateEnd;
+  void pesquisarVendasPorData(String startDate, String endDate) {
+    ref.read(vendaProvider.notifier).getVendasPorData(
+        Helpers.dateTimeToDbDate(startDate), Helpers.dateTimeToDbDate(endDate));
+    startDateController.text = startDate;
+    endDateController.text = endDate;
 
-    List<Venda> vendasFiltradas =
-        await vendasApi.ordenarListaPorDataDecrescente(
-            _dateFormat.parse(dateStart), _dateFormat.parse(dateEnd));
-    Map<String, dynamic> resumo = await vendasApi.resumoVendas(vendasFiltradas);
+    resumoVendas();
+    _vendasStreamController.add(_vendasState.list);
+  }
 
-    _vendasStreamController.add(vendasFiltradas);
+  void resumoVendas() {
+    int quantVendaRua, quantVendaFiado;
+    double totalVendaRua, totalVendaFiado;
+    // NumberFormat numberFormat = NumberFormat('##');
+
+    quantVendaRua = quantVendaFiado = 0;
+    totalVendaRua = totalVendaFiado = 0.0;
+
+    for (Venda venda in _vendasState.list) {
+      switch (venda.fiado) {
+        case true:
+          quantVendaFiado += 1;
+          totalVendaFiado += venda.total!;
+          break;
+        case false:
+          quantVendaRua += 1;
+          totalVendaRua += venda.total!;
+          break;
+      }
+    }
+
+    Map<String, dynamic> resumo = <String, dynamic>{
+      "Fiado": {"Total": totalVendaFiado, "Quantidade": quantVendaFiado},
+      "Rua": {"Total": totalVendaRua, "Quantidade": quantVendaRua},
+      "Vendas": {
+        "Total": totalVendaRua + totalVendaFiado,
+        "Quantidade": quantVendaRua + quantVendaFiado,
+      },
+    };
+
     _resumoStreamController.add(resumo);
+    // return resumo;
   }
 
   void _carregarDados() async {
-    vendasApi = VendasApi();
-
-    DateTime now = DateTime.now();
-    _dateStartController = TextEditingController(text: _dateFormat.format(now));
-    _dateEndController = TextEditingController(text: _dateFormat.format(now));
-
     _vendasStreamController = StreamController<List<Venda>>();
     _resumoStreamController =
         StreamController<Map<String, dynamic>>.broadcast();
-
-    // DateTime startData = _dateFormat.parse('00/00/0000');
-    List<Venda> vendasFiltradas =
-        await vendasApi.ordenarListaPorDataDecrescente(
-            _dateFormat.parse(_dateFormat.format(now)),
-            _dateFormat.parse(_dateFormat.format(now)));
-
-    Map<String, dynamic> resumo = await vendasApi.resumoVendas(vendasFiltradas);
-
-    _vendasStreamController.add(vendasFiltradas);
-    _resumoStreamController.add(resumo);
+    startDateController =
+        TextEditingController(text: _dateFormat.format(DateTime.now()));
+    endDateController =
+        TextEditingController(text: _dateFormat.format(DateTime.now()));
   }
 
   @override
   void dispose() {
     _vendasStreamController.close();
     _resumoStreamController.close();
-    _dateStartController.dispose();
-    _dateEndController.dispose();
+    startDateController.dispose();
+    endDateController.dispose();
     super.dispose();
   }
 }

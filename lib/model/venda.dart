@@ -1,61 +1,139 @@
 import 'package:vendas_gerenciamento/api/vendas_api.dart';
-import 'package:vendas_gerenciamento/model/abatimento.dart';
-import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/utils/keys/keys.dart';
+import 'package:vendas_gerenciamento/utils/utils.dart';
 
-class Venda {
-  int id;
-  double quantidade;
-  double preco;
-  double desconto;
-  DateTime data;
-  Cliente cliente;
+class Venda extends AbstractModel {
+  final int? id;
+  final double quantidade;
+  final double preco;
+  final double desconto;
+  final DateTime date;
+  final Cliente cliente;
+  final double? total;
+  final bool? fiado;
+  final bool? isAberto;
+  final double? totalAberto;
 
-  Venda(
-      {required this.id,
-      required this.quantidade,
-      required this.preco,
-      required this.data,
-      required this.cliente,
-      required this.desconto});
+  Venda({
+    this.id,
+    required this.quantidade,
+    required this.preco,
+    required this.date,
+    required this.cliente,
+    required this.desconto,
+    this.total,
+    this.fiado,
+    this.isAberto,
+    this.totalAberto,
+  });
 
   bool isFiado() {
-    return cliente.id != 1 ? true : false;
+    return cliente.id != 0 ? true : false;
   }
 
-  double total() {
+  double calcTotal() {
     return (quantidade * preco) - desconto;
   }
 
-  List<Abatimento> getAbatimentosVenda() {
-    return VendasApi().abatimentosVenda(id);
+  // List<Abatimento> getAbatimentosVenda() {
+  //   return VendasApi().abatimentosVenda(id!);
+  // }
+
+  // bool isOpen() {
+  //   bool isOpen;
+  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
+
+  //   if (abatimentosVenda.isEmpty) {
+  //     isOpen = true;
+  //   } else {
+  //     double totalAbatido = 0.0;
+  //     for (Abatimento abatimento in abatimentosVenda) {
+  //       totalAbatido += abatimento.valor;
+  //     }
+
+  //     totalAbatido == calcTotal() ? isOpen = false : isOpen = true;
+  //   }
+
+  //   return isOpen;
+  // }
+
+  // double totalEmAberto() {
+  //   double totalAbatido = 0.0;
+
+  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
+  //   for (Abatimento abatimento in abatimentosVenda) {
+  //     totalAbatido = abatimento.valor + totalAbatido;
+  //   }
+
+  //   return calcTotal() - totalAbatido;
+  // }
+
+  @override
+  Venda copyWith({
+    int? id,
+    double? quantidade,
+    double? preco,
+    double? desconto,
+    DateTime? date,
+    Cliente? cliente,
+    double? total,
+    bool? fiado,
+    bool? isAberto,
+    double? totalAberto,
+  }) {
+    return Venda(
+      id: id ?? this.id,
+      quantidade: quantidade ?? this.quantidade,
+      preco: preco ?? this.preco,
+      desconto: desconto ?? this.desconto,
+      date: date ?? this.date,
+      cliente: cliente ?? this.cliente,
+      total: total ?? this.total,
+      fiado: fiado ?? this.fiado,
+      isAberto: isAberto ?? this.isAberto,
+      totalAberto: totalAberto ?? this.totalAberto,
+    );
   }
 
-  bool isOpen() {
-    bool isOpen;
-    List<Abatimento> abatimentosVenda = getAbatimentosVenda();
-
-    if (abatimentosVenda.isEmpty) {
-      isOpen = true;
-    } else {
-      double totalAbatido = 0.0;
-      for (Abatimento abatimento in abatimentosVenda) {
-        totalAbatido += abatimento.valor;
-      }
-
-      totalAbatido == total() ? isOpen = false : isOpen = true;
-    }
-
-    return isOpen;
+  @override
+  List<Object?> get props {
+    return [
+      id!,
+      quantidade,
+      preco,
+      desconto,
+      date,
+      cliente,
+      total!,
+    ];
   }
 
-  double totalEmAberto() {
-    double totalAbatido = 0.0;
+  @override
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      VendaKeys.idVenda: id,
+      VendaKeys.quantidade: quantidade,
+      VendaKeys.preco: preco,
+      VendaKeys.desconto: desconto,
+      VendaKeys.dateVenda: date,
+      VendaKeys.idCliente: cliente.id,
+      VendaKeys.total: total,
+    };
+  }
 
-    List<Abatimento> abatimentosVenda = getAbatimentosVenda();
-    for (Abatimento abatimento in abatimentosVenda) {
-      totalAbatido = abatimento.valor + totalAbatido;
-    }
-
-    return total() - totalAbatido;
+  factory Venda.fromJson(Map<String, dynamic> map, Cliente cliente) {
+    return Venda(
+      id: map[VendaKeys.idVenda],
+      quantidade: map[VendaKeys.quantidade],
+      preco: map[VendaKeys.preco],
+      desconto: map[VendaKeys.desconto],
+      date: Helpers.dbDataToDateTime(map[VendaKeys.dateVenda]),
+      cliente: cliente,
+      total: map[VendaKeys.total],
+      fiado: map[VendaKeys.isFiado] == 1 ? true : false,
+      isAberto: map[VendaKeys.isAberto] == 1 ? true : false,
+      totalAberto: map[VendaKeys.totalEmAberto],
+    );
   }
 }

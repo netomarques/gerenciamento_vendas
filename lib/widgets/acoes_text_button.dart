@@ -7,12 +7,10 @@ class AcoesTextButton extends StatelessWidget {
   AcoesTextButton(
       {this.onFunction = defaultFunction, this.text = 'Cadastrar', super.key});
 
-  double _largura = 0.0;
   double _altura = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
     _altura = MediaQuery.of(context).size.height;
 
     return SizedBox(

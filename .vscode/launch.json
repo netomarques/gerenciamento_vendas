@@ -34,7 +34,7 @@
             "name": "Moto e 7 wifi",
             "request": "launch",
             "type": "dart",
-            "deviceId": "192.168.0.176:5555"
+            "deviceId": "192.168.0.210:5555"
         },
     ],
     "compounds": [

@@ -222,7 +222,7 @@ class _AlterarClienteState extends State<AlterarCliente> {
         // widget._cliente.nome = _clienteAlterado.nome;
         // widget._cliente.telefone = _clienteAlterado.telefone;
         // widget._cliente.cpf = _clienteAlterado.cpf;
-        VendasApi().alterarCliente(widget._cliente);
+        // VendasApi().alterarCliente(widget._cliente);
         _exibirDialog('Cliente alterado com sucesso');
         _formKey.currentState!.reset();
         //_limparCampos();

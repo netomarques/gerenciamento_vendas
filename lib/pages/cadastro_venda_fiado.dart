@@ -8,7 +8,8 @@ import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 import 'package:intl/intl.dart';
 
 class CadastroVendaFiado extends StatefulWidget {
-  final Cliente cliente = VendasApi().clientes.values.elementAt(2);
+  // final Cliente cliente = VendasApi().clientes.values.elementAt(2);
+  final Cliente cliente = Cliente(nome: "nome", telefone: "telefone");
 
   CadastroVendaFiado({super.key});
 
@@ -368,13 +369,14 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
     if (_formKey.currentState!.validate()) {
       try {
         Venda venda = Venda(
-            id: VendasApi().gerarId(),
+            // id: VendasApi().gerarId(),
+            id: 0,
             quantidade: _venda.quantidade,
             preco: _venda.preco,
             date: _venda.date,
             desconto: _venda.desconto,
             cliente: _venda.cliente);
-        VendasApi().adicionarVenda(venda);
+        // VendasApi().adicionarVenda(venda);
         _exibirDialog('Venda cadastrada com sucesso');
         _formKey.currentState!.reset();
         _limparCampos();

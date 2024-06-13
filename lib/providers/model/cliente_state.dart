@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
 
 class ClienteState extends Equatable {
-  final List<Map<String, dynamic>> list;
+  final List<Cliente> list;
 
   const ClienteState(this.list);
 
@@ -9,7 +10,7 @@ class ClienteState extends Equatable {
     this.list = const [],
   });
 
-  ClienteState copyWith({List<Map<String, dynamic>>? list}) {
+  ClienteState copyWith({List<Cliente>? list}) {
     return ClienteState(
       list ?? this.list,
     );

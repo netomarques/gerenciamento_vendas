@@ -1,46 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/repository/repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vendas_gerenciamento/services/service.dart';
 
 class ClienteNotifier extends StateNotifier<ClienteState> {
-  final DataRepository _repository;
+  // final DataRepository _repository;
+  final ClienteService _clienteService;
 
-  ClienteNotifier(this._repository) : super(const ClienteState.initial()) {
-    getAllRecords();
+  ClienteNotifier(this._clienteService) : super(const ClienteState.initial()) {
+    getClientes();
   }
 
-  Future<void> insertRecord(Map<String, dynamic> values) async {
+  Future<void> salvarCliente(Cliente cliente) async {
     try {
-      await _repository.insertRecord(values);
-      getAllRecords();
+      await _clienteService.salvarCliente(cliente);
+      getClientes();
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  void getAllRecords() async {
+  void getClientes() async {
     try {
-      final list = await _repository.getAllRecords();
+      final list = await _clienteService.getClientes();
       state = state.copyWith(list: list);
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  Future<void> updateRecord(Map<String, dynamic> values, int id) async {
+  Future<void> atualizarCliente(Cliente cliente) async {
     try {
-      await _repository.updateRecord(values, id);
-      getAllRecords();
+      await _clienteService.atualizarCliente(cliente);
+      getClientes();
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  Future<void> deleteRecord(int id) async {
+  Future<void> deletarCliente(int id) async {
     try {
-      await _repository.deleteRecord(id);
-      getAllRecords();
+      await _clienteService.deletarCliente(id);
+      getClientes();
     } catch (e) {
       debugPrint(e.toString());
     }

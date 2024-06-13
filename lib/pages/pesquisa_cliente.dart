@@ -188,7 +188,7 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
     _clientesStreamController.add(
       List.generate(
         clientes.length,
-        (index) => Cliente.fromJson(clientes[index]),
+        (index) => clientes[index],
       ),
     );
   }

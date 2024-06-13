@@ -27,15 +27,23 @@ class NavButtonsFloating extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButtonReplacementRiver("Cadastro de cliente",
-              "assets/images/account_client_icon.png", context),
+          _floatingActionButtonReplacementRiver(
+              "Cadastro de cliente",
+              "assets/images/account_client_icon.png",
+              context,
+              RouteLocation.cadastroCliente),
           _botaoDialogVenda(
               "Venda", "assets/images/buy_shop_icon.png", context),
-          _floatingActionButton(
+          _floatingActionButtonReplacementRiver(
               "Pesquisa de cliente",
               "assets/images/find_search_icon.png",
               context,
-              "/pesquisa_cliente"),
+              RouteLocation.pesquisaCliente),
+          // _floatingActionButton(
+          //     "Pesquisa de cliente",
+          //     "assets/images/find_search_icon.png",
+          //     context,
+          //     "/pesquisa_cliente"),
         ],
       ),
     );
@@ -95,12 +103,12 @@ class NavButtonsFloating extends ConsumerWidget {
   }
 
   _floatingActionButtonReplacementRiver(
-      String tooltip, String icon, BuildContext context) {
+      String tooltip, String icon, BuildContext context, String routeLocation) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
-      onPressed: () => context.push(RouteLocation.pesquisaCliente),
+      onPressed: () => context.push(routeLocation),
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: Color(0xFF910029)),
         borderRadius: BorderRadius.circular(100),
@@ -141,8 +149,8 @@ class NavButtonsFloating extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                _botaoVenda(context, "Rua", "/cadastro_venda_rua"),
-                _botaoVenda(context, "Fiado", "/cadastro_venda_fiado"),
+                _botaoVenda(context, "Rua", RouteLocation.cadastroVendaRua),
+                _botaoVenda(context, "Fiado", RouteLocation.cadastroVendaFiado),
               ],
             ),
           ),
@@ -151,7 +159,7 @@ class NavButtonsFloating extends ConsumerWidget {
     );
   }
 
-  _botaoVenda(context, botaoTexto, routeName) {
+  _botaoVenda(context, botaoTexto, routeLocation) {
     return Container(
       margin: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width * 0.1),
@@ -163,7 +171,7 @@ class NavButtonsFloating extends ConsumerWidget {
       child: TextButton(
         onPressed: () => {
           Navigator.pop(context),
-          pushReplacementNamed(context, routeName),
+          context.push(routeLocation),
         },
         child: Text(
           botaoTexto,

@@ -162,23 +162,24 @@ class _PainelClienteState extends State<PainelCliente> {
   }
 
   void _carregarVendas(String dateStart, String dateEnd) async {
-    List<Venda> vendasCliente = await VendasApi().vendasCliente(
-      widget._cliente.id!,
-      _dateFormat.parse(dateStart),
-      _dateFormat.parse(dateEnd),
-    );
+    // List<Venda> vendasCliente = await VendasApi().vendasCliente(
+    //   widget._cliente.id!,
+    //   _dateFormat.parse(dateStart),
+    //   _dateFormat.parse(dateEnd),
+    // );
 
-    _vendasStreamController.add(vendasCliente);
+    // _vendasStreamController.add(vendasCliente);
   }
 
   Future<double> _carregarDados() async {
-    List<Venda> vendasCliente = await VendasApi().vendasCliente(
-        widget._cliente.id!,
-        _dateFormat.parse(_dateFormat.format(DateTime(1900))),
-        _dateFormat.parse(_dateFormat.format(DateTime.now())));
+    // List<Venda> vendasCliente = await VendasApi().vendasCliente(
+    //     widget._cliente.id!,
+    //     _dateFormat.parse(_dateFormat.format(DateTime(1900))),
+    //     _dateFormat.parse(_dateFormat.format(DateTime.now())));
 
-    _vendasStreamController.add(vendasCliente);
-    return VendasApi().valorTotalEmAbertoPorCliente(vendasCliente);
+    // _vendasStreamController.add(vendasCliente);
+    // return VendasApi().valorTotalEmAbertoPorCliente(vendasCliente);
+    return 2;
   }
 
   @override

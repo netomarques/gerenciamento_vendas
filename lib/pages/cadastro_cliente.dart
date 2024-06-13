@@ -5,29 +5,35 @@ import 'package:vendas_gerenciamento/model/cliente.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cnpj_formato.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cpf_formato.dart';
 import 'package:vendas_gerenciamento/pages/formatters/cpf_ou_cnpj_formato.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:vendas_gerenciamento/utils/extensions.dart';
 import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:vendas_gerenciamento/pages/formatters/telefone_formato.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CadastroCliente extends StatefulWidget {
+class CadastroCliente extends ConsumerStatefulWidget {
+  static CadastroCliente builder(BuildContext context, GoRouterState state) =>
+      const CadastroCliente();
+
   const CadastroCliente({super.key});
 
   @override
-  State<CadastroCliente> createState() => _CadastroClienteState();
+  ConsumerState<CadastroCliente> createState() => _CadastroClienteState();
 }
 
-class _CadastroClienteState extends State<CadastroCliente> {
+class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _textNomeController;
   late final TextEditingController _textTelefoneController;
   late final TextEditingController _textCpfController;
   late Cliente _cliente;
+  late Size _deviceSize;
+  late ClienteNotifier _clienteNotifier;
 
   // final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-
-  late double _largura;
-  late double _altura;
 
   @override
   void initState() {
@@ -37,8 +43,8 @@ class _CadastroClienteState extends State<CadastroCliente> {
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
-    _altura = MediaQuery.of(context).size.height;
+    _deviceSize = context.devicesize;
+    _clienteNotifier = ref.read(clienteProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -132,8 +138,8 @@ class _CadastroClienteState extends State<CadastroCliente> {
 
   _tituloForm() {
     return Container(
-      width: _largura,
-      height: _altura * 0.1,
+      width: _deviceSize.width,
+      height: _deviceSize.height * 0.1,
       color: const Color(0xff910029),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: const Text(
@@ -154,7 +160,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedNome(String value) {
-    // _cliente.nome = value;
+    _cliente = _cliente.copyWith(nome: value);
   }
 
   String? _validatorNome(String? value) {
@@ -170,7 +176,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    // _cliente.telefone = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    _cliente = _cliente.copyWith(telefone: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
   String? _validatorTelefone(String? value) {
@@ -192,7 +198,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    // _cliente.cpf = value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '');
+    _cliente = _cliente.copyWith(cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
   String? _validatorCpf(String? value) {
@@ -218,12 +224,11 @@ class _CadastroClienteState extends State<CadastroCliente> {
       try {
         _formKey.currentState!.save();
         Cliente cliente = Cliente(
-          id: VendasApi().gerarIdCliente(),
           nome: _cliente.nome,
           telefone: _cliente.telefone,
           cpf: _cliente.cpf,
         );
-        VendasApi().adicionarCliente(cliente);
+        _clienteNotifier.salvarCliente(cliente);
         _exibirDialog('Cliente cadastrado com sucesso');
         _formKey.currentState!.reset();
         _limparCampos();
@@ -254,7 +259,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _limparCampos() {
-    _cliente = Cliente(id: 0, nome: "nome", telefone: "92999999999");
+    _cliente = Cliente(nome: "nome", telefone: "92999999999");
 
     _textNomeController.text = _cliente.nome;
     _textTelefoneController.text = _cliente.telefone;
@@ -262,7 +267,7 @@ class _CadastroClienteState extends State<CadastroCliente> {
   }
 
   void _carregarDados() {
-    _cliente = Cliente(id: 0, nome: "nome", telefone: "92999999999");
+    _cliente = Cliente(nome: "nome", telefone: "92999999999");
 
     _textNomeController = TextEditingController();
     _textTelefoneController = TextEditingController();

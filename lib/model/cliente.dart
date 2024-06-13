@@ -1,4 +1,5 @@
 import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 class Cliente extends AbstractModel {
   final int? id;
@@ -41,19 +42,19 @@ class Cliente extends AbstractModel {
   @override
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'id': id,
-      'nome': nome,
-      'telefone': telefone,
-      'cpf': cpf,
+      ClienteKeys.idCliente: id,
+      ClienteKeys.nome: nome,
+      ClienteKeys.telefone: telefone,
+      ClienteKeys.cpfcnpj: cpf,
     };
   }
 
   factory Cliente.fromJson(Map<String, dynamic> map) {
     return Cliente(
-      id: map['id'],
-      nome: map['nome'],
-      telefone: map['telefone'],
-      cpf: map['cpf'] ?? "00000000000",
+      id: map[ClienteKeys.idCliente],
+      nome: map[ClienteKeys.nome],
+      telefone: map[ClienteKeys.telefone],
+      cpf: map[ClienteKeys.cpfcnpj] ?? "00000000000",
     );
   }
 }

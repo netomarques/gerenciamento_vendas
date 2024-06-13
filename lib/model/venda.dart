@@ -36,38 +36,38 @@ class Venda extends AbstractModel {
     return (quantidade * preco) - desconto;
   }
 
-  List<Abatimento> getAbatimentosVenda() {
-    return VendasApi().abatimentosVenda(id!);
-  }
+  // List<Abatimento> getAbatimentosVenda() {
+  //   return VendasApi().abatimentosVenda(id!);
+  // }
 
-  bool isOpen() {
-    bool isOpen;
-    List<Abatimento> abatimentosVenda = getAbatimentosVenda();
+  // bool isOpen() {
+  //   bool isOpen;
+  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
 
-    if (abatimentosVenda.isEmpty) {
-      isOpen = true;
-    } else {
-      double totalAbatido = 0.0;
-      for (Abatimento abatimento in abatimentosVenda) {
-        totalAbatido += abatimento.valor;
-      }
+  //   if (abatimentosVenda.isEmpty) {
+  //     isOpen = true;
+  //   } else {
+  //     double totalAbatido = 0.0;
+  //     for (Abatimento abatimento in abatimentosVenda) {
+  //       totalAbatido += abatimento.valor;
+  //     }
 
-      totalAbatido == calcTotal() ? isOpen = false : isOpen = true;
-    }
+  //     totalAbatido == calcTotal() ? isOpen = false : isOpen = true;
+  //   }
 
-    return isOpen;
-  }
+  //   return isOpen;
+  // }
 
-  double totalEmAberto() {
-    double totalAbatido = 0.0;
+  // double totalEmAberto() {
+  //   double totalAbatido = 0.0;
 
-    List<Abatimento> abatimentosVenda = getAbatimentosVenda();
-    for (Abatimento abatimento in abatimentosVenda) {
-      totalAbatido = abatimento.valor + totalAbatido;
-    }
+  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
+  //   for (Abatimento abatimento in abatimentosVenda) {
+  //     totalAbatido = abatimento.valor + totalAbatido;
+  //   }
 
-    return calcTotal() - totalAbatido;
-  }
+  //   return calcTotal() - totalAbatido;
+  // }
 
   @override
   Venda copyWith({

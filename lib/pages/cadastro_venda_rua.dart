@@ -46,9 +46,10 @@ class _CadastroVendaRuaState extends State<CadastroVendaRua> {
               Icons.dashboard,
               color: Color(0xFFEB710A),
             ),
-            onPressed: () {
-              pushReplacementNamed(context, '/');
-            },
+            // onPressed: () {
+            //   pushReplacementNamed(context, '/');
+            // },
+            onPressed: () {},
           ),
         ],
       ),

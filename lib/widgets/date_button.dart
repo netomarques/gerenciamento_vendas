@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateButton extends StatefulWidget {
-  late String _dateStart;
-  late String _dateEnd;
+  final String dateStart;
+  final String dateEnd;
   final Function carregarVendas;
 
-  DateButton(this._dateStart, this._dateEnd, this.carregarVendas, {super.key});
+  const DateButton(this.dateStart, this.dateEnd, this.carregarVendas,
+      {super.key});
 
   @override
   State<DateButton> createState() => _DateButtonState();
@@ -18,16 +19,17 @@ class _DateButtonState extends State<DateButton> {
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
   final _now = DateTime.now();
   late final StreamController<Map<String, dynamic>> _streamController;
+  late String _dateStart;
+  late String _dateEnd;
 
   @override
   void initState() {
     super.initState();
+    _dateStart = widget.dateStart;
+    _dateEnd = widget.dateEnd;
     _streamController = StreamController();
-    _streamController.add({
-      "dateStart": widget._dateStart,
-      "dateEnd": widget._dateEnd,
-      "isVisible": false
-    });
+    _streamController.add(
+        {"dateStart": _dateStart, "dateEnd": _dateEnd, "isVisible": false});
   }
 
   @override
@@ -88,8 +90,8 @@ class _DateButtonState extends State<DateButton> {
       firstDate: DateTime(1900),
       lastDate: _now,
       initialDateRange: DateTimeRange(
-        end: _dateFormat.parse(widget._dateEnd),
-        start: _dateFormat.parse(widget._dateStart),
+        end: _dateFormat.parse(_dateEnd),
+        start: _dateFormat.parse(_dateStart),
       ),
       builder: (context, child) {
         return Column(
@@ -106,19 +108,19 @@ class _DateButtonState extends State<DateButton> {
     );
 
     if (picked != null &&
-        (_dateFormat.format(picked.start) != widget._dateStart ||
-            _dateFormat.format(picked.end) != widget._dateEnd)) {
-      widget._dateStart = _dateFormat.format(picked.start);
-      widget._dateEnd = _dateFormat.format(picked.end);
+        (_dateFormat.format(picked.start) != _dateStart ||
+            _dateFormat.format(picked.end) != _dateEnd)) {
+      _dateStart = _dateFormat.format(picked.start);
+      _dateEnd = _dateFormat.format(picked.end);
 
       Map<String, dynamic> datas = {};
-      datas["dateStart"] = widget._dateStart;
-      datas["dateEnd"] = widget._dateEnd;
+      datas["dateStart"] = _dateStart;
+      datas["dateEnd"] = _dateEnd;
       datas["isVisible"] = picked.start != picked.end ? true : false;
 
       _streamController.add(datas);
 
-      widget.carregarVendas(widget._dateStart, widget._dateEnd);
+      widget.carregarVendas(_dateStart, _dateEnd);
     }
   }
 

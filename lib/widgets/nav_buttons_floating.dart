@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vendas_gerenciamento/utils/extensions.dart';
 
 class NavButtonsFloating extends ConsumerWidget {
   static NavButtonsFloating builder(
           BuildContext context, GoRouterState state) =>
-      const NavButtonsFloating();
+      NavButtonsFloating();
 
-  const NavButtonsFloating({super.key});
+  NavButtonsFloating({super.key});
+
+  late BuildContext _context;
+  late Size _size;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Size size = MediaQuery.of(context).size;
+    _context = context;
+    // Size size = MediaQuery.of(context).size;
+    _size = context.devicesize;
 
     return Container(
       decoration: BoxDecoration(
@@ -21,35 +26,27 @@ class NavButtonsFloating extends ConsumerWidget {
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.only(right: 38, left: 38, bottom: 2),
-      width: size.width * 0.8,
-      height: size.height * 0.095,
+      width: _size.width * 0.8,
+      height: _size.height * 0.095,
       padding: const EdgeInsets.all(4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButtonReplacementRiver(
+          _floatingActionButtonRiver(
               "Cadastro de cliente",
               "assets/images/account_client_icon.png",
-              context,
               RouteLocation.cadastroCliente),
-          _botaoDialogVenda(
-              "Venda", "assets/images/buy_shop_icon.png", context),
-          _floatingActionButtonReplacementRiver(
+          _botaoDialogVenda("Venda", "assets/images/buy_shop_icon.png"),
+          _floatingActionButtonRiver(
               "Pesquisa de cliente",
               "assets/images/find_search_icon.png",
-              context,
               RouteLocation.pesquisaCliente),
-          // _floatingActionButton(
-          //     "Pesquisa de cliente",
-          //     "assets/images/find_search_icon.png",
-          //     context,
-          //     "/pesquisa_cliente"),
         ],
       ),
     );
   }
 
-  _botaoDialogVenda(String tooltip, String icon, BuildContext context) {
+  _botaoDialogVenda(String tooltip, String icon) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       backgroundColor: const Color(0xFF17CA84),
@@ -58,71 +55,90 @@ class NavButtonsFloating extends ConsumerWidget {
         side: const BorderSide(width: 1, color: Color(0xFF910029)),
         borderRadius: BorderRadius.circular(100),
       ),
-      onPressed: () => _onTapDialog(context),
+      onPressed: () => _onTapDialog(),
       child: Image.asset(
         icon,
-        height: MediaQuery.of(context).size.height * 0.06,
+        height: _size.height * 0.06,
+        // height: MediaQuery.of(context).size.height * 0.06,
       ),
     );
   }
 
-  _floatingActionButton(
-      String tooltip, String icon, BuildContext context, String routeName) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      backgroundColor: const Color(0xFF17CA84),
-      tooltip: tooltip,
-      onPressed: () => pushNamed(context, routeName),
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFF910029)),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Image.asset(
-        icon,
-        height: MediaQuery.of(context).size.height * 0.06,
-      ),
-    );
-  }
+  // _floatingActionButton(
+  //     String tooltip, String icon, BuildContext context, String routeName) {
+  //   return FloatingActionButton(
+  //     heroTag: UniqueKey(),
+  //     backgroundColor: const Color(0xFF17CA84),
+  //     tooltip: tooltip,
+  //     onPressed: () => pushNamed(context, routeName),
+  //     shape: RoundedRectangleBorder(
+  //       side: const BorderSide(width: 1, color: Color(0xFF910029)),
+  //       borderRadius: BorderRadius.circular(100),
+  //     ),
+  //     child: Image.asset(
+  //       icon,
+  //       height: MediaQuery.of(context).size.height * 0.06,
+  //     ),
+  //   );
+  // }
 
-  _floatingActionButtonReplacement(
-      String tooltip, String icon, BuildContext context, String routeName) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      backgroundColor: const Color(0xFF17CA84),
-      tooltip: tooltip,
-      onPressed: () => pushReplacementNamed(context, routeName),
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFF910029)),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Image.asset(
-        icon,
-        height: MediaQuery.of(context).size.height * 0.06,
-      ),
-    );
-  }
+  // _floatingActionButtonReplacement(
+  //     String tooltip, String icon, BuildContext context, String routeName) {
+  //   return FloatingActionButton(
+  //     heroTag: UniqueKey(),
+  //     backgroundColor: const Color(0xFF17CA84),
+  //     tooltip: tooltip,
+  //     onPressed: () => pushReplacementNamed(context, routeName),
+  //     shape: RoundedRectangleBorder(
+  //       side: const BorderSide(width: 1, color: Color(0xFF910029)),
+  //       borderRadius: BorderRadius.circular(100),
+  //     ),
+  //     child: Image.asset(
+  //       icon,
+  //       height: MediaQuery.of(context).size.height * 0.06,
+  //     ),
+  //   );
+  // }
 
   _floatingActionButtonReplacementRiver(
-      String tooltip, String icon, BuildContext context, String routeLocation) {
+      String tooltip, String icon, String routeLocation) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
-      onPressed: () => context.push(routeLocation),
+      onPressed: () => _context.go(routeLocation),
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: Color(0xFF910029)),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Image.asset(
         icon,
-        height: MediaQuery.of(context).size.height * 0.06,
+        height: _size.height * 0.06,
       ),
     );
   }
 
-  _onTapDialog(context) {
+  _floatingActionButtonRiver(
+      String tooltip, String icon, String routeLocation) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: const Color(0xFF17CA84),
+      tooltip: tooltip,
+      onPressed: () => _context.push(routeLocation),
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Image.asset(
+        icon,
+        height: _size.height * 0.06,
+      ),
+    );
+  }
+
+  _onTapDialog() {
     showDialog(
-      context: context,
+      context: _context,
       builder: (context) {
         return AlertDialog(
           title: Container(
@@ -145,12 +161,12 @@ class NavButtonsFloating extends ConsumerWidget {
               ),
               borderRadius: BorderRadius.all(Radius.circular(26))),
           content: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: _size.height * 0.3,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                _botaoVenda(context, "Rua", RouteLocation.cadastroVendaRua),
-                _botaoVenda(context, "Fiado", RouteLocation.cadastroVendaFiado),
+                _botaoVenda("Rua", RouteLocation.cadastroVendaRua),
+                _botaoVenda("Fiado", RouteLocation.cadastroVendaFiado),
               ],
             ),
           ),
@@ -159,19 +175,18 @@ class NavButtonsFloating extends ConsumerWidget {
     );
   }
 
-  _botaoVenda(context, botaoTexto, routeLocation) {
+  _botaoVenda(botaoTexto, routeLocation) {
     return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.1),
-      width: MediaQuery.of(context).size.width * 0.5,
+      margin: EdgeInsets.symmetric(horizontal: _size.width * 0.1),
+      width: _size.width * 0.5,
       decoration: BoxDecoration(
         color: const Color(0xFF910029),
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextButton(
         onPressed: () => {
-          Navigator.pop(context),
-          context.push(routeLocation),
+          Navigator.pop(_context),
+          _context.push(routeLocation),
         },
         child: Text(
           botaoTexto,

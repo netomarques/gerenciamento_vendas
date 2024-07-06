@@ -1,4 +1,4 @@
-import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/repositories/repositories.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 import 'package:sqflite/sqflite.dart';
 

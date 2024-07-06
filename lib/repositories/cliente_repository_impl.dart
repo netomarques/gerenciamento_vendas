@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/repositories/repositories.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 class ClienteRepositoryImpl extends ClienteRepository {
@@ -28,6 +28,20 @@ class ClienteRepositoryImpl extends ClienteRepository {
     return db.transaction(
       (txn) async {
         return txn.query(DbClienteKeys.tableName);
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getClientesLazyLoading(
+      int limit, int offset) async {
+    final Database db = await connection.database;
+    return db.transaction(
+      (txn) async {
+        return txn.query(
+          DbClienteKeys.tableName,
+          limit: limit,
+          offset: offset,
+        );
       },
     );
   }
@@ -70,6 +84,21 @@ class ClienteRepositoryImpl extends ClienteRepository {
           values,
           where: '${DbClienteKeys.idColuna} = ?',
           whereArgs: [id],
+        );
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getClientesPorNome(String nome, int limit, int offset) async {
+    final Database db = await connection.database;
+    return db.transaction(
+      (txn) async {
+        return txn.query(
+          DbClienteKeys.tableName,
+          where: '${DbClienteKeys.nomeColuna} LIKE ?',
+          whereArgs: ['$nome%'],
+          limit: limit,
+          offset: offset,
         );
       },
     );

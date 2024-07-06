@@ -1,4 +1,3 @@
-import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';

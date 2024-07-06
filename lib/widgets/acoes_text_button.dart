@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:vendas_gerenciamento/utils/extensions.dart';
 
 class AcoesTextButton extends StatelessWidget {
   final Function onFunction;
   final String text;
 
-  AcoesTextButton(
-      {this.onFunction = defaultFunction, this.text = 'Cadastrar', super.key});
-
-  double _altura = 0.0;
+  const AcoesTextButton(
+      {required this.onFunction, this.text = 'Cadastrar', super.key});
 
   @override
   Widget build(BuildContext context) {
-    _altura = MediaQuery.of(context).size.height;
+    final Size sizeDevice = context.devicesize;
 
     return SizedBox(
-      height: _altura * 0.07,
+      height: sizeDevice.height * 0.07,
       child: ElevatedButton(
         onPressed: () => onFunction(),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF910029),
+          backgroundColor: const Color(0xFFEB710A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -33,6 +32,4 @@ class AcoesTextButton extends StatelessWidget {
       ),
     );
   }
-
-  static void defaultFunction() {}
 }

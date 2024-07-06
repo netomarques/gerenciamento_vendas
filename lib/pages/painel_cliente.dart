@@ -1,44 +1,69 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/api/vendas_api.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
-import 'package:vendas_gerenciamento/model/cliente.dart';
-import 'package:vendas_gerenciamento/model/venda.dart';
-import 'package:vendas_gerenciamento/pages/widgets/vendas_widget.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class PainelCliente extends StatefulWidget {
-  final Cliente _cliente;
-  const PainelCliente(this._cliente, {super.key});
+class PainelCliente extends ConsumerStatefulWidget {
+  final int idCliente;
+
+  static PainelCliente builder(BuildContext context, GoRouterState state) =>
+      PainelCliente(state.extra as int);
+
+  const PainelCliente(this.idCliente, {super.key});
 
   @override
-  State<PainelCliente> createState() => _PainelClienteState();
+  ConsumerState<PainelCliente> createState() => _PainelClienteState();
 }
 
-class _PainelClienteState extends State<PainelCliente> {
+class _PainelClienteState extends ConsumerState<PainelCliente> {
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  final _vendasStreamController = StreamController<List<Venda>>();
-  double _altura = 0.0;
-  double _largura = 0.0;
-  late final Future<double> _totalAReceber;
+  late String _dateStart;
+  late String _dateEnd;
+  late Size _deviceSize;
+  late ClienteAtualState _clienteAtualState;
+  late final int _idCliente;
+  late final ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
-    _totalAReceber = _carregarDados();
+    _carregarDados();
+  }
+
+  _carregarDados() {
+    scrollController = ScrollController();
+    scrollController.addListener(_onScrollCarregarMaisVendas);
+    _dateStart = _dateFormat.format(DateTime.now());
+    _dateEnd = _dateFormat.format(DateTime.now());
+
+    _idCliente = widget.idCliente;
   }
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
-    _altura = MediaQuery.of(context).size.height;
+    _deviceSize = context.devicesize;
+    _clienteAtualState = ref.watch(clienteAtualProvider(_idCliente));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        backgroundColor: const Color(0xFFEB710A),
+        title: const Text(
+          'Painel do Cliente',
+          style: TextStyle(
+            color: Color(0xFFFDFFFF),
+          ),
+        ),
+        leading: BackButton(
+          onPressed: () {
+            context.pop();
+            _limparDados();
+          },
+        ),
       ),
       resizeToAvoidBottomInset: false,
       body: _body(),
@@ -53,29 +78,17 @@ class _PainelClienteState extends State<PainelCliente> {
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: SizedBox(
-              width: _largura * 0.35,
-              child: DateButton(_dateFormat.format(DateTime.now()),
-                  _dateFormat.format(DateTime.now()), _carregarVendas)),
+              width: _deviceSize.width * 0.35,
+              child: DateButton(_dateStart, _dateEnd, _carregarVendasPorData)),
         ),
-        StreamBuilder<List<Venda>>(
-          stream: _vendasStreamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Expanded(
-                child: Center(child: Text('Erro: ${snapshot.error}')),
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            final List<Venda> vendas = snapshot.data!;
-
-            return VendasWidget(
-                vendas: vendas, route: RouteLocation.listarPagamentos);
-          },
+        VendasWidget(
+          vendas: _clienteAtualState.vendasDoCliente,
+          route: RouteLocation.listarPagamentos,
+          scrollController: scrollController,
         ),
+        _clienteAtualState.carregando
+            ? const CircularProgressIndicator()
+            : Container(),
       ],
     );
   }
@@ -84,29 +97,29 @@ class _PainelClienteState extends State<PainelCliente> {
     return Stack(
       children: <Widget>[
         Container(
-          width: _largura,
-          height: _altura * 0.23,
-          color: const Color(0xFF910029),
+          width: _deviceSize.width,
+          height: _deviceSize.height * 0.23,
+          color: const Color(0xFFEB710A),
           child: Column(
             children: <Widget>[
               Container(
                 color: const Color(0xFF006940),
-                width: _largura,
-                height: _altura * 0.075,
+                width: _deviceSize.width,
+                height: _deviceSize.height * 0.075,
               ),
               Container(
-                height: _altura * 0.085,
+                height: _deviceSize.height * 0.085,
                 margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Text(
-                      widget._cliente.nome,
+                      _clienteAtualState.cliente!.nome,
                       style: const TextStyle(
                           color: Color(0xffFDFFFF), fontSize: 16),
                     ),
                     Text(
-                      widget._cliente.telefone,
+                      _clienteAtualState.cliente!.telefone,
                       style: const TextStyle(
                         color: Color(0xffFDFFFF),
                         fontSize: 16,
@@ -119,13 +132,13 @@ class _PainelClienteState extends State<PainelCliente> {
           ),
         ),
         GestureDetector(
-          onTap: () => pushNamed(context, "/alterar_cliente",
-              arguments: {"cliente": widget._cliente}),
+          onTap: () =>
+              context.push(RouteLocation.alterarCliente, extra: _idCliente),
           child: Container(
-            margin: EdgeInsets.only(top: 8, left: _largura * 0.40),
+            margin: EdgeInsets.only(top: 8, left: _deviceSize.width * 0.40),
             child: Image.asset(
               "assets/images/client_avatar_icon.png",
-              height: _altura * 0.1,
+              height: _deviceSize.height * 0.1,
             ),
           ),
         ),
@@ -135,56 +148,55 @@ class _PainelClienteState extends State<PainelCliente> {
 
   _textoInformacao() {
     return Container(
-      width: _largura,
-      height: _altura * 0.07,
+      width: _deviceSize.width,
+      height: _deviceSize.height * 0.07,
       color: const Color(0xFF3B7554),
       padding: const EdgeInsets.all(3.0),
       child: Opacity(
         opacity: 0.65,
         child: Center(
-          child: FutureBuilder<double>(
-            future: _totalAReceber,
-            builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Text(
-                  "Total a receber: R\$ ${snapshot.data!.toStringAsFixed(2)}",
-                  style:
-                      const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
+          child: Text(
+            "Total a receber: R\$ ${_clienteAtualState.totalEmAberto.toStringAsFixed(2)}",
+            style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
           ),
         ),
       ),
     );
   }
 
-  void _carregarVendas(String dateStart, String dateEnd) async {
-    // List<Venda> vendasCliente = await VendasApi().vendasCliente(
-    //   widget._cliente.id!,
-    //   _dateFormat.parse(dateStart),
-    //   _dateFormat.parse(dateEnd),
-    // );
-
-    // _vendasStreamController.add(vendasCliente);
+  void _onScrollCarregarMaisVendas() {
+    if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent &&
+        !_clienteAtualState.carregando) {
+      ref
+          .read(clienteAtualProvider(_idCliente).notifier)
+          .getMaisVendasPorClienteLazyLoading(
+            startDate: Helpers.dateTimeToDbDate(_dateStart),
+            endDate: Helpers.dateTimeToDbDate(_dateEnd),
+          );
+    }
   }
 
-  Future<double> _carregarDados() async {
-    // List<Venda> vendasCliente = await VendasApi().vendasCliente(
-    //     widget._cliente.id!,
-    //     _dateFormat.parse(_dateFormat.format(DateTime(1900))),
-    //     _dateFormat.parse(_dateFormat.format(DateTime.now())));
+  void _carregarVendasPorData(String dateStart, String dateEnd) async {
+    if (!_clienteAtualState.carregando) {
+      _dateStart = dateStart;
+      _dateEnd = dateEnd;
+      ref
+          .read(clienteAtualProvider(_idCliente).notifier)
+          .getVendasPorClienteLazyLoading(
+            startDate: Helpers.dateTimeToDbDate(dateStart),
+            endDate: Helpers.dateTimeToDbDate(dateEnd),
+          );
+    }
+  }
 
-    // _vendasStreamController.add(vendasCliente);
-    // return VendasApi().valorTotalEmAbertoPorCliente(vendasCliente);
-    return 2;
+  _limparDados() {
+    ref.read(clienteAtualProvider(widget.idCliente).notifier).limparDados();
   }
 
   @override
   void dispose() {
-    _vendasStreamController.close();
+    scrollController.dispose();
     super.dispose();
   }
 }

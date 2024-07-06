@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
-import 'package:vendas_gerenciamento/repository/repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VendaNotifier extends StateNotifier<VendaState> {
   // final DataRepository _repository;

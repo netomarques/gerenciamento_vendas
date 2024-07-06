@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/abatimento.dart';
 import 'package:intl/intl.dart';
+import 'package:vendas_gerenciamento/utils/extensions.dart';
 
 class AbatimentosWidget extends StatelessWidget {
   final List<Abatimento> _abatimentosVenda;
@@ -8,13 +9,11 @@ class AbatimentosWidget extends StatelessWidget {
   AbatimentosWidget(this._abatimentosVenda, {super.key});
 
   final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  double _altura = 0.0;
-  double _largura = 0.0;
+  late final Size _deviceSize;
 
   @override
   Widget build(BuildContext context) {
-    _largura = MediaQuery.of(context).size.width;
-    _altura = MediaQuery.of(context).size.height;
+    _deviceSize = context.devicesize;
 
     return Expanded(
         child: ListView.builder(
@@ -28,8 +27,8 @@ class AbatimentosWidget extends StatelessWidget {
           child: Container(
             margin:
                 const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
-            width: _largura,
-            height: _altura * 0.155,
+            width: _deviceSize.width,
+            height: _deviceSize.height * 0.155,
             color: const Color(0xFF006940),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,8 +45,8 @@ class AbatimentosWidget extends StatelessWidget {
 
   _abatimentoData(data) {
     return Container(
-      width: _largura * 0.26,
-      height: _altura * 0.03,
+      width: _deviceSize.width * 0.26,
+      height: _deviceSize.height * 0.03,
       margin: const EdgeInsets.only(left: 8, top: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFFDFFFF),
@@ -67,8 +66,8 @@ class AbatimentosWidget extends StatelessWidget {
 
   _abatimentoValor(valor) {
     return Container(
-      width: _largura * 0.6,
-      height: _altura * 0.095,
+      width: _deviceSize.width * 0.6,
+      height: _deviceSize.height * 0.095,
       margin: const EdgeInsets.only(left: 16, top: 8),
       child: Row(
         children: <Widget>[

@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vendas_gerenciamento/api/vendas_api.dart';
-import 'package:vendas_gerenciamento/model/cliente.dart';
-import 'package:vendas_gerenciamento/pages/formatters/cnpj_formato.dart';
-import 'package:vendas_gerenciamento/pages/formatters/cpf_formato.dart';
-import 'package:vendas_gerenciamento/pages/formatters/cpf_ou_cnpj_formato.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
-import 'package:vendas_gerenciamento/utils/extensions.dart';
-import 'package:vendas_gerenciamento/utils/nav.dart';
-import 'package:vendas_gerenciamento/pages/formatters/telefone_formato.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 import 'package:go_router/go_router.dart';
@@ -30,10 +24,6 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   late final TextEditingController _textTelefoneController;
   late final TextEditingController _textCpfController;
   late Cliente _cliente;
-  late Size _deviceSize;
-  late ClienteNotifier _clienteNotifier;
-
-  // final DateFormat _dateFormat = DateFormat('dd/MM/yy');
 
   @override
   void initState() {
@@ -43,22 +33,15 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
 
   @override
   Widget build(BuildContext context) {
-    _deviceSize = context.devicesize;
-    _clienteNotifier = ref.read(clienteProvider.notifier);
-
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.dashboard,
-              color: Color(0xFFEB710A),
-            ),
-            onPressed: () {
-              pushReplacementNamed(context, '/');
-            },
-          )
-        ],
+        backgroundColor: const Color(0xFFEB710A),
+        title: const Text(
+          'Cadastro de Cliente',
+          style: TextStyle(
+            color: Color(0xFFFDFFFF),
+          ),
+        ),
       ),
       // resizeToAvoidBottomInset: false,
       body: _body(),
@@ -66,89 +49,69 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   _body() {
-    return Container(
-      color: const Color(0xFF006940),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _tituloForm(),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _containerTextForm(
-                        AppTextFormField2(
-                          'Informe o nome',
-                          'Nome',
-                          TextInputType.text,
-                          _validatorNome,
-                          _onSavedNome,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _containerTextForm(
+                      AppTextFormField2(
+                        'Informe o nome',
+                        'Nome',
+                        TextInputType.text,
+                        _validatorNome,
+                        _onSavedNome,
+                      ),
+                    ),
+                    _containerTextForm(
+                      AppTextFormField2(
+                        'Informe o telefone',
+                        'Telefone',
+                        TextInputType.number,
+                        _validatorTelefone,
+                        _onSavedTelefone,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          TelefoneFormato(),
+                        ],
+                      ),
+                    ),
+                    _containerTextForm(
+                      AppTextFormField2(
+                        'Informe o CPF/CNPJ',
+                        'CPF/CNPJ',
+                        TextInputType.number,
+                        _validatorCpf,
+                        _onSavedCpf,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
+                        ],
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 60, bottom: 8),
+                        child: AcoesTextButton(
+                          onFunction: _submitForm,
+                          text: 'Cadastrar Cliente',
                         ),
                       ),
-                      _containerTextForm(
-                        AppTextFormField2(
-                          'Informe o telefone',
-                          'Telefone',
-                          TextInputType.number,
-                          _validatorTelefone,
-                          _onSavedTelefone,
-                          formato: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            TelefoneFormato(),
-                          ],
-                        ),
-                      ),
-                      _containerTextForm(
-                        AppTextFormField2(
-                          'Informe o CPF/CNPJ',
-                          'CPF/CNPJ',
-                          TextInputType.number,
-                          _validatorCpf,
-                          _onSavedCpf,
-                          formato: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
-                          ],
-                        ),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 60, bottom: 8),
-                          child: AcoesTextButton(
-                            onFunction: _submitForm,
-                            text: 'Cadastrar Cliente',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  _tituloForm() {
-    return Container(
-      width: _deviceSize.width,
-      height: _deviceSize.height * 0.1,
-      color: const Color(0xff910029),
-      padding: const EdgeInsets.only(left: 16, top: 12),
-      child: const Text(
-        'Cadastro de Cliente',
-        style: TextStyle(
-          color: Color(0xffFDFFFF),
-          fontSize: 30,
         ),
-      ),
+      ],
     );
   }
 
@@ -176,7 +139,8 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _cliente = _cliente.copyWith(telefone: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
+    _cliente = _cliente.copyWith(
+        telefone: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
   String? _validatorTelefone(String? value) {
@@ -198,7 +162,8 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _cliente = _cliente.copyWith(cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
+    _cliente =
+        _cliente.copyWith(cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
   String? _validatorCpf(String? value) {
@@ -228,7 +193,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
           telefone: _cliente.telefone,
           cpf: _cliente.cpf,
         );
-        _clienteNotifier.salvarCliente(cliente);
+        ref.read(clienteServiceProvider).salvarCliente(cliente);
         _exibirDialog('Cliente cadastrado com sucesso');
         _formKey.currentState!.reset();
         _limparCampos();
@@ -259,7 +224,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _limparCampos() {
-    _cliente = Cliente(nome: "nome", telefone: "92999999999");
+    _cliente = Cliente(nome: "", telefone: "");
 
     _textNomeController.text = _cliente.nome;
     _textTelefoneController.text = _cliente.telefone;
@@ -267,7 +232,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _carregarDados() {
-    _cliente = Cliente(nome: "nome", telefone: "92999999999");
+    _cliente = Cliente(nome: "", telefone: "");
 
     _textNomeController = TextEditingController();
     _textTelefoneController = TextEditingController();

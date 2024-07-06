@@ -87,7 +87,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
             );
           },
         ),
-        const NavButtonsFloating(),
+        NavButtonsFloating(),
       ],
     );
   }
@@ -96,7 +96,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     return Container(
       width: _deviceSize.width,
       height: _deviceSize.height * 0.25,
-      color: const Color(0xff910029),
+      color: const Color(0xFFEB710A),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [

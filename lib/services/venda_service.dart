@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
-import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/repositories/repositories.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 import 'package:vendas_gerenciamento/utils/keys/db_venda_keys.dart';
 
@@ -25,6 +25,16 @@ class VendaService {
     } catch (e) {
       debugPrint(e.toString());
       throw Exception('Erro ao consultar Venda');
+    }
+  }
+
+  Future<void> salvarVenda(Venda venda) async {
+    try {
+      final vendaJson = venda.toJson();
+      await _repository.insertRecord(vendaJson);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao salvar Venda');
     }
   }
 
@@ -60,6 +70,17 @@ class VendaService {
     }
   }
 
+  Future<double> getTotalEmAbertoDoCliente(int idCliente) async {
+    try {
+      final resultado = await _repository.getTotalEmAbertoDoCliente(idCliente);
+      double totalEmAberto = resultado.first['sum_total_em_aberto'] ?? 0.0;
+      return totalEmAberto;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Total Em Aberto Do Cliente');
+    }
+  }
+
   Future<List<Abatimento>> getAbatimentosPorVenda(idVenda) async {
     try {
       final resultado = await _repository.getAbatimentosPorVenda(idVenda);
@@ -72,13 +93,51 @@ class VendaService {
     }
   }
 
-  Future<void> salvarVenda(Venda venda) async {
+  Future<List<Venda>> getVendasPorCliente(idCliente) async {
     try {
-      final vendaJson = venda.toJson();
-      await _repository.insertRecord(vendaJson);
+      final resultados = await _repository.getVendasPorClientes(idCliente);
+      final List<Venda> vendas = [];
+
+      for (var vendaJson in resultados) {
+        final Cliente cliente = await _clienteService
+            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception('Erro ao salvar Venda');
+      throw Exception('Erro ao consultar Venda por Cliente');
+    }
+  }
+
+  Future<List<Venda>> getVendasPorClienteLazyLoading(
+    int idCliente,
+    int limit,
+    int offset,
+    String startDate,
+    String endDate,
+  ) async {
+    try {
+      final resultados = await _repository.getVendasPorClientesLazyLoading(
+        idCliente,
+        limit,
+        offset,
+        startDate,
+        endDate,
+      );
+
+      final List<Venda> vendas = [];
+      for (var vendaJson in resultados) {
+        final Cliente cliente = await _clienteService
+            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda por Cliente');
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 @immutable
 class RouteLocation {

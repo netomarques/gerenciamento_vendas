@@ -48,9 +48,10 @@ class _CadastroVendaFiadoState extends State<CadastroVendaFiado> {
               Icons.dashboard,
               color: Color(0xFFEB710A),
             ),
-            onPressed: () {
-              pushReplacementNamed(context, '/');
-            },
+            // onPressed: () {
+            //   pushReplacementNamed(context, '/');
+            // },
+            onPressed: () {},
           ),
         ],
       ),

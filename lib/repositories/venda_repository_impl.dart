@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/repositories/repositories.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 class VendaRepositoryImpl extends DataRepository {
@@ -92,6 +92,51 @@ class VendaRepositoryImpl extends DataRepository {
     return db.transaction(
       (txn) async {
         return txn.rawQuery(DbVendaKeys.sqlVendasPorData, args);
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getVendasPorClientes(int idCliente) async {
+    final Database db = await connection.database;
+    final List<dynamic> args = [idCliente];
+    return db.transaction(
+      (txn) async {
+        return txn.rawQuery(
+          DbVendaKeys.sqlVendasPorCliente,
+          args,
+        );
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getTotalEmAbertoDoCliente(
+      int idCliente) async {
+    final Database db = await connection.database;
+    final List<dynamic> args = [idCliente];
+    return db.transaction(
+      (txn) async {
+        return txn.rawQuery(
+          DbVendaKeys.sqlTotalEmAbertoDoCliente,
+          args,
+        );
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getVendasPorClientesLazyLoading(
+      int idCliente,
+      int limit,
+      int offset,
+      String startDate,
+      String endDate) async {
+    final Database db = await connection.database;
+    final List<dynamic> args = [idCliente, startDate, endDate, limit, offset];
+    return db.transaction(
+      (txn) async {
+        return txn.rawQuery(
+          DbVendaKeys.sqlVendasPorClienteLazyLoadingPorData,
+          args,
+        );
       },
     );
   }

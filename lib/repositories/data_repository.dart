@@ -1,4 +1,4 @@
-import 'package:vendas_gerenciamento/repository/repository.dart';
+import 'package:vendas_gerenciamento/repositories/repositories.dart';
 
 abstract class DataRepository {
   late DatabaseProvider connection;

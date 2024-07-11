@@ -144,11 +144,13 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
       }
 
       final valor = double.parse(value);
-      if (valor > _venda.totalAberto!) {
+      if (valor > double.parse(_venda.totalAberto!.toStringAsFixed(2))) {
         return 'Por favor, valor não pode ser \nmaior do que ${_venda.totalAberto}';
       }
 
-      double.parse(value);
+      if (valor <= 0) {
+        return 'Por favor, valor não pode ser 0';
+      }
     } on FormatException {
       return 'Por favor, informe um valor \nnumérico válido para o valor';
     } catch (e) {

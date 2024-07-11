@@ -1,54 +1,49 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/model/abatimento.dart';
-import 'package:vendas_gerenciamento/model/cliente.dart';
-import 'package:vendas_gerenciamento/model/venda.dart';
-import 'package:vendas_gerenciamento/pages/widgets/abatimento_widget.dart';
-import 'package:vendas_gerenciamento/pages/widgets/venda_widget.dart';
-import 'package:vendas_gerenciamento/providers/services/services.dart';
-import 'package:vendas_gerenciamento/services/service.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/pages/cadastro_abatimento.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
-import 'package:vendas_gerenciamento/widgets/app_text_form_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ListaPagamento extends ConsumerStatefulWidget {
-  final Venda venda;
+  final int idVenda;
 
   static ListaPagamento builder(BuildContext context, GoRouterState state) =>
-      ListaPagamento(venda: state.extra! as Venda);
+      ListaPagamento(idVenda: state.extra! as int);
 
-  const ListaPagamento({super.key, required this.venda});
+  const ListaPagamento({super.key, required this.idVenda});
 
   @override
   ConsumerState<ListaPagamento> createState() => _ListaPagamentoState();
 }
 
 class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
-  late final StreamController<List<Abatimento>> _abatimentosStreamController;
-  late final Cliente _cliente;
-  late final Venda _venda;
-  late final Future<double> _totalAReceber;
-  late VendaService _vendaService;
+  late final int _idVenda;
+  late VendaState _vendaState;
   late Size _deviceSize;
 
   @override
   void initState() {
+    _idVenda = widget.idVenda;
     super.initState();
-    _abatimentosStreamController = StreamController<List<Abatimento>>();
-    _carregarDados();
   }
 
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
-    _vendaService = ref.watch(vendaServiceProvider);
-    _carregarAbatimentos();
+    _vendaState = ref.watch(vendaProvider(_idVenda));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        backgroundColor: const Color(0xFFEB710A),
+        title: const Text(
+          'Venda - Abatimentos',
+          style: TextStyle(
+            color: Color(0xffFDFFFF),
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
       body: _body(),
@@ -71,34 +66,22 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
             ],
           ),
         ),
-        VendaWidget(venda: _venda),
-        _textoInformacao("Histórico de abatimento"),
-        StreamBuilder<List<Abatimento>>(
-          stream: _abatimentosStreamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Expanded(
-                child: Center(child: Text('Erro: ${snapshot.error}')),
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            final List<Abatimento> abatimentosVenda = snapshot.data!;
-
-            return Expanded(
-              child: ListView.builder(
-                itemCount: abatimentosVenda.length,
-                shrinkWrap: true,
-                itemBuilder: ((context, index) {
-                  Abatimento abatimento = abatimentosVenda[index];
-                  return AbatimentoWidget(abatimento: abatimento);
-                }),
-              ),
-            );
-          },
+        _vendaState.carregando
+            ? const CircularProgressIndicator()
+            : VendaWidget(venda: _vendaState.venda!),
+        _textoInformacao(),
+        Expanded(
+          child: _vendaState.carregando
+              ? const CircularProgressIndicator()
+              : ListView.builder(
+                  itemCount: _vendaState.abatimentosDaVenda.length,
+                  shrinkWrap: true,
+                  itemBuilder: ((context, index) {
+                    Abatimento abatimento =
+                        _vendaState.abatimentosDaVenda[index];
+                    return AbatimentoWidget(abatimento: abatimento);
+                  }),
+                ),
         )
       ],
     );
@@ -110,7 +93,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         Container(
           width: _deviceSize.width,
           height: _deviceSize.height * 0.23,
-          color: const Color(0xFF910029),
+          color: const Color(0xFFEB710A),
           child: Column(
             children: <Widget>[
               Container(
@@ -121,23 +104,25 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
               Container(
                 height: _deviceSize.height * 0.085,
                 margin: const EdgeInsets.only(top: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text(
-                      _cliente.nome,
-                      style: const TextStyle(
-                          color: Color(0xffFDFFFF), fontSize: 16),
-                    ),
-                    Text(
-                      _cliente.telefone,
-                      style: const TextStyle(
-                        color: Color(0xffFDFFFF),
-                        fontSize: 16,
+                child: _vendaState.carregando
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(
+                            _vendaState.venda!.cliente.nome,
+                            style: const TextStyle(
+                                color: Color(0xffFDFFFF), fontSize: 16),
+                          ),
+                          Text(
+                            _vendaState.venda!.cliente.telefone,
+                            style: const TextStyle(
+                              color: Color(0xffFDFFFF),
+                              fontSize: 16,
+                            ),
+                          )
+                        ],
                       ),
-                    )
-                  ],
-                ),
               ),
             ],
           ),
@@ -161,53 +146,29 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
       child: Opacity(
         opacity: 0.65,
         child: Center(
-          child: FutureBuilder<double>(
-            future: _totalAReceber,
-            builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Text(
-                  "A receber: R\$ ${snapshot.data!.toStringAsFixed(2)}",
+          child: _vendaState.carregando
+              ? const CircularProgressIndicator()
+              : Text(
+                  "A receber: R\$ ${_vendaState.venda!.totalAberto!.toStringAsFixed(2)}",
                   style:
                       const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
-          ),
+                ),
         ),
       ),
     );
   }
 
-  _textoInformacao(text) {
+  _textoInformacao() {
     return Container(
       height: _deviceSize.height * 0.07,
       color: const Color(0xFF3B7554),
       padding: const EdgeInsets.all(3.0),
-      child: Opacity(
+      child: const Opacity(
         opacity: 0.65,
         child: Center(
           child: Text(
-            text,
-            style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
-          ),
-        ),
-      ),
-    );
-  }
-
-  _textoInformacaoDialog(text) {
-    return Container(
-      height: _deviceSize.height * 0.07,
-      color: const Color(0xFF3B7554),
-      padding: const EdgeInsets.all(3.0),
-      child: Opacity(
-        opacity: 0.65,
-        child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(color: Color(0xFF7AA28B), fontSize: 20),
+            'Histórico de abatimento',
+            style: TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
           ),
         ),
       ),
@@ -225,81 +186,30 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF006940),
-          shape: const RoundedRectangleBorder(
-              side: BorderSide(
-                width: 2,
-                color: Color(0xFF910029),
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(26))),
-          content: SizedBox(
-            height: _deviceSize.height * 0.3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                FutureBuilder<double>(
-                  future: _totalAReceber,
-                  builder:
-                      (BuildContext context, AsyncSnapshot<double> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return _textoInformacaoDialog(
-                          "A receber: R\$ ${snapshot.data!.toStringAsFixed(2)}");
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
-                ),
-                const AppTextFormField("Valor do abatimento", "valor"),
-                const AppTextFormField(
-                    "Data do abatimento", "Data de abatimento"),
-              ],
+        if (_vendaState.venda!.totalAberto! > 0.0) {
+          return CadastroAbatimento(_vendaState.venda!);
+        } else {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF006940),
+            content: const Text(
+              'Não há valores em aberto',
+              style: TextStyle(fontSize: 20),
             ),
-          ),
-          actions: [
-            _botaoCadastrarAbatimento(),
-          ],
-        );
+            actions: [
+              TextButton(
+                onPressed: () => context.pop(),
+                child: const Text(
+                  "OK",
+                  style: TextStyle(
+                    color: Color(0xFFFDFFFF),
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
       },
     );
-  }
-
-  _botaoCadastrarAbatimento() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: _deviceSize.width * 0.1),
-      width: _deviceSize.width * 0.5,
-      decoration: BoxDecoration(
-        color: const Color(0xFF910029),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: TextButton(
-        onPressed: () => {},
-        child: const Text(
-          "Cadastrar",
-          style: TextStyle(
-            color: Color(0xFFFDFFFF),
-            fontSize: 20,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _carregarDados() async {
-    _venda = widget.venda;
-    _cliente = _venda.cliente;
-    _totalAReceber = Future.value(_venda.totalAberto);
-  }
-
-  Future<void> _carregarAbatimentos() async {
-    List<Abatimento> abatimentoVendas =
-        await _vendaService.getAbatimentosPorVenda(_venda.id);
-    _abatimentosStreamController.add(abatimentoVendas);
-  }
-
-  @override
-  void dispose() {
-    _abatimentosStreamController.close();
-    super.dispose();
   }
 }

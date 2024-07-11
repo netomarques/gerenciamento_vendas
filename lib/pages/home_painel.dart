@@ -28,7 +28,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   late final StreamController<List<Venda>> _vendasStreamController;
   late final StreamController<Map<String, dynamic>> _resumoStreamController;
   late Size _deviceSize;
-  late VendaState _vendasState;
+  late ListaVendasState _vendasState;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
-    _vendasState = ref.watch(vendaProvider);
+    _vendasState = ref.watch(listaVendasProvider);
     _vendasStreamController.add(_vendasState.list);
     resumoVendas();
 
@@ -79,7 +79,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
                   Venda venda = vendas[index];
                   return GestureDetector(
                     onTap: () => context.push(RouteLocation.listarPagamentos,
-                        extra: venda),
+                        extra: venda.id),
                     child: VendaWidget(venda: venda),
                   );
                 },
@@ -340,7 +340,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   }
 
   void pesquisarVendasPorData(String startDate, String endDate) {
-    ref.read(vendaProvider.notifier).getVendasPorData(
+    ref.read(listaVendasProvider.notifier).getVendasPorData(
         Helpers.dateTimeToDbDate(startDate), Helpers.dateTimeToDbDate(endDate));
     startDateController.text = startDate;
     endDateController.text = endDate;

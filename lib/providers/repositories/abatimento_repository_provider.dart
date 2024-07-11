@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/repositories/repositories.dart';
 
-final vendaRepositoryProvider = Provider<VendaRepositoryImpl>((ref) {
+final abatimentoRepositoryProvider = Provider.autoDispose<AbatimentoRepositoryImpl>((ref) {
   final connection = ref.read(connectionProvider);
-  return VendaRepositoryImpl(connection);
+  return AbatimentoRepositoryImpl(connection);
 });

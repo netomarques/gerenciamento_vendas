@@ -25,7 +25,7 @@ class VendasWidget extends StatelessWidget {
         itemBuilder: (context, index) {
           Venda venda = vendas[index];
           return GestureDetector(
-            onTap: () => context.push(route, extra: venda),
+            onTap: () => context.push(route, extra: venda.id),
             child: VendaWidget(venda: venda),
           );
         },

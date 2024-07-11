@@ -62,12 +62,12 @@ class VendaRepositoryImpl extends DataRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getByIdRecord(int id) async {
+  Future<List<Map<String, dynamic>>> getByIdRecord(int idVenda) async {
     final Database db = await connection.database;
-    final List<dynamic> args = [id];
+    final List<dynamic> args = [idVenda];
     return db.transaction(
       (txn) async {
-        return txn.rawQuery(DbVendaKeys.sqlVendas, args);
+        return txn.rawQuery(DbVendaKeys.sqlVenda, args);
       },
     );
   }
@@ -80,6 +80,7 @@ class VendaRepositoryImpl extends DataRepository {
           DbAbatimentoKeys.tableName,
           where: '${DbAbatimentoKeys.idVendaColuna} = ?',
           whereArgs: [idVenda],
+          orderBy: '${DbAbatimentoKeys.dateAbatimentoColuna} DESC',
         );
       },
     );

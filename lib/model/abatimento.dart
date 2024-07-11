@@ -40,7 +40,8 @@ class Abatimento extends AbstractModel {
     return <String, dynamic>{
       AbatimentoKeys.idVenda: idVenda,
       AbatimentoKeys.valor: valor,
-      AbatimentoKeys.dateAbatimento: dateAbatimento,
+      AbatimentoKeys.dateAbatimento: Helpers.dateTimeToDbDate(
+          Helpers.formatarDateTimeToString(dateAbatimento)),
     };
   }
 

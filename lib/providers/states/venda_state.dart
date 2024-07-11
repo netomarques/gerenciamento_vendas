@@ -2,20 +2,30 @@ import 'package:equatable/equatable.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 
 class VendaState extends Equatable {
-  final List<Venda> list;
+  final Venda? venda;
+  final List<Abatimento> abatimentosDaVenda;
+  final bool carregando;
 
-  const VendaState(this.list);
+  const VendaState(this.venda, this.abatimentosDaVenda, this.carregando);
 
   const VendaState.initial({
-    this.list = const [],
+    this.venda,
+    this.abatimentosDaVenda = const [],
+    this.carregando = false,
   });
 
-  VendaState copyWith({List<Venda>? list}) {
+  VendaState copyWith({
+    Venda? venda,
+    List<Abatimento>? abatimentosDaVenda,
+    bool? carregando,
+  }) {
     return VendaState(
-      list ?? this.list,
+      venda ?? this.venda,
+      abatimentosDaVenda ?? this.abatimentosDaVenda,
+      carregando ?? this.carregando,
     );
   }
 
   @override
-  List<Object?> get props => [list];
+  List<Object?> get props => [venda, abatimentosDaVenda, carregando];
 }

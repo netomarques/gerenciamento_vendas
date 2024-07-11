@@ -5,55 +5,24 @@ import 'package:vendas_gerenciamento/services/service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VendaNotifier extends StateNotifier<VendaState> {
-  // final DataRepository _repository;
-  final VendaService service;
+  final VendaService _vendaService;
 
-  VendaNotifier(this.service) : super(const VendaState.initial()) {
-    getVendas();
+  VendaNotifier(this._vendaService, int idVenda)
+      : super(const VendaState.initial()) {
+    getVenda(idVenda);
   }
 
-  void salvarVenda(Venda venda) async {
+  void getVenda(int idVenda) async {
+    final Venda venda;
+    final List<Abatimento> abatimentos;
     try {
-      await service.salvarVenda(venda);
-      getVendas();
+      state = state.copyWith(carregando: true);
+      venda = await _vendaService.getVendaId(idVenda);
+      abatimentos = await _vendaService.getAbatimentosPorVenda(idVenda);
+      state = state.copyWith(
+          venda: venda, abatimentosDaVenda: abatimentos, carregando: false);
     } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  void getVendas() async {
-    try {
-      final List<Venda> vendas = await service.getVendas();
-      state = state.copyWith(list: vendas);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  void getVendasPorData(String startDate, String endDate) async {
-    try {
-      final List<Venda> vendas =
-          await service.getVendasPorData(startDate, endDate);
-      state = state.copyWith(list: vendas);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  Future<void> updateRecord(Map<String, dynamic> values, int id) async {
-    try {
-      // await _repository.updateRecord(values, id);
-      getVendas();
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  Future<void> deleteRecord(int id) async {
-    try {
-      // await _repository.deleteRecord(id);
-      getVendas();
-    } catch (e) {
+      state = state.copyWith(carregando: false);
       debugPrint(e.toString());
     }
   }

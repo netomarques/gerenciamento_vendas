@@ -30,4 +30,26 @@ class Helpers {
           'Erro ao converter DateTime para String no formato do banco');
     }
   }
+
+  static String formatarDateTimeToString(DateTime date) {
+    try {
+      return DateFormat('dd/MM/yy').format(date);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao formatar Data');
+    }
+  }
+
+  static DateTime stringFormatadaToDateTime(stringFormatada) {
+    try {
+      List<String> parts = stringFormatada.split('/');
+      int day = int.parse(parts[0]);
+      int month = int.parse(parts[1]);
+      int year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao converter String para DataTime');
+    }
+  }
 }

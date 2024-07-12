@@ -27,47 +27,6 @@ class Venda extends AbstractModel {
     this.totalAberto,
   });
 
-  bool isFiado() {
-    return cliente.id != 0 ? true : false;
-  }
-
-  double calcTotal() {
-    return (quantidade * preco) - desconto;
-  }
-
-  // List<Abatimento> getAbatimentosVenda() {
-  //   return VendasApi().abatimentosVenda(id!);
-  // }
-
-  // bool isOpen() {
-  //   bool isOpen;
-  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
-
-  //   if (abatimentosVenda.isEmpty) {
-  //     isOpen = true;
-  //   } else {
-  //     double totalAbatido = 0.0;
-  //     for (Abatimento abatimento in abatimentosVenda) {
-  //       totalAbatido += abatimento.valor;
-  //     }
-
-  //     totalAbatido == calcTotal() ? isOpen = false : isOpen = true;
-  //   }
-
-  //   return isOpen;
-  // }
-
-  // double totalEmAberto() {
-  //   double totalAbatido = 0.0;
-
-  //   List<Abatimento> abatimentosVenda = getAbatimentosVenda();
-  //   for (Abatimento abatimento in abatimentosVenda) {
-  //     totalAbatido = abatimento.valor + totalAbatido;
-  //   }
-
-  //   return calcTotal() - totalAbatido;
-  // }
-
   @override
   Venda copyWith({
     int? id,

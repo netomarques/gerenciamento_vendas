@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/venda.dart';
-import 'package:vendas_gerenciamento/pages/widgets/venda_widget.dart';
+import 'package:vendas_gerenciamento/pages/widgets/widgets.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class VendasWidget extends StatelessWidget {
+class VendasWidget extends ConsumerWidget {
   const VendasWidget({
     super.key,
     required this.vendas,
@@ -16,7 +18,7 @@ class VendasWidget extends StatelessWidget {
   final ScrollController scrollController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: ListView.builder(
         controller: scrollController,
@@ -25,8 +27,11 @@ class VendasWidget extends StatelessWidget {
         itemBuilder: (context, index) {
           Venda venda = vendas[index];
           return GestureDetector(
-            onTap: () => context.push(route, extra: venda.id),
             child: VendaWidget(venda: venda),
+            onTap: () => {
+              ref.read(vendaProvider(venda).notifier).getVenda(),
+              context.push(route, extra: venda),
+            },
           );
         },
       ),

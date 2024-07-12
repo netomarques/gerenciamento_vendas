@@ -99,10 +99,4 @@ class ClientesNotifier extends StateNotifier<ClientesState> {
       debugPrint(e.toString());
     }
   }
-
-  // void limparLista() {
-  //   // const List<Cliente> list = [];
-  //   // state = state.copyWith(list: list, carregando: false);
-  //   state = const ClientesState.initial();
-  // }
 }

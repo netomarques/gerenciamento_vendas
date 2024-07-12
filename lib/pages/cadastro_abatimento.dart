@@ -101,7 +101,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
         _formKey.currentState!.save();
         ref.read(abatimentoServiceProvider).salvarAbatimento(_abatimento);
         context.pop();
-        ref.read(vendaProvider(_venda.id!).notifier).getVenda(_venda.id!);
+        ref.read(vendaProvider(_venda).notifier).getVenda();
         _exibirDialog('Abatimento salvo');
       } catch (e) {
         _formKey.currentState!.reset();

@@ -7,14 +7,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class VendaNotifier extends StateNotifier<VendaState> {
   final VendaService _vendaService;
 
-  VendaNotifier(this._vendaService, int idVenda)
+  VendaNotifier(this._vendaService, Venda venda)
       : super(const VendaState.initial()) {
-    getVenda(idVenda);
+    _setVenda(venda);
   }
 
-  void getVenda(int idVenda) async {
+  _setVenda(Venda venda) {
+    state = state.copyWith(venda: venda);
+  }
+
+  void getVenda() async {
     final Venda venda;
     final List<Abatimento> abatimentos;
+    int idVenda = state.venda!.id!;
     try {
       state = state.copyWith(carregando: true);
       venda = await _vendaService.getVendaId(idVenda);
@@ -25,5 +30,12 @@ class VendaNotifier extends StateNotifier<VendaState> {
       state = state.copyWith(carregando: false);
       debugPrint(e.toString());
     }
+  }
+
+  void limparDados() {
+    state = state.copyWith(
+      abatimentosDaVenda: const [],
+      carregando: false,
+    );
   }
 }

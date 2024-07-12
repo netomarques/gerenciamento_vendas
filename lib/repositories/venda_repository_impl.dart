@@ -72,6 +72,20 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  Future<List<Map<String, dynamic>>> getVendasLazyLoading(
+      int limit, int offset, String startDate, String endDate) async {
+    final Database db = await connection.database;
+    final List<dynamic> args = [startDate, endDate, limit, offset];
+    return db.transaction(
+      (txn) async {
+        return txn.rawQuery(
+          DbVendaKeys.sqlVendasLazyLoading,
+          args,
+        );
+      },
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getAbatimentosPorVenda(int idVenda) async {
     final Database db = await connection.database;
     return db.transaction(

@@ -27,6 +27,19 @@ class DbVendaKeys {
     ORDER BY v.$dateColuna DESC;
   ''';
 
+  static const String sqlVendasLazyLoading = '''
+    SELECT v.*, 
+           CASE WHEN v.$idClienteColuna == 1 THEN 0 ELSE 1 END $isFiadoColuna,
+           CASE WHEN (v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) THEN v.$totalColuna ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $totalEmAbertoColuna,
+           CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
+    FROM $tableName  v
+    WHERE v.$dateColuna BETWEEN ? AND ?
+    GROUP BY v.$idColuna
+    ORDER BY v.$dateColuna DESC
+    LIMIT ?
+    OFFSET ?;
+  ''';
+
   static const String sqlVenda = '''
     SELECT v.*, 
            CASE WHEN v.$idClienteColuna == 1 THEN 0 ELSE 1 END $isFiadoColuna,

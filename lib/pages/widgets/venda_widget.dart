@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
-import 'package:vendas_gerenciamento/utils/extensions.dart';
-import 'package:intl/intl.dart';
+import 'package:vendas_gerenciamento/providers/providers.dart';
+import 'package:vendas_gerenciamento/utils/utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class VendaWidget extends StatelessWidget {
+class VendaWidget extends ConsumerWidget {
   final Venda venda;
 
   const VendaWidget({
@@ -12,12 +13,13 @@ class VendaWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final DateFormat dateFormat = DateFormat('dd/MM/yy');
+  Widget build(BuildContext context, WidgetRef ref) {
+    final vendaState = ref.watch(vendaProvider(venda));
     Size deviceSize = context.devicesize;
-    Color cor = venda.fiado == false || venda.isAberto == false
-        ? const Color(0xFF006940)
-        : const Color(0xFF910029);
+    Color cor =
+        vendaState.venda!.fiado == false || vendaState.venda!.isAberto == false
+            ? const Color(0xFF006940)
+            : const Color(0xFF910029);
 
     return Container(
       margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
@@ -39,7 +41,7 @@ class VendaWidget extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      dateFormat.format(venda.date),
+                      Helpers.formatarDateTimeToString(vendaState.venda!.date),
                       style: const TextStyle(
                         fontSize: 16,
                         color: Color(0xFF969CAF),
@@ -87,7 +89,7 @@ class VendaWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             Text(
-                              '${venda.quantidade.toStringAsFixed(2)} Kg',
+                              '${vendaState.venda!.quantidade.toStringAsFixed(2)} Kg',
                               style: TextStyle(
                                 fontSize: (deviceSize.width *
                                         0.5 *
@@ -101,7 +103,7 @@ class VendaWidget extends StatelessWidget {
                             Opacity(
                               opacity: 0.6,
                               child: Text(
-                                'R\$ ${venda.preco.toStringAsFixed(2)}',
+                                'R\$ ${vendaState.venda!.preco.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontSize: (deviceSize.width *
                                           0.5 *
@@ -138,7 +140,7 @@ class VendaWidget extends StatelessWidget {
                             TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                       ),
                       Text(
-                        "R\$ ${venda.total?.toStringAsFixed(2)}",
+                        "R\$ ${vendaState.venda!.total?.toStringAsFixed(2)}",
                         style: TextStyle(
                           color: const Color(0xFFFDFFFF),
                           fontSize: (deviceSize.width *
@@ -152,7 +154,7 @@ class VendaWidget extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    venda.cliente.nome,
+                    vendaState.venda!.cliente.nome,
                     style:
                         const TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                   ),

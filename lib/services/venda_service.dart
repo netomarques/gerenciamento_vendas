@@ -28,6 +28,30 @@ class VendaService {
     }
   }
 
+  Future<List<Venda>> getVendasLazyLoading(
+    int limit,
+    int offset,
+    String startDate,
+    String endDate,
+  ) async {
+    try {
+      final resultados = await _repository.getVendasLazyLoading(
+          limit, offset, startDate, endDate);
+          
+      final List<Venda> vendas = [];
+      for (var vendaJson in resultados) {
+        final Cliente cliente = await _clienteService
+            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda');
+    }
+  }
+
   Future<void> salvarVenda(Venda venda) async {
     try {
       final vendaJson = venda.toJson();

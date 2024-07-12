@@ -8,32 +8,32 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ListaPagamento extends ConsumerStatefulWidget {
-  final int idVenda;
+  final Venda venda;
 
   static ListaPagamento builder(BuildContext context, GoRouterState state) =>
-      ListaPagamento(idVenda: state.extra! as int);
+      ListaPagamento(venda: state.extra! as Venda);
 
-  const ListaPagamento({super.key, required this.idVenda});
+  const ListaPagamento({super.key, required this.venda});
 
   @override
   ConsumerState<ListaPagamento> createState() => _ListaPagamentoState();
 }
 
 class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
-  late final int _idVenda;
+  late final Venda _venda;
   late VendaState _vendaState;
   late Size _deviceSize;
 
   @override
   void initState() {
-    _idVenda = widget.idVenda;
+    _venda = widget.venda;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
-    _vendaState = ref.watch(vendaProvider(_idVenda));
+    _vendaState = ref.watch(vendaProvider(_venda));
 
     return Scaffold(
       appBar: AppBar(
@@ -43,6 +43,12 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
           style: TextStyle(
             color: Color(0xffFDFFFF),
           ),
+        ),
+        leading: BackButton(
+          onPressed: () {
+            context.pop();
+            _limparDados();
+          },
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -211,5 +217,9 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         }
       },
     );
+  }
+
+  _limparDados() {
+    ref.read(vendaProvider(_venda).notifier).limparDados();
   }
 }

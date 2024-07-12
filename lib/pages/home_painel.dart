@@ -1,16 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
-import 'package:vendas_gerenciamento/model/model.dart';
-import 'package:vendas_gerenciamento/pages/widgets/venda_widget.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class HomePainel extends ConsumerStatefulWidget {
   static HomePainel builder(BuildContext context, GoRouterState state) =>
@@ -22,11 +18,7 @@ class HomePainel extends ConsumerStatefulWidget {
 }
 
 class _HomePainelState extends ConsumerState<HomePainel> {
-  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  late final TextEditingController startDateController;
-  late final TextEditingController endDateController;
-  late final StreamController<List<Venda>> _vendasStreamController;
-  late final StreamController<Map<String, dynamic>> _resumoStreamController;
+  late final ScrollController _scrollController;
   late Size _deviceSize;
   late ListaVendasState _vendasState;
 
@@ -40,8 +32,6 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
     _vendasState = ref.watch(listaVendasProvider);
-    _vendasStreamController.add(_vendasState.list);
-    resumoVendas();
 
     return Scaffold(
       appBar: AppBar(
@@ -56,37 +46,14 @@ class _HomePainelState extends ConsumerState<HomePainel> {
       children: [
         _painel(),
         _textoInformacao(),
-        StreamBuilder<List<Venda>>(
-          stream: _vendasStreamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Expanded(
-                child: Center(child: Text('Erro: ${snapshot.error}')),
-              );
-            }
-
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            final List<Venda> vendas = snapshot.data!;
-
-            return Expanded(
-              child: ListView.builder(
-                itemCount: vendas.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  Venda venda = vendas[index];
-                  return GestureDetector(
-                    onTap: () => context.push(RouteLocation.listarPagamentos,
-                        extra: venda.id),
-                    child: VendaWidget(venda: venda),
-                  );
-                },
-              ),
-            );
-          },
+        VendasWidget(
+          route: RouteLocation.listarPagamentos,
+          vendas: _vendasState.list,
+          scrollController: _scrollController,
         ),
+        _vendasState.carregando
+            ? const Center(child: CircularProgressIndicator())
+            : Container(),
         NavButtonsFloating(),
       ],
     );
@@ -133,29 +100,15 @@ class _HomePainelState extends ConsumerState<HomePainel> {
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
-          Container(
-            alignment: Alignment.topLeft,
-            child: StreamBuilder<Map<String, dynamic>>(
-              stream: _resumoStreamController.stream,
-              builder: ((context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Text(
-                    'Erro:',
-                    style: TextStyle(color: Colors.white, fontSize: 2),
-                  );
-                }
-
-                if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                }
-
-                return Text(
-                  'R\$ ${snapshot.data!["Vendas"]["Total"].toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.white, fontSize: 32),
-                );
-              }),
-            ),
-          ),
+          _vendasState.carregando
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    'R\$ ${_vendasState.totalDasVendas.toStringAsFixed(2)}',
+                    style: const TextStyle(color: Colors.white, fontSize: 32),
+                  ),
+                ),
         ],
       ),
     );
@@ -165,7 +118,9 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     return Container(
       width: _deviceSize.width * 0.35,
       alignment: Alignment.topCenter,
-      child: DateButton(startDateController.text, endDateController.text,
+      child: DateButton(
+          Helpers.formatarDateTimeToString(DateTime.now()),
+          Helpers.formatarDateTimeToString(DateTime.now()),
           pesquisarVendasPorData),
     );
   }
@@ -173,12 +128,14 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   _painelDados() {
     return SizedBox(
       width: _deviceSize.width,
-      child: Row(
-        children: <Widget>[
-          _painelTotalVendas(),
-          _painelDadosValorQuantidade(),
-        ],
-      ),
+      child: _vendasState.carregando
+          ? const Center(child: CircularProgressIndicator())
+          : Row(
+              children: <Widget>[
+                _painelTotalVendas(),
+                _painelDadosValorQuantidade(),
+              ],
+            ),
     );
   }
 
@@ -202,28 +159,10 @@ class _HomePainelState extends ConsumerState<HomePainel> {
                 Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 8),
-                  child: StreamBuilder<Map<String, dynamic>>(
-                    stream: _resumoStreamController.stream,
-                    builder: ((context, snapshot) {
-                      if (snapshot.hasError) {
-                        return const Text(
-                          'Erro:',
-                          style: TextStyle(color: Colors.white, fontSize: 2),
-                        );
-                      }
-
-                      if (!snapshot.hasData) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      return Text(
-                        snapshot.data!["Vendas"]["Quantidade"]
-                            .toString()
-                            .padLeft(2, '0'),
-                        style: const TextStyle(
-                            color: Color(0xfffdffff), fontSize: 16),
-                      );
-                    }),
+                  child: Text(
+                    _vendasState.list.length.toString().padLeft(2, '0'),
+                    style:
+                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
                 ),
                 Container(
@@ -248,77 +187,65 @@ class _HomePainelState extends ConsumerState<HomePainel> {
   _painelDadosValorQuantidade() {
     return SizedBox(
       width: _deviceSize.width * 0.6,
-      child: StreamBuilder<Map<String, dynamic>>(
-        stream: _resumoStreamController.stream,
-        builder: ((context, snapshot) {
-          if (snapshot.hasError) {
-            return const Text(
-              'Erro:',
-              style: TextStyle(color: Colors.white, fontSize: 2),
-            );
-          }
-
-          if (!snapshot.hasData) {
-            return const CircularProgressIndicator();
-          }
-
-          return Row(
-            children: <Widget>[
-              SizedBox(
-                width: _deviceSize.width * 0.6 * 0.5,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'R\$ ${snapshot.data!["Rua"]["Total"].toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            color: Color(0xfffdffff), fontSize: 16),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Opacity(
-                        opacity: 0.5,
+      child: Row(
+        children: <Widget>[
+          SizedBox(
+            width: _deviceSize.width * 0.6 * 0.5,
+            child: _vendasState.carregando
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.topLeft,
                         child: Text(
-                          '${snapshot.data!["Rua"]["Quantidade"].toString().padLeft(2, '0')} Rua',
+                          'R\$ ${_vendasState.totalDaVendaRua.toStringAsFixed(2)}',
                           style: const TextStyle(
-                              color: Color(0xfffdffff), fontSize: 12),
+                              color: Color(0xfffdffff), fontSize: 16),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: _deviceSize.width * 0.6 * 0.5,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'R\$ ${snapshot.data!["Fiado"]["Total"].toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            color: Color(0xfffdffff), fontSize: 16),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: Opacity(
-                        opacity: 0.5,
-                        child: Text(
-                          '${snapshot.data!["Fiado"]["Quantidade"].toString().padLeft(2, '0')} Fiados',
-                          style: const TextStyle(
-                              color: Color(0xfffdffff), fontSize: 12),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Opacity(
+                          opacity: 0.5,
+                          child: Text(
+                            '${_vendasState.qtdeVendaRua.toString().padLeft(2, '0')} Rua',
+                            style: const TextStyle(
+                                color: Color(0xfffdffff), fontSize: 12),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }),
+                    ],
+                  ),
+          ),
+          SizedBox(
+            width: _deviceSize.width * 0.6 * 0.5,
+            child: _vendasState.carregando
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          'R\$ ${_vendasState.totalDaVendaFiado.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                              color: Color(0xfffdffff), fontSize: 16),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Opacity(
+                          opacity: 0.5,
+                          child: Text(
+                            '${_vendasState.qtdeVendaFiado.toString().padLeft(2, '0')} Fiados',
+                            style: const TextStyle(
+                                color: Color(0xfffdffff), fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -341,64 +268,29 @@ class _HomePainelState extends ConsumerState<HomePainel> {
 
   void pesquisarVendasPorData(String startDate, String endDate) {
     ref.read(listaVendasProvider.notifier).getVendasPorData(
-        Helpers.dateTimeToDbDate(startDate), Helpers.dateTimeToDbDate(endDate));
-    startDateController.text = startDate;
-    endDateController.text = endDate;
-
-    resumoVendas();
-    _vendasStreamController.add(_vendasState.list);
+          Helpers.stringFormatadaToDateTime(startDate),
+          Helpers.stringFormatadaToDateTime(endDate),
+        );
   }
 
-  void resumoVendas() {
-    int quantVendaRua, quantVendaFiado;
-    double totalVendaRua, totalVendaFiado;
-    // NumberFormat numberFormat = NumberFormat('##');
-
-    quantVendaRua = quantVendaFiado = 0;
-    totalVendaRua = totalVendaFiado = 0.0;
-
-    for (Venda venda in _vendasState.list) {
-      switch (venda.fiado) {
-        case true:
-          quantVendaFiado += 1;
-          totalVendaFiado += venda.total!;
-          break;
-        case false:
-          quantVendaRua += 1;
-          totalVendaRua += venda.total!;
-          break;
-      }
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        !_vendasState.carregando) {
+      ref
+          .read(listaVendasProvider.notifier)
+          .getVendasLazyLoading(carregarMaisVendas: true);
     }
-
-    Map<String, dynamic> resumo = <String, dynamic>{
-      "Fiado": {"Total": totalVendaFiado, "Quantidade": quantVendaFiado},
-      "Rua": {"Total": totalVendaRua, "Quantidade": quantVendaRua},
-      "Vendas": {
-        "Total": totalVendaRua + totalVendaFiado,
-        "Quantidade": quantVendaRua + quantVendaFiado,
-      },
-    };
-
-    _resumoStreamController.add(resumo);
-    // return resumo;
   }
 
   void _carregarDados() async {
-    _vendasStreamController = StreamController<List<Venda>>();
-    _resumoStreamController =
-        StreamController<Map<String, dynamic>>.broadcast();
-    startDateController =
-        TextEditingController(text: _dateFormat.format(DateTime.now()));
-    endDateController =
-        TextEditingController(text: _dateFormat.format(DateTime.now()));
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _vendasStreamController.close();
-    _resumoStreamController.close();
-    startDateController.dispose();
-    endDateController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }

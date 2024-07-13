@@ -7,8 +7,9 @@ import 'package:vendas_gerenciamento/utils/keys/db_venda_keys.dart';
 class VendaService {
   final VendaRepositoryImpl _repository;
   final ClienteService _clienteService;
+  final AbatimentoService _abatimentoService;
 
-  VendaService(this._repository, this._clienteService);
+  VendaService(this._repository, this._clienteService, this._abatimentoService);
 
   Future<List<Venda>> getVendas() async {
     try {
@@ -37,7 +38,7 @@ class VendaService {
     try {
       final resultados = await _repository.getVendasLazyLoading(
           limit, offset, startDate, endDate);
-          
+
       final List<Venda> vendas = [];
       for (var vendaJson in resultados) {
         final Cliente cliente = await _clienteService
@@ -59,6 +60,19 @@ class VendaService {
     } catch (e) {
       debugPrint(e.toString());
       throw Exception('Erro ao salvar Venda');
+    }
+  }
+
+  Future<int> salvarVendaRua(Venda venda, Abatimento abatimento) async {
+    try {
+      final vendaJson = venda.toJson();
+      int idVenda = await _repository.insertRecord(vendaJson);
+      abatimento = abatimento.copyWith(idVenda: idVenda);
+      await _abatimentoService.salvarAbatimento(abatimento);
+      return idVenda;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e);
     }
   }
 

@@ -23,6 +23,16 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
     }
   }
 
+  Future<int> salvarVendaRua(Venda venda, Abatimento abatimento) async {
+    try {
+      final idVenda = await _vendaService.salvarVendaRua(venda, abatimento);
+      getVendasLazyLoading();
+      return idVenda;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   void getVendas() async {
     try {
       state = state.copyWith(carregando: true);

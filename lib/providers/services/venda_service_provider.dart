@@ -3,7 +3,8 @@ import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 
 final vendaServiceProvider = Provider<VendaService>((ref) {
-  final vendaRepository = ref.watch(vendaRepositoryProvider);
-  final clienteService = ref.watch(clienteServiceProvider);
-  return VendaService(vendaRepository, clienteService);
+  final vendaRepository = ref.read(vendaRepositoryProvider);
+  final clienteService = ref.read(clienteServiceProvider);
+  final abatimentoService = ref.read(abatimentoServiceProvider);
+  return VendaService(vendaRepository, clienteService, abatimentoService);
 });

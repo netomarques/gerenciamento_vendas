@@ -27,6 +27,19 @@ class Venda extends AbstractModel {
     this.totalAberto,
   });
 
+  Venda.initial({
+    this.id,
+    this.quantidade = 0.0,
+    this.preco = 0.0,
+    this.desconto = 0.0,
+    required this.date,
+    required this.cliente,
+    this.total = 0.0,
+    this.fiado,
+    this.isAberto,
+    this.totalAberto,
+  });
+
   @override
   Venda copyWith({
     int? id,
@@ -74,7 +87,7 @@ class Venda extends AbstractModel {
       VendaKeys.quantidade: quantidade,
       VendaKeys.preco: preco,
       VendaKeys.desconto: desconto,
-      VendaKeys.dateVenda: date,
+      VendaKeys.dateVenda: Helpers.formatarDateTimeToDateDB(date),
       VendaKeys.idCliente: cliente.id,
       VendaKeys.total: total,
     };

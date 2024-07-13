@@ -14,6 +14,13 @@ class Cliente extends AbstractModel {
     this.cpf = "00000000000",
   });
 
+  Cliente.initial({
+    this.id = 1,
+    this.nome = 'RUA',
+    this.telefone = '92999999999',
+    this.cpf = '00000000000',
+  });
+
   @override
   Cliente copyWith({
     int? id,

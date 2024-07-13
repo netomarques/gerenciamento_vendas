@@ -191,59 +191,55 @@ class _HomePainelState extends ConsumerState<HomePainel> {
         children: <Widget>[
           SizedBox(
             width: _deviceSize.width * 0.6 * 0.5,
-            child: _vendasState.carregando
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          'R\$ ${_vendasState.totalDaVendaRua.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                              color: Color(0xfffdffff), fontSize: 16),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Opacity(
-                          opacity: 0.5,
-                          child: Text(
-                            '${_vendasState.qtdeVendaRua.toString().padLeft(2, '0')} Rua',
-                            style: const TextStyle(
-                                color: Color(0xfffdffff), fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ],
+            child: Column(
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    'R\$ ${_vendasState.totalDaVendaRua.toStringAsFixed(2)}',
+                    style:
+                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      '${_vendasState.qtdeVendaRua.toString().padLeft(2, '0')} Rua',
+                      style: const TextStyle(
+                          color: Color(0xfffdffff), fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           SizedBox(
             width: _deviceSize.width * 0.6 * 0.5,
-            child: _vendasState.carregando
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          'R\$ ${_vendasState.totalDaVendaFiado.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                              color: Color(0xfffdffff), fontSize: 16),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Opacity(
-                          opacity: 0.5,
-                          child: Text(
-                            '${_vendasState.qtdeVendaFiado.toString().padLeft(2, '0')} Fiados',
-                            style: const TextStyle(
-                                color: Color(0xfffdffff), fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ],
+            child: Column(
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    'R\$ ${_vendasState.totalDaVendaFiado.toStringAsFixed(2)}',
+                    style:
+                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
                   ),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      '${_vendasState.qtdeVendaFiado.toString().padLeft(2, '0')} Fiados',
+                      style: const TextStyle(
+                          color: Color(0xfffdffff), fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

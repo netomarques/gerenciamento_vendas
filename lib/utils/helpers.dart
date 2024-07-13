@@ -31,6 +31,17 @@ class Helpers {
     }
   }
 
+  static String formatarDateTimeToDateDB(DateTime date) {
+    try {
+      String formatoDbDate = DateFormat('yyyy-MM-dd').format(date);
+      return formatoDbDate;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(
+          'Erro ao converter DateTime para String no formato do banco');
+    }
+  }
+
   static String formatarDateTimeToString(DateTime date) {
     try {
       return DateFormat('dd/MM/yy').format(date);

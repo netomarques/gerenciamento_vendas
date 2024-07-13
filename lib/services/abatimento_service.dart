@@ -7,13 +7,14 @@ class AbatimentoService {
 
   AbatimentoService(this._repository);
 
-  Future<void> salvarAbatimento(Abatimento abatimento) async {
+  Future<int> salvarAbatimento(Abatimento abatimento) async {
     try {
       final abatimentoJson = abatimento.toJson();
-      await _repository.insertRecord(abatimentoJson);
+      int id = await _repository.insertRecord(abatimentoJson);
+      return id;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception('Erro ao salvar Abatimento');
+      throw Exception('Erro ao salvar Abatimento: $e');
     }
   }
 }

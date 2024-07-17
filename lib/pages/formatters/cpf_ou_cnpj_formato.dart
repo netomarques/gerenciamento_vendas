@@ -1,8 +1,7 @@
 import 'package:flutter/services.dart';
-import 'package:vendas_gerenciamento/pages/formatters/icpf_ou_cnpj.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 
 class CpfOuCnpjFormato extends TextInputFormatter {
-
   final List<ICpfOuCnpj> _formatters;
 
   CpfOuCnpjFormato(this._formatters);
@@ -19,5 +18,4 @@ class CpfOuCnpjFormato extends TextInputFormatter {
     });
     return delegatedFormatter.formatEditUpdate(oldValue, newValue);
   }
-
 }

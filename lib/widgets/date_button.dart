@@ -57,7 +57,7 @@ class _DateButtonState extends State<DateButton> {
               onPressed: () => _showDateRangePicker(context),
               child: Text(
                 datas["dateEnd"],
-                style: const TextStyle(fontSize: 20, color: Color(0xFFFDFFFF)),
+                style: const TextStyle(fontSize: 18, color: Color(0xFFFDFFFF)),
               ),
             ),
             Visibility(
@@ -74,7 +74,7 @@ class _DateButtonState extends State<DateButton> {
                 child: Text(
                   datas["dateStart"],
                   style:
-                      const TextStyle(fontSize: 20, color: Color(0xFFFDFFFF)),
+                      const TextStyle(fontSize: 18, color: Color(0xFFFDFFFF)),
                 ),
               ),
             ),

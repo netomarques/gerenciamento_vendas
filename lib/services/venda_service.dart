@@ -53,10 +53,10 @@ class VendaService {
     }
   }
 
-  Future<void> salvarVenda(Venda venda) async {
+  Future<int> _salvarVenda(Venda venda) {
     try {
       final vendaJson = venda.toJson();
-      await _repository.insertRecord(vendaJson);
+      return _repository.insertRecord(vendaJson);
     } catch (e) {
       debugPrint(e.toString());
       throw Exception('Erro ao salvar Venda');
@@ -65,10 +65,26 @@ class VendaService {
 
   Future<int> salvarVendaRua(Venda venda, Abatimento abatimento) async {
     try {
-      final vendaJson = venda.toJson();
-      int idVenda = await _repository.insertRecord(vendaJson);
+      final idVenda = await _salvarVenda(venda);
       abatimento = abatimento.copyWith(idVenda: idVenda);
       await _abatimentoService.salvarAbatimento(abatimento);
+
+      return idVenda;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e);
+    }
+  }
+
+  Future<int> salvarVendaFiado(Venda venda, Abatimento? abatimento) async {
+    try {
+      final vendaJson = venda.toJson();
+      int idVenda = await _repository.insertRecord(vendaJson);
+
+      if (abatimento != null) {
+        abatimento = abatimento.copyWith(idVenda: idVenda);
+        await _abatimentoService.salvarAbatimento(abatimento);
+      }
       return idVenda;
     } catch (e) {
       debugPrint(e.toString());

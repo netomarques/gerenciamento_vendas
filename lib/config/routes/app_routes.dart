@@ -41,4 +41,9 @@ final appRoutes = [
     parentNavigatorKey: navigationKey,
     builder: CadastroVendaRua.builder,
   ),
+  GoRoute(
+    path: RouteLocation.cadastroVendaFiado,
+    parentNavigatorKey: navigationKey,
+    builder: CadastroVendaFiado.builder,
+  ),
 ];

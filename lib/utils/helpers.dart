@@ -63,4 +63,25 @@ class Helpers {
       throw Exception('Erro ao converter String para DataTime');
     }
   }
+
+  static Future<DateTime?> showCustomDatePicker(BuildContext context) async {
+    return await showDatePicker(
+      context: context,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      initialDate: DateTime.now(),
+      builder: (context, child) {
+        return Column(
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400.0,
+              ),
+              child: child,
+            )
+          ],
+        );
+      },
+    );
+  }
 }

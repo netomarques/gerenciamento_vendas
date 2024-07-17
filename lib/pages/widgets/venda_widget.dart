@@ -51,7 +51,7 @@ class VendaWidget extends ConsumerWidget {
                 ),
                 Container(
                   width: deviceSize.width * 0.5,
-                  height: deviceSize.height * 0.078,
+                  height: deviceSize.height * 0.09,
                   margin: const EdgeInsets.only(left: 8, top: 8),
                   child: Row(
                     children: <Widget>[
@@ -60,26 +60,13 @@ class VendaWidget extends ConsumerWidget {
                       ),
                       Container(
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              'Quant: ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFFFDFFFF),
-                              ),
-                            ),
-                            Opacity(
-                              opacity: 0.6,
-                              child: Text(
-                                'Preço/kg: ',
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  color: Color(0xFFFDFFFF),
-                                ),
-                              ),
-                            ),
+                            _textCampo('Quant '),
+                            _textCampo('Preço/kg: '),
+                            _textCampo('Desconto: '),
                           ],
                         ),
                       ),
@@ -87,33 +74,19 @@ class VendaWidget extends ConsumerWidget {
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              '${vendaState.venda!.quantidade.toStringAsFixed(2)} Kg',
-                              style: TextStyle(
-                                fontSize: (deviceSize.width *
-                                        0.5 *
-                                        deviceSize.height *
-                                        0.078 *
-                                        0.095) /
-                                    100,
-                                color: const Color(0xFFFDFFFF),
-                              ),
+                            _textValor(
+                              'Kg ${vendaState.venda!.quantidade.toStringAsFixed(2)}',
+                              deviceSize,
                             ),
-                            Opacity(
-                              opacity: 0.6,
-                              child: Text(
-                                'R\$ ${vendaState.venda!.preco.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontSize: (deviceSize.width *
-                                          0.5 *
-                                          deviceSize.height *
-                                          0.078 *
-                                          0.09) /
-                                      100,
-                                  color: const Color(0xFFFDFFFF),
-                                ),
-                              ),
+                            _textValor(
+                              'R\$ ${vendaState.venda!.preco.toStringAsFixed(2)}',
+                              deviceSize,
+                            ),
+                            _textValor(
+                              'R\$ ${vendaState.venda!.desconto.toStringAsFixed(2)}',
+                              deviceSize,
                             ),
                           ],
                         ),
@@ -163,6 +136,27 @@ class VendaWidget extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  _textCampo(text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 12,
+        color: Color(0xFFFDFFFF),
+      ),
+    );
+  }
+
+  _textValor(text, deviceSize) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize:
+            (deviceSize.width * 0.5 * deviceSize.height * 0.078 * 0.095) / 100,
+        color: const Color(0xFFFDFFFF),
       ),
     );
   }

@@ -14,18 +14,28 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
     getVendasLazyLoading();
   }
 
-  void salvarVenda(Venda venda) async {
-    try {
-      await _vendaService.salvarVenda(venda);
-      getVendas();
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
+  // void salvarVenda(Venda venda) async {
+  //   try {
+  //     await _vendaService.salvarVenda(venda);
+  //     getVendas();
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //   }
+  // }
 
   Future<int> salvarVendaRua(Venda venda, Abatimento abatimento) async {
     try {
       final idVenda = await _vendaService.salvarVendaRua(venda, abatimento);
+      getVendasLazyLoading();
+      return idVenda;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<int> salvarVendaFiado(Venda venda, Abatimento? abatimento) async {
+    try {
+      final idVenda = await _vendaService.salvarVendaFiado(venda, abatimento);
       getVendasLazyLoading();
       return idVenda;
     } catch (e) {

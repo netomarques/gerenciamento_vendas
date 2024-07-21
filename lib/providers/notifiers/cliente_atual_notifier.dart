@@ -40,8 +40,7 @@ class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
       state = state.copyWith(carregando: true);
 
       if (endDate.isEmpty) {
-        endDate = Helpers.dateTimeToDbDate(
-            DateFormat('dd/MM/yy').format(DateTime.now()));
+        endDate = Helpers.formatarDateTimeToDateDB(DateTime.now());
       }
 
       final vendasDoCliente =
@@ -70,8 +69,7 @@ class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
     List<Venda> vendasDoCliente = List<Venda>.from(state.vendasDoCliente);
 
     if (endDate.isEmpty) {
-      endDate = Helpers.dateTimeToDbDate(
-          DateFormat('dd/MM/yy').format(DateTime.now()));
+      endDate = Helpers.formatarDateTimeToDateDB(DateTime.now());
     }
 
     try {

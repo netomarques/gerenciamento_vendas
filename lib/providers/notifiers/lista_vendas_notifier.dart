@@ -1,16 +1,24 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 
 class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
   final VendaService _vendaService;
 
   ListaVendasNotifier(this._vendaService)
-      : super(ListaVendasState.initial(
-            startDate: DateTime(1900), endDate: DateTime.now())) {
+      : super(
+          ListaVendasState.initial(
+            startDate: DateTime(1900),
+            endDate: DateTime.now(),
+            totalDaVendaFiado: Decimal.zero,
+            totalDaVendaRua: Decimal.zero,
+            totalDasVendas: Decimal.zero,
+          ),
+        ) {
     getVendasLazyLoading();
   }
 
@@ -56,13 +64,11 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
   }
 
   void getVendasLazyLoading({bool carregarMaisVendas = false}) async {
-    int limit = state.limit;
-    int offset = state.list.length;
+    final limit = state.limit;
+    final offset = state.list.length;
+    final dbStartDate = Helpers.formatarDateTimeToDateDB(state.startDate);
+    final dbEndDate = Helpers.formatarDateTimeToDateDB(state.endDate);
     List<Venda> vendas = [];
-    String dbStartDate = Helpers.dateTimeToDbDate(
-        Helpers.formatarDateTimeToString(state.startDate));
-    String dbEndDate = Helpers.dateTimeToDbDate(
-        Helpers.formatarDateTimeToString(state.endDate));
 
     try {
       state = state.copyWith(carregando: true);
@@ -83,9 +89,9 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
   }
 
   _calcularResumo(List<Venda> vendas) {
-    double totalDasVendas = 0.0;
-    double totalVendaRua = 0.0;
-    double totalVendaFiado = 0.0;
+    Decimal totalDasVendas = Decimal.zero;
+    Decimal totalVendaRua = Decimal.zero;
+    Decimal totalVendaFiado = Decimal.zero;
     int qtdeVendaRua = 0;
     int qtdeVendaFiado = 0;
 
@@ -111,12 +117,10 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
   }
 
   void getVendasPorData(DateTime startDate, DateTime endDate) async {
-    int limit = state.limit;
-    int offset = 0;
-    String dbStartDate =
-        Helpers.dateTimeToDbDate(Helpers.formatarDateTimeToString(startDate));
-    String dbEndDate =
-        Helpers.dateTimeToDbDate(Helpers.formatarDateTimeToString(endDate));
+    final limit = state.limit;
+    const offset = 0;
+    String dbStartDate = Helpers.formatarDateTimeToDateDB(startDate);
+    String dbEndDate = Helpers.formatarDateTimeToDateDB(endDate);
 
     try {
       state = state.copyWith(

@@ -1,5 +1,8 @@
-import 'package:sqflite/sqflite.dart';
+import 'dart:io';
+
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 class DatabaseProvider {
@@ -16,15 +19,54 @@ class DatabaseProvider {
   }
 
   Future<Database> _initDatabase() async {
-    final String dbPath = await getDatabasesPath();
-    final String path = join(dbPath, "vendaspanai.db");
-    // var exists = await databaseExists(path);
+    // final String dbPath = await getDatabasesPath();
+    // final String path = join(dbPath, "vendaspanai.db");
+    // // var exists = await databaseExists(path);
+    final appDocumentsDirectory = await getApplicationDocumentsDirectory();
+    final dbPath = join(appDocumentsDirectory.path, 'vendaspanai.db');
 
+    // exportDatabase();
     return openDatabase(
-      path,
+      dbPath,
       version: 1,
       onCreate: _onCreate,
     );
+  }
+
+  Future<void> exportDatabase() async {
+    try {
+      // Obtenha o diretório do banco de dados
+      // final directory = await getApplicationDocumentsDirectory();
+      final appDocumentsDirectory = await getApplicationDocumentsDirectory();
+      // final directory = Directory(
+      //     '/data/user/0/br.com.wilsonnetodev.vendas_gerenciamento/databases');
+      final dbPath = join(appDocumentsDirectory.path, 'vendaspanai.db');
+      final dbFile = File(dbPath);
+      if (!await dbFile.exists()) {
+        print('Banco de dados original não encontrado: $dbPath');
+        return;
+      }
+
+      // Obtenha o diretório de destino (armazenamento externo, por exemplo)
+      final externalDirectory = await getExternalStorageDirectory();
+      if (externalDirectory != null) {
+        final newDbDirectory = externalDirectory.path;
+        final newDbDir = Directory(newDbDirectory);
+        if (!await newDbDir.exists()) {
+          await newDbDir.create(recursive: true);
+        }
+        final newDbPath =
+            join(externalDirectory.path, 'vendaspanai_exportado.db');
+
+        // Copie o arquivo de banco de dados
+        final newDbFile = File(newDbPath);
+        await dbFile.copy(newDbFile.path);
+
+        print('Banco de dados exportado com sucesso para $newDbPath');
+      }
+    } catch (e) {
+      print('Erro ao exportar o banco de dados: $e');
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {

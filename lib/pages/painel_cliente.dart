@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class PainelCliente extends ConsumerStatefulWidget {
   final int idCliente;
@@ -21,9 +21,8 @@ class PainelCliente extends ConsumerStatefulWidget {
 }
 
 class _PainelClienteState extends ConsumerState<PainelCliente> {
-  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  late String _dateStart;
-  late String _dateEnd;
+  late DateTime _dateStart;
+  late DateTime _dateEnd;
   late Size _deviceSize;
   late ClienteAtualState _clienteAtualState;
   late final int _idCliente;
@@ -38,8 +37,8 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
   _carregarDados() {
     scrollController = ScrollController();
     scrollController.addListener(_onScrollCarregarMaisVendas);
-    _dateStart = _dateFormat.format(DateTime.now());
-    _dateEnd = _dateFormat.format(DateTime.now());
+    _dateStart = DateTime.now();
+    _dateEnd = DateTime.now();
 
     _idCliente = widget.idCliente;
   }
@@ -79,7 +78,10 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
           padding: const EdgeInsets.all(4.0),
           child: SizedBox(
               width: _deviceSize.width * 0.35,
-              child: DateButton(_dateStart, _dateEnd, _carregarVendasPorData)),
+              child: DateButton(
+                  Helpers.formatarDateTimeToString(_dateStart),
+                  Helpers.formatarDateTimeToString(_dateEnd),
+                  _carregarVendasPorData)),
         ),
         VendasWidget(
           vendas: _clienteAtualState.vendasDoCliente,
@@ -171,21 +173,21 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
       ref
           .read(clienteAtualProvider(_idCliente).notifier)
           .getMaisVendasPorClienteLazyLoading(
-            startDate: Helpers.dateTimeToDbDate(_dateStart),
-            endDate: Helpers.dateTimeToDbDate(_dateEnd),
+            startDate: Helpers.formatarDateTimeToDateDB(_dateStart),
+            endDate: Helpers.formatarDateTimeToDateDB(_dateEnd),
           );
     }
   }
 
   void _carregarVendasPorData(String dateStart, String dateEnd) async {
     if (!_clienteAtualState.carregando) {
-      _dateStart = dateStart;
-      _dateEnd = dateEnd;
+      _dateStart = Helpers.stringFormatadaToDateTime(dateStart);
+      _dateEnd = Helpers.stringFormatadaToDateTime(dateEnd);
       ref
           .read(clienteAtualProvider(_idCliente).notifier)
           .getVendasPorClienteLazyLoading(
-            startDate: Helpers.dateTimeToDbDate(dateStart),
-            endDate: Helpers.dateTimeToDbDate(dateEnd),
+            startDate: Helpers.formatarDateTimeToDateDB(_dateStart),
+            endDate: Helpers.formatarDateTimeToDateDB(_dateEnd),
           );
     }
   }

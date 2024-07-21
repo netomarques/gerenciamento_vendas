@@ -1,18 +1,18 @@
+import 'package:decimal/decimal.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
-import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 
 class Venda extends AbstractModel {
   final int? id;
-  final double quantidade;
-  final double preco;
-  final double desconto;
+  final Decimal quantidade;
+  final Decimal preco;
+  final Decimal desconto;
   final DateTime date;
   final Cliente cliente;
-  final double? total;
+  final Decimal? total;
   final bool? fiado;
   final bool? isAberto;
-  final double? totalAberto;
+  final Decimal? totalAberto;
 
   Venda({
     this.id,
@@ -29,12 +29,12 @@ class Venda extends AbstractModel {
 
   Venda.initial({
     this.id,
-    this.quantidade = 0.0,
-    this.preco = 0.0,
-    this.desconto = 0.0,
+    required this.quantidade,
+    required this.preco,
+    required this.desconto,
     required this.date,
     required this.cliente,
-    this.total = 0.0,
+    required this.total,
     this.fiado,
     this.isAberto,
     this.totalAberto,
@@ -43,15 +43,15 @@ class Venda extends AbstractModel {
   @override
   Venda copyWith({
     int? id,
-    double? quantidade,
-    double? preco,
-    double? desconto,
+    Decimal? quantidade,
+    Decimal? preco,
+    Decimal? desconto,
     DateTime? date,
     Cliente? cliente,
-    double? total,
+    Decimal? total,
     bool? fiado,
     bool? isAberto,
-    double? totalAberto,
+    Decimal? totalAberto,
   }) {
     return Venda(
       id: id ?? this.id,
@@ -84,27 +84,36 @@ class Venda extends AbstractModel {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       VendaKeys.idVenda: id,
-      VendaKeys.quantidade: quantidade,
-      VendaKeys.preco: preco,
-      VendaKeys.desconto: desconto,
+      VendaKeys.quantidade: quantidade.toDouble(),
+      VendaKeys.preco: preco.toDouble(),
+      VendaKeys.desconto: desconto.toDouble(),
       VendaKeys.dateVenda: Helpers.formatarDateTimeToDateDB(date),
       VendaKeys.idCliente: cliente.id,
-      VendaKeys.total: total,
+      VendaKeys.total: total!.toDouble(),
     };
   }
 
   factory Venda.fromJson(Map<String, dynamic> map, Cliente cliente) {
     return Venda(
       id: map[VendaKeys.idVenda],
-      quantidade: map[VendaKeys.quantidade],
-      preco: map[VendaKeys.preco],
-      desconto: map[VendaKeys.desconto],
+      quantidade: Decimal.parse(map[VendaKeys.quantidade].toString()),
+      preco: Decimal.parse(map[VendaKeys.preco].toString()),
+      desconto: Decimal.parse(map[VendaKeys.desconto].toString()),
       date: Helpers.dbDataToDateTime(map[VendaKeys.dateVenda]),
       cliente: cliente,
-      total: map[VendaKeys.total],
+      total: Decimal.parse(map[VendaKeys.total].toString()),
       fiado: map[VendaKeys.isFiado] == 1 ? true : false,
       isAberto: map[VendaKeys.isAberto] == 1 ? true : false,
-      totalAberto: map[VendaKeys.totalEmAberto],
+      totalAberto: Decimal.parse(map[VendaKeys.totalEmAberto].toString()),
     );
+  }
+
+  @override
+  String toString() {
+    return 'Venda{id: $id, quantidade: $quantidade '
+        'preco: $preco, desconto: $desconto, '
+        'date: $date, cliente: $cliente, '
+        'total: $total, fiado: $fiado, '
+        'isAberto: $isAberto, totalAberto: $totalAberto}';
   }
 }

@@ -1,10 +1,10 @@
+import 'package:decimal/decimal.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
-import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 
 class Abatimento extends AbstractModel {
   final int idVenda;
-  final double valor;
+  final Decimal valor;
   final DateTime dateAbatimento;
 
   Abatimento({
@@ -16,7 +16,7 @@ class Abatimento extends AbstractModel {
   @override
   Abatimento copyWith({
     int? idVenda,
-    double? valor,
+    Decimal? valor,
     DateTime? dateAbatimento,
   }) {
     return Abatimento(
@@ -39,7 +39,7 @@ class Abatimento extends AbstractModel {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       AbatimentoKeys.idVenda: idVenda,
-      AbatimentoKeys.valor: valor,
+      AbatimentoKeys.valor: valor.toDouble(),
       AbatimentoKeys.dateAbatimento:
           Helpers.formatarDateTimeToDateDB(dateAbatimento),
     };
@@ -48,7 +48,7 @@ class Abatimento extends AbstractModel {
   factory Abatimento.fromJson(Map<String, dynamic> map) {
     return Abatimento(
       idVenda: map[AbatimentoKeys.idVenda],
-      valor: map[AbatimentoKeys.valor],
+      valor: Decimal.parse(map[AbatimentoKeys.valor].toString()),
       dateAbatimento:
           Helpers.dbDataToDateTime(map[AbatimentoKeys.dateAbatimento]),
     );

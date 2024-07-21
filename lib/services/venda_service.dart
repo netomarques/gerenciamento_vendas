@@ -78,8 +78,7 @@ class VendaService {
 
   Future<int> salvarVendaFiado(Venda venda, Abatimento? abatimento) async {
     try {
-      final vendaJson = venda.toJson();
-      int idVenda = await _repository.insertRecord(vendaJson);
+      final idVenda = await _salvarVenda(venda);
 
       if (abatimento != null) {
         abatimento = abatimento.copyWith(idVenda: idVenda);

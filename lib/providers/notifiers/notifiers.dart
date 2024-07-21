@@ -8,3 +8,5 @@ export 'vendas_cliente_notifier.dart';
 export 'vendas_cliente_provider.dart';
 export 'venda_notifier.dart';
 export 'venda_provider.dart';
+export 'button_provider.dart';
+export 'button_notifier.dart';

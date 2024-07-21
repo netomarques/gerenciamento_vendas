@@ -1,11 +1,15 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class CadastroVendaRua extends ConsumerStatefulWidget {
   static CadastroVendaRua builder(BuildContext context, GoRouterState state) =>
@@ -19,11 +23,12 @@ class CadastroVendaRua extends ConsumerStatefulWidget {
 
 class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
   final _formKey = GlobalKey<FormState>();
+  late final NumberFormat _formatterMoeda;
+  late final NumberFormat _formatterQuantidade;
   late final TextEditingController _valorTotalController;
   late final TextEditingController _dataVendaController;
-  late final TextEditingController _descontoController;
   late Venda _venda;
-  // late Size _deviceSize;
+  late ButtonState _buttonState;
 
   @override
   void initState() {
@@ -33,7 +38,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
 
   @override
   Widget build(BuildContext context) {
-    // _deviceSize = context.devicesize;
+    _buttonState = ref.watch(buttonProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -56,7 +61,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              _containerValorTotal(),
+              _containerTextForm(_textValorTotal()),
               Form(
                 key: _formKey,
                 child: Column(
@@ -76,33 +81,44 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
                     ),
                     _containerTextForm(
                       AppTextFormField2(
-                        '0.00',
-                        'Quantidade(Kg)',
+                        '0.00 kg',
+                        'Quantidade(kg)',
                         TextInputType.number,
                         _validatorQuantidade,
                         _onSavedQuantidade,
                         onChanged: _onChangedQuantidade,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          QuantidadeFormato()
+                        ],
                       ),
                     ),
                     _containerTextForm(
                       AppTextFormField2(
-                        '0.00',
-                        'Preço/Kg',
+                        'R\$ 0.00',
+                        'Preço/kg',
                         TextInputType.number,
                         _validatorPreco,
                         _onSavedPreco,
                         onChanged: _onChangedPreco,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          MoedaFormato()
+                        ],
                       ),
                     ),
                     _containerTextForm(
                       AppTextFormField2(
-                        '0.00',
+                        'R\$ 0.00',
                         'Desconto',
                         TextInputType.number,
                         _validatorDesconto,
                         _onSavedDesconto,
                         onChanged: _onChangedDesconto,
-                        controller: _descontoController,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          MoedaFormato()
+                        ],
                       ),
                     ),
                     Center(
@@ -110,6 +126,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
                         padding: const EdgeInsets.only(top: 60, bottom: 8),
                         child: AcoesTextButton(
                           onFunction: _submitForm,
+                          carregando: _buttonState.carregando,
                           text: 'Cadastrar Venda',
                         ),
                       ),
@@ -124,53 +141,60 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     );
   }
 
-  _containerValorTotal() {
-    return _containerTextForm(
-      TextField(
-        controller: _valorTotalController,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Color(0xFFEB710A),
-        ),
-        decoration: InputDecoration(
-          labelText: 'Total',
-          labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 10.0,
-          ),
-          filled: true,
-          fillColor: const Color(0xFFEB710A).withOpacity(0.2),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(32.0),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(32.0),
-            borderSide: const BorderSide(
-              color: Color(0xFF006940),
-              width: 1.0,
-            ),
-          ),
-        ),
-        enabled: false,
+  _textValorTotal() {
+    return TextField(
+      controller: _valorTotalController,
+      style: const TextStyle(
+        fontSize: 14,
+        color: Color(0xFFEB710A),
       ),
+      decoration: InputDecoration(
+        labelText: 'Total',
+        labelStyle: const TextStyle(fontSize: 14, color: Color(0xFF006940)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 10.0,
+        ),
+        filled: true,
+        fillColor: const Color(0xFFEB710A).withOpacity(0.2),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(32.0),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(32.0),
+          borderSide: const BorderSide(
+            color: Color(0xFF006940),
+            width: 1.0,
+          ),
+        ),
+      ),
+      enabled: false,
+    );
+  }
+
+  _containerTextForm(widget) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
+      child: widget,
     );
   }
 
   void _onSavedPreco(String value) {
-    _venda = _venda.copyWith(preco: double.parse(value));
+    _venda = _venda.copyWith(preco: _stringParseDecimal(value));
   }
 
   String? _validatorPreco(String? value) {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o preço do quilo';
-      } else {
-        double.parse(value);
+      }
+      final preco = _stringParseDecimal(value);
+      if (preco == Decimal.zero) {
+        return 'Por favor, preco não pode ser zero';
       }
     } on FormatException {
-      return 'Por favor, informe um valor numérico válido para o preço';
+      return 'Por favor, informe um valor numérico \nválido para o preço';
     } catch (e) {
       return 'Erro ao validar preço';
     }
@@ -180,14 +204,16 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
 
   String? _onChangedPreco(String? value) {
     String? error = _validatorPreco(value);
+    if ('Por favor, preco não pode ser zero' == error) {
+      error = null;
+    }
 
     try {
       if (error != null) {
         return error;
-      } else {
-        _venda = _venda.copyWith(preco: double.parse(value!));
-        _atualizaValorTotal();
       }
+      _venda = _venda.copyWith(preco: _stringParseDecimal(value));
+      _atualizaValorTotal();
     } catch (e) {
       return 'Erro não identificado';
     }
@@ -195,7 +221,10 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
   }
 
   void _onSavedQuantidade(String value) {
-    _venda = _venda.copyWith(quantidade: double.parse(value));
+    _venda = _venda.copyWith(
+      quantidade: Decimal.parse(
+          _formatterQuantidade.parse(value.replaceAll(' kg', '')).toString()),
+    );
   }
 
   String? _validatorQuantidade(String? value) {
@@ -203,7 +232,14 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe a quantidade vendida';
       }
-      double.parse(value);
+      final quantidade = Decimal.parse(
+        _formatterQuantidade
+            .parse(value.replaceAll(RegExp(r' kg'), ''))
+            .toString(),
+      );
+      if (quantidade == Decimal.zero) {
+        return 'Por favor, quantidade não pode ser zero';
+      }
     } on FormatException {
       return 'Por favor, informe um valor numérico válido \npara a quantidade vendida';
     } catch (e) {
@@ -213,12 +249,27 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     return null;
   }
 
-  void _onChangedQuantidade(String value) {
+  String? _onChangedQuantidade(String? value) {
     String? error = _validatorQuantidade(value);
-    if (error == null) {
-      _venda = _venda.copyWith(quantidade: double.parse(value));
-      _atualizaValorTotal();
+    if ('Por favor, quantidade não pode ser zero' == error) {
+      error = null;
     }
+
+    try {
+      if (error != null) {
+        return error;
+      }
+      _venda = _venda.copyWith(
+        quantidade: Decimal.parse(
+          _formatterQuantidade.parse(value!.replaceAll(' kg', '')).toString(),
+        ),
+      );
+      _atualizaValorTotal();
+    } catch (e) {
+      return 'Erro não identificado';
+    }
+
+    return null;
   }
 
   void _onSavedData(String value) {
@@ -229,9 +280,8 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe a data da venda';
-      } else {
-        Helpers.stringFormatadaToDateTime(value);
       }
+      Helpers.stringFormatadaToDateTime(value);
     } catch (e) {
       return 'Por favor, verifique o formato da data da venda';
     }
@@ -240,7 +290,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
   }
 
   void _onSavedDesconto(String value) {
-    _venda = _venda.copyWith(desconto: double.parse(value));
+    _venda = _venda.copyWith(desconto: _stringParseDecimal(value));
   }
 
   String? _validatorDesconto(String? value) {
@@ -248,8 +298,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o desconto';
       }
-
-      double.parse(value);
+      _stringParseDecimal(value);
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
     } catch (e) {
@@ -266,7 +315,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
       if (error != null) {
         return error;
       }
-      _venda = _venda.copyWith(desconto: double.parse(value!));
+      _venda = _venda.copyWith(desconto: _stringParseDecimal(value));
       _atualizaValorTotal();
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
@@ -277,90 +326,31 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     return null;
   }
 
+  Decimal _stringParseDecimal(value) {
+    return Decimal.parse(_formatterMoeda.parse(value).toString());
+  }
+
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       String msg = '';
       try {
+        ref.read(buttonProvider.notifier).setCarregando(true);
+        _formKey.currentState!.save();
         final abatimento = Abatimento(
             idVenda: 0, valor: _venda.total!, dateAbatimento: _venda.date);
         await ref
             .read(listaVendasProvider.notifier)
             .salvarVendaRua(_venda, abatimento);
-
         msg = 'Venda cadastrada com sucesso';
         _formKey.currentState!.reset();
         _limparCampos();
-        // if (ok == 1) {
-        //   msg = 'Venda cadastrada com sucesso';
-        //   _formKey.currentState!.reset();
-        //   _limparCampos();
-        // } else {
-        //   msg = 'Venda não foi cadastrada';
-        // }
       } catch (e) {
         msg = e.toString();
       } finally {
         _exibirDialog(msg);
+        ref.read(buttonProvider.notifier).setCarregando(false);
       }
     }
-  }
-
-  _containerTextForm(widget) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
-      child: widget,
-    );
-  }
-
-  void _atualizaValorTotal() {
-    final total = double.parse(
-        ((_venda.quantidade * _venda.preco) - _venda.desconto)
-            .toStringAsFixed(2));
-    _venda = _venda.copyWith(total: total);
-    _valorTotalController.text = 'R\$ $total';
-  }
-
-  void _showDatePicker() async {
-    DateTime selectDate = DateTime.now();
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      initialDate: selectDate,
-      builder: (context, child) {
-        return Column(
-          children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 400.0,
-              ),
-              child: child,
-            )
-          ],
-        );
-      },
-    );
-
-    if (picked != null && picked != selectDate) {
-      _dataVendaController.text = Helpers.formatarDateTimeToString(picked);
-    }
-  }
-
-  void _carregarDados() {
-    _venda = Venda.initial(date: DateTime.now(), cliente: Cliente.initial());
-
-    _valorTotalController =
-        TextEditingController(text: _venda.total!.toStringAsFixed(2));
-    _descontoController = TextEditingController();
-    _dataVendaController = TextEditingController(
-        text: Helpers.formatarDateTimeToString(_venda.date));
-  }
-
-  void _limparCampos() {
-    _venda = Venda.initial(date: DateTime.now(), cliente: Cliente.initial());
-    _dataVendaController.text = Helpers.formatarDateTimeToString(_venda.date);
-    _descontoController.text = '${_venda.desconto}';
-    _atualizaValorTotal();
   }
 
   void _exibirDialog(String mensagem) {
@@ -374,7 +364,7 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                context.pop();
               },
             ),
           ],
@@ -383,11 +373,58 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     );
   }
 
+  void _atualizaValorTotal() {
+    final total = Decimal.parse(
+      ((_venda.quantidade * _venda.preco) - _venda.desconto).toStringAsFixed(2),
+    );
+    _venda = _venda.copyWith(total: total);
+    _valorTotalController.text = _formatterMoeda.format(total.toDouble());
+  }
+
+  void _showDatePicker() async {
+    final DateTime? selectDate = await Helpers.showCustomDatePicker(context);
+    if (selectDate != null) {
+      _dataVendaController.text =
+          Helpers.formatarDateTimeToString(selectDate, format: 'dd/MM/yyyy');
+    }
+  }
+
+  void _carregarDados() {
+    _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    _formatterQuantidade = NumberFormat('#,##0.00', 'pt_BR');
+    _venda = Venda.initial(
+      date: DateTime.now(),
+      cliente: Cliente.initial(),
+      desconto: Decimal.zero,
+      preco: Decimal.zero,
+      quantidade: Decimal.zero,
+      total: Decimal.zero,
+    );
+    _valorTotalController = TextEditingController();
+    _dataVendaController = TextEditingController(
+      text: Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy'),
+    );
+    _atualizaValorTotal();
+  }
+
+  void _limparCampos() {
+    _venda = Venda.initial(
+      date: DateTime.now(),
+      cliente: Cliente.initial(),
+      desconto: Decimal.zero,
+      preco: Decimal.zero,
+      quantidade: Decimal.zero,
+      total: Decimal.zero,
+    );
+    _dataVendaController.text =
+        Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy');
+    _atualizaValorTotal();
+  }
+
   @override
   void dispose() {
     _valorTotalController.dispose();
     _dataVendaController.dispose();
-    _descontoController.dispose();
     super.dispose();
   }
 }

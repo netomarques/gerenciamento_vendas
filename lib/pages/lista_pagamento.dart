@@ -4,6 +4,7 @@ import 'package:vendas_gerenciamento/pages/cadastro_abatimento.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
+import 'package:decimal/decimal.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -192,7 +193,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     showDialog(
       context: context,
       builder: (context) {
-        if (_vendaState.venda!.totalAberto! > 0.0) {
+        if (_vendaState.venda!.totalAberto! > Decimal.zero) {
           return CadastroAbatimento(_vendaState.venda!);
         } else {
           return AlertDialog(

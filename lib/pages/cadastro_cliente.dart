@@ -101,6 +101,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
                         padding: const EdgeInsets.only(top: 60, bottom: 8),
                         child: AcoesTextButton(
                           onFunction: _submitForm,
+                          carregando: false,
                           text: 'Cadastrar Cliente',
                         ),
                       ),

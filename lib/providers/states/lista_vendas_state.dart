@@ -1,16 +1,17 @@
 import 'package:equatable/equatable.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:decimal/decimal.dart';
 
 class ListaVendasState extends Equatable {
   final List<Venda> list;
   final int limit;
   final bool carregando;
   final bool filtroPorData;
-  final double totalDasVendas;
+  final Decimal totalDasVendas;
   final int qtdeVendaRua;
   final int qtdeVendaFiado;
-  final double totalDaVendaRua;
-  final double totalDaVendaFiado;
+  final Decimal totalDaVendaRua;
+  final Decimal totalDaVendaFiado;
   final DateTime startDate;
   final DateTime endDate;
 
@@ -33,11 +34,11 @@ class ListaVendasState extends Equatable {
     this.limit = 10,
     this.carregando = false,
     this.filtroPorData = false,
-    this.totalDasVendas = 0.0,
+    required this.totalDasVendas,
     this.qtdeVendaRua = 0,
     this.qtdeVendaFiado = 0,
-    this.totalDaVendaRua = 0.0,
-    this.totalDaVendaFiado = 0.0,
+    required this.totalDaVendaRua,
+    required this.totalDaVendaFiado,
     required this.startDate,
     required this.endDate,
   });
@@ -47,11 +48,11 @@ class ListaVendasState extends Equatable {
     int? limit,
     bool? carregando,
     bool? filtroPorData,
-    double? totalDasVendas,
+    Decimal? totalDasVendas,
     int? qtdeVendaRua,
     int? qtdeVendaFiado,
-    double? totalDaVendaRua,
-    double? totalDaVendaFiado,
+    Decimal? totalDaVendaRua,
+    Decimal? totalDaVendaFiado,
     DateTime? startDate,
     DateTime? endDate,
   }) {

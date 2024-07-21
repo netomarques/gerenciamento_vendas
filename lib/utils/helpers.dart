@@ -17,19 +17,19 @@ class Helpers {
     }
   }
 
-  static String dateTimeToDbDate(String date) {
-    try {
-      final DateFormat inputDateFormat = DateFormat('dd/MM/yy');
-      final DateFormat dbDateFormat = DateFormat('yyyy-MM-dd');
-      String formatoBdDate = dbDateFormat.format(
-          dbDateFormat.parse(dbDateFormat.format(inputDateFormat.parse(date))));
-      return formatoBdDate;
-    } catch (e) {
-      debugPrint(e.toString());
-      throw Exception(
-          'Erro ao converter DateTime para String no formato do banco');
-    }
-  }
+  // static String dateTimeToDbDate(String date) {
+  //   try {
+  //     final DateFormat inputDateFormat = DateFormat('dd/MM/yy');
+  //     final DateFormat dbDateFormat = DateFormat('yyyy-MM-dd');
+  //     String formatoBdDate = dbDateFormat.format(
+  //         dbDateFormat.parse(dbDateFormat.format(inputDateFormat.parse(date))));
+  //     return formatoBdDate;
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //     throw Exception(
+  //         'Erro ao converter DateTime para String no formato do banco');
+  //   }
+  // }
 
   static String formatarDateTimeToDateDB(DateTime date) {
     try {
@@ -42,9 +42,10 @@ class Helpers {
     }
   }
 
-  static String formatarDateTimeToString(DateTime date) {
+  static String formatarDateTimeToString(DateTime date,
+      {String format = 'dd/MM/yy'}) {
     try {
-      return DateFormat('dd/MM/yy').format(date);
+      return DateFormat(format).format(date);
     } catch (e) {
       debugPrint(e.toString());
       throw Exception('Erro ao formatar Data');

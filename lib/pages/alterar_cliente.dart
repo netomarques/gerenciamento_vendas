@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AlterarCliente extends ConsumerStatefulWidget {
   final int idCliente;
@@ -29,7 +29,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   late Cliente _clienteAtualizado;
   late ClienteAtualNotifier _clienteAtualNotifier;
   late final int _idCliente;
-
+  late ButtonState _buttonState;
   late Size _deviceSize;
 
   @override
@@ -44,6 +44,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
+    _buttonState = ref.watch(buttonProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -117,6 +118,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
                         padding: const EdgeInsets.only(top: 60, bottom: 8),
                         child: AcoesTextButton(
                           onFunction: _submitForm,
+                          carregando: _buttonState.carregando,
                           text: 'Salvar modificação',
                         ),
                       ),

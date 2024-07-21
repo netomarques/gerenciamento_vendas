@@ -1,10 +1,14 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CadastroAbatimento extends ConsumerStatefulWidget {
   final Venda venda;
@@ -17,7 +21,8 @@ class CadastroAbatimento extends ConsumerStatefulWidget {
 
 class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _textValorController;
+  late final NumberFormat _formatterMoeda;
+  // late final TextEditingController _textValorController;
   late final TextEditingController _dataAbatimentoController;
   late Size _deviceSize;
   late Venda _venda;
@@ -25,12 +30,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
 
   @override
   void initState() {
-    _venda = widget.venda;
-    _textValorController = TextEditingController();
-    _dataAbatimentoController = TextEditingController(
-        text: Helpers.formatarDateTimeToString(DateTime.now()));
-    _abatimento = Abatimento(
-        idVenda: _venda.id!, valor: 0.0, dateAbatimento: DateTime.now());
+    _carregarDados();
     super.initState();
   }
 
@@ -59,12 +59,16 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
                   children: <Widget>[
                     _containerTextForm(
                       AppTextFormField2(
-                        '0.0',
+                        'R\$ 0.00',
                         'Valor do abatimento',
                         TextInputType.number,
                         _validatorValor,
                         _onSavedValor,
-                        controller: _textValorController,
+                        // controller: _textValorController,
+                        formato: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          MoedaFormato()
+                        ],
                       ),
                     ),
                     _containerTextForm(
@@ -97,15 +101,20 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      String msg = '';
       try {
         _formKey.currentState!.save();
-        ref.read(abatimentoServiceProvider).salvarAbatimento(_abatimento);
-        context.pop();
+        await ref.read(abatimentoServiceProvider).salvarAbatimento(_abatimento);
         ref.read(vendaProvider(_venda).notifier).getVenda();
-        _exibirDialog('Abatimento salvo');
-      } catch (e) {
+        // _exibirDialog('Abatimento salvo');
+        msg = 'Abatimento cadastrado com sucesso';
         _formKey.currentState!.reset();
-        _exibirDialog('Erro ao salvar abatimento');
+        context.pop();
+      } catch (e) {
+        // _exibirDialog('Erro ao salvar abatimento');
+        msg = 'Erro ao salvar abatimento';
+      } finally {
+        _exibirDialog(msg);
       }
     }
   }
@@ -143,12 +152,12 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
         return 'Por favor, informe o valor';
       }
 
-      final valor = double.parse(value);
-      if (valor > double.parse(_venda.totalAberto!.toStringAsFixed(2))) {
+      final valor = Decimal.parse(_formatterMoeda.parse(value).toString());
+      if (valor > _venda.totalAberto!) {
         return 'Por favor, valor não pode ser \nmaior do que ${_venda.totalAberto}';
       }
 
-      if (valor <= 0) {
+      if (valor <= Decimal.zero) {
         return 'Por favor, valor não pode ser 0';
       }
     } on FormatException {
@@ -161,7 +170,9 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
   }
 
   void _onSavedValor(String value) {
-    _abatimento = _abatimento.copyWith(valor: double.parse(value));
+    _abatimento = _abatimento.copyWith(
+      valor: Decimal.parse(_formatterMoeda.parse(value).toString()),
+    );
   }
 
   String? _validatorData(String? value) {
@@ -184,28 +195,10 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
   }
 
   void _showDatePicker() async {
-    DateTime selectDate = DateTime.now();
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      initialDate: selectDate,
-      builder: (context, child) {
-        return Column(
-          children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 400.0,
-              ),
-              child: child,
-            )
-          ],
-        );
-      },
-    );
-
-    if (picked != null && picked != selectDate) {
-      _dataAbatimentoController.text = Helpers.formatarDateTimeToString(picked);
+    final DateTime? selectDate = await Helpers.showCustomDatePicker(context);
+    if (selectDate != null) {
+      _dataAbatimentoController.text =
+          Helpers.formatarDateTimeToString(selectDate);
     }
   }
 
@@ -218,7 +211,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
         opacity: 0.65,
         child: Center(
           child: Text(
-            "A receber: R\$ ${_venda.totalAberto!.toStringAsFixed(2)}",
+            "A receber: R\$ ${_venda.totalAberto!}",
             style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
           ),
         ),
@@ -251,9 +244,21 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
     );
   }
 
+  _carregarDados() {
+    _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    _venda = widget.venda;
+    // _textValorController = TextEditingController();
+    _dataAbatimentoController = TextEditingController(
+        text: Helpers.formatarDateTimeToString(DateTime.now()));
+    _abatimento = Abatimento(
+        idVenda: _venda.id!,
+        valor: Decimal.zero,
+        dateAbatimento: DateTime.now());
+  }
+
   @override
   void dispose() {
-    _textValorController.dispose();
+    // _textValorController.dispose();
     _dataAbatimentoController.dispose();
     super.dispose();
   }

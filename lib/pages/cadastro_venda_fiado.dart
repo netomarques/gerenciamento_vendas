@@ -1,13 +1,15 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CadastroVendaFiado extends ConsumerStatefulWidget {
   static CadastroVendaFiado builder(
@@ -22,10 +24,12 @@ class CadastroVendaFiado extends ConsumerStatefulWidget {
 
 class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   final _formKey = GlobalKey<FormState>();
+  late final NumberFormat _formatterMoeda;
+  late final NumberFormat _formatterQuantidade;
   late final TextEditingController _valorTotalController;
   late final TextEditingController _dataVendaController;
-  late final TextEditingController _descontoController;
   late Venda _venda;
+  late ButtonState _buttonState;
 
   @override
   void initState() {
@@ -39,6 +43,8 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
 
   @override
   Widget build(BuildContext context) {
+    _buttonState = ref.watch(buttonProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFEB710A),
@@ -117,7 +123,6 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
                         _validatorDesconto,
                         _onSavedDesconto,
                         onChanged: _onChangedDesconto,
-                        controller: _descontoController,
                         formato: [
                           FilteringTextInputFormatter.digitsOnly,
                           MoedaFormato()
@@ -129,6 +134,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
                         padding: const EdgeInsets.only(top: 60, bottom: 8),
                         child: AcoesTextButton(
                           onFunction: _submitForm,
+                          carregando: _buttonState.carregando,
                           text: 'Cadastrar Venda',
                         ),
                       ),
@@ -219,17 +225,17 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   }
 
   void _onSavedPreco(String value) {
-    // _venda.preco = double.parse(value);
-    _venda = _venda.copyWith(
-        preco: double.parse(value.substring(3).replaceAll(',', '.')));
+    _venda = _venda.copyWith(preco: _stringParseDecimal(value));
   }
 
   String? _validatorPreco(String? value) {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o preço do quilo';
-      } else {
-        double.parse(value.substring(3).replaceAll(',', '.'));
+      }
+      final preco = _stringParseDecimal(value);
+      if (preco == Decimal.zero) {
+        return 'Por favor, preco não pode ser zero';
       }
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o preço';
@@ -242,16 +248,16 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
 
   String? _onChangedPreco(String? value) {
     String? error = _validatorPreco(value);
+    if ('Por favor, preco não pode ser zero' == error) {
+      error = null;
+    }
 
     try {
       if (error != null) {
         return error;
-      } else {
-        // _venda.preco = double.parse(value!);
-        _venda = _venda.copyWith(
-            preco: double.parse(value!.substring(3).replaceAll(',', '.')));
-        _atualizaValorTotal();
       }
+      _venda = _venda.copyWith(preco: _stringParseDecimal(value));
+      _atualizaValorTotal();
     } catch (e) {
       return 'Erro não identificado';
     }
@@ -259,10 +265,10 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   }
 
   void _onSavedQuantidade(String value) {
-    // _venda.quantidade = double.parse(value);
     _venda = _venda.copyWith(
-        quantidade: double.parse(
-            value.replaceAll(RegExp(r' kg'), '').replaceAll(',', '.')));
+      quantidade: Decimal.parse(
+          _formatterQuantidade.parse(value.replaceAll(' kg', '')).toString()),
+    );
   }
 
   String? _validatorQuantidade(String? value) {
@@ -270,9 +276,14 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe a quantidade vendida';
       }
-
-      print(value.replaceAll(RegExp(r' kg'), '').replaceAll(',', '.'));
-      double.parse(value.replaceAll(RegExp(r' kg'), '').replaceAll(',', '.'));
+      final quantidade = Decimal.parse(
+        _formatterQuantidade
+            .parse(value.replaceAll(RegExp(r' kg'), ''))
+            .toString(),
+      );
+      if (quantidade == Decimal.zero) {
+        return 'Por favor, quantidade não pode ser zero';
+      }
     } on FormatException {
       return 'Por favor, informe um valor numérico válido \npara a quantidade vendida';
     } catch (e) {
@@ -284,17 +295,20 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
 
   String? _onChangedQuantidade(String? value) {
     String? error = _validatorQuantidade(value);
+    if ('Por favor, quantidade não pode ser zero' == error) {
+      error = null;
+    }
 
     try {
       if (error != null) {
         return error;
-      } else {
-        // _venda.quantidade = double.parse(value!);
-        _venda = _venda.copyWith(
-            quantidade: double.parse(
-                value!.replaceAll(RegExp(r' kg'), '').replaceAll(',', '.')));
-        _atualizaValorTotal();
       }
+      _venda = _venda.copyWith(
+        quantidade: Decimal.parse(
+          _formatterQuantidade.parse(value!.replaceAll(' kg', '')).toString(),
+        ),
+      );
+      _atualizaValorTotal();
     } catch (e) {
       return 'Erro não identificado';
     }
@@ -304,18 +318,14 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
 
   void _onSavedData(String value) {
     _venda = _venda.copyWith(date: Helpers.stringFormatadaToDateTime(value));
-
-    // _venda.date =
-    //     dateFormatBanco.parse(dateFormatBanco.format(_dateFormat.parse(value)));
   }
 
   String? _validatorData(String? value) {
     try {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe a date da venda';
-      } else {
-        Helpers.stringFormatadaToDateTime(value);
       }
+      Helpers.stringFormatadaToDateTime(value);
     } catch (e) {
       return 'Por favor, verifique o formato da data da venda';
     }
@@ -324,9 +334,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   }
 
   void _onSavedDesconto(String value) {
-    // _venda.desconto = double.parse(value);
-    _venda = _venda.copyWith(
-        desconto: double.parse(value.substring(3).replaceAll(',', '.')));
+    _venda = _venda.copyWith(preco: _stringParseDecimal(value));
   }
 
   String? _validatorDesconto(String? value) {
@@ -334,8 +342,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       if (value == null || value.isEmpty) {
         return 'Por favor, informe o desconto';
       }
-
-      double.parse(value.substring(3).replaceAll(',', '.'));
+      _stringParseDecimal(value);
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
     } catch (e) {
@@ -352,9 +359,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       if (error != null) {
         return error;
       }
-      // _venda.desconto = double.parse(value!);
-      _venda = _venda.copyWith(
-          desconto: double.parse(value!.substring(3).replaceAll(',', '.')));
+      _venda = _venda.copyWith(desconto: _stringParseDecimal(value));
       _atualizaValorTotal();
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
@@ -365,13 +370,19 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
     return null;
   }
 
+  Decimal _stringParseDecimal(value) {
+    return Decimal.parse(_formatterMoeda.parse(value).toString());
+  }
+
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       String msg = '';
       try {
+        ref.read(buttonProvider.notifier).setCarregando(true);
         if (_venda.cliente.id == 1) {
           msg = 'Selecione um cliente';
         } else {
+          _formKey.currentState!.save();
           // final abatimento = Abatimento(
           //     idVenda: 0, valor: _venda.total!, dateAbatimento: _venda.date);
           await ref
@@ -385,14 +396,22 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
         msg = e.toString();
       } finally {
         _exibirDialog(msg);
+        ref.read(buttonProvider.notifier).setCarregando(false);
       }
     }
   }
 
   void _limparCampos() {
-    _venda = Venda.initial(date: DateTime.now(), cliente: Cliente.initial());
-    _dataVendaController.text = Helpers.formatarDateTimeToString(_venda.date);
-    _descontoController.text = '${_venda.desconto}';
+    _venda = Venda.initial(
+      date: DateTime.now(),
+      cliente: Cliente.initial(),
+      desconto: Decimal.zero,
+      preco: Decimal.zero,
+      quantidade: Decimal.zero,
+      total: Decimal.zero,
+    );
+    _dataVendaController.text =
+        Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy');
     _atualizaValorTotal();
   }
 
@@ -417,35 +436,42 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   }
 
   void _atualizaValorTotal() {
-    final total = double.parse(
-        ((_venda.quantidade * _venda.preco) - _venda.desconto)
-            .toStringAsFixed(2));
+    final total = Decimal.parse(
+      ((_venda.quantidade * _venda.preco) - _venda.desconto).toStringAsFixed(2),
+    );
     _venda = _venda.copyWith(total: total);
-    _valorTotalController.text = 'R\$ $total';
+    _valorTotalController.text = _formatterMoeda.format(total.toDouble());
   }
 
   void _showDatePicker() async {
     final DateTime? selectDate = await Helpers.showCustomDatePicker(context);
     if (selectDate != null) {
-      _dataVendaController.text = Helpers.formatarDateTimeToString(selectDate);
+      _dataVendaController.text =
+          Helpers.formatarDateTimeToString(selectDate, format: 'dd/MM/yyyy');
     }
   }
 
   void _carregarDados() {
-    _venda = Venda.initial(date: DateTime.now(), cliente: Cliente.initial());
-
+    _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    _formatterQuantidade = NumberFormat('#,##0.00', 'pt_BR');
+    _venda = Venda.initial(
+      date: DateTime.now(),
+      cliente: Cliente.initial(),
+      desconto: Decimal.zero,
+      preco: Decimal.zero,
+      quantidade: Decimal.zero,
+      total: Decimal.zero,
+    );
     _valorTotalController = TextEditingController();
-    _descontoController = TextEditingController();
     _dataVendaController = TextEditingController(
-        text: Helpers.formatarDateTimeToString(_venda.date));
-
+      text: Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy'),
+    );
     _atualizaValorTotal();
   }
 
   @override
   void dispose() {
     _dataVendaController.dispose();
-    _descontoController.dispose();
     _valorTotalController.dispose();
     super.dispose();
   }

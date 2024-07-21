@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 import 'package:vendas_gerenciamento/widgets/nav_buttons_floating.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePainel extends ConsumerStatefulWidget {
   static HomePainel builder(BuildContext context, GoRouterState state) =>
@@ -36,6 +36,17 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.dashboard,
+              color: Color(0xFFEB710A),
+            ),
+            onPressed: () {
+              ref.read(connectionProvider).exportDatabase();
+            },
+          )
+        ],
       ),
       body: _body(),
     );
@@ -105,7 +116,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
               : Container(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'R\$ ${_vendasState.totalDasVendas.toStringAsFixed(2)}',
+                    'R\$ ${_vendasState.totalDasVendas}',
                     style: const TextStyle(color: Colors.white, fontSize: 32),
                   ),
                 ),
@@ -159,21 +170,15 @@ class _HomePainelState extends ConsumerState<HomePainel> {
                 Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 8),
-                  child: Text(
-                    _vendasState.list.length.toString().padLeft(2, '0'),
-                    style:
-                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
-                  ),
+                  child: _text(
+                      _vendasState.list.length.toString().padLeft(2, '0'), 16),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 8),
-                  child: const Opacity(
+                  child: Opacity(
                     opacity: 0.5,
-                    child: Text(
-                      'Total de vendas',
-                      style: TextStyle(color: Color(0xfffdffff), fontSize: 12),
-                    ),
+                    child: _text('Total de vendas', 12),
                   ),
                 ),
               ],
@@ -195,21 +200,15 @@ class _HomePainelState extends ConsumerState<HomePainel> {
               children: <Widget>[
                 Container(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    'R\$ ${_vendasState.totalDaVendaRua.toStringAsFixed(2)}',
-                    style:
-                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
-                  ),
+                  child: _text('R\$ ${_vendasState.totalDaVendaRua}', 16),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   child: Opacity(
                     opacity: 0.5,
-                    child: Text(
-                      '${_vendasState.qtdeVendaRua.toString().padLeft(2, '0')} Rua',
-                      style: const TextStyle(
-                          color: Color(0xfffdffff), fontSize: 12),
-                    ),
+                    child: _text(
+                        '${_vendasState.qtdeVendaRua.toString().padLeft(2, '0')} Rua',
+                        12),
                   ),
                 ),
               ],
@@ -221,21 +220,15 @@ class _HomePainelState extends ConsumerState<HomePainel> {
               children: <Widget>[
                 Container(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    'R\$ ${_vendasState.totalDaVendaFiado.toStringAsFixed(2)}',
-                    style:
-                        const TextStyle(color: Color(0xfffdffff), fontSize: 16),
-                  ),
+                  child: _text('R\$ ${_vendasState.totalDaVendaFiado}', 16),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   child: Opacity(
                     opacity: 0.5,
-                    child: Text(
-                      '${_vendasState.qtdeVendaFiado.toString().padLeft(2, '0')} Fiados',
-                      style: const TextStyle(
-                          color: Color(0xfffdffff), fontSize: 12),
-                    ),
+                    child: _text(
+                        '${_vendasState.qtdeVendaFiado.toString().padLeft(2, '0')} Fiados',
+                        12),
                   ),
                 ),
               ],
@@ -243,6 +236,13 @@ class _HomePainelState extends ConsumerState<HomePainel> {
           ),
         ],
       ),
+    );
+  }
+
+  _text(text, double fontSize) {
+    return Text(
+      text,
+      style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize),
     );
   }
 

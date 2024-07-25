@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
-import 'package:vendas_gerenciamento/model/cliente.dart';
+import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PesquisaCliente extends ConsumerStatefulWidget {
   static PesquisaCliente builder(BuildContext context, GoRouterState state) =>
@@ -60,34 +58,11 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
           Container(
               margin: const EdgeInsets.only(bottom: 8),
               child: const Divider(color: Color(0xFFEB710A), thickness: 1)),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              child: ListView.builder(
-                controller: _scrollController,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  Cliente cliente = _clientesState.list[index];
-                  ClienteAtualState clienteAtualState =
-                      ref.watch(clienteAtualProvider(cliente.id!));
-
-                  return GestureDetector(
-                    child: _containerCliente(clienteAtualState.cliente!.nome,
-                        clienteAtualState.cliente!.telefone),
-                    onTap: () {
-                      ref
-                          .read(clienteAtualProvider(
-                                  clienteAtualState.cliente!.id!)
-                              .notifier)
-                          .getVendasPorClienteLazyLoading();
-                      context.push(RouteLocation.painelCliente,
-                          extra: cliente.id!);
-                    },
-                  );
-                },
-                itemCount: _clientesState.list.length,
-              ),
-            ),
+          ClientesWidget(
+            clientes: _clientesState.list,
+            route: RouteLocation.painelCliente,
+            scrollController: _scrollController,
+            onRefresh: _refresh,
           ),
           _clientesState.carregando
               ? const Center(child: CircularProgressIndicator())
@@ -136,50 +111,6 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
         ),
       ),
     );
-  }
-
-  _containerCliente(String nome, String telefone) {
-    return Container(
-      color: const Color(0xFFEB710A),
-      height: _deviceSize.height * 0.1,
-      margin: const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Text(
-            nome,
-            style: const TextStyle(
-              color: Color(0xffFDFFFF),
-              fontSize: 16,
-            ),
-          ),
-          Text(
-            // telefone,
-            formatarTelefone(telefone),
-            style: const TextStyle(
-              color: Color(0xffFDFFFF),
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String formatarTelefone(String telefone) {
-    final telefoneFormatado = StringBuffer();
-
-    telefoneFormatado.write('(${telefone.substring(0, 2)}) ');
-
-    if (telefone.length == 11) {
-      telefoneFormatado.write('${telefone.substring(2, 7)}-');
-      telefoneFormatado.write(telefone.substring(7));
-    } else {
-      telefoneFormatado.write('${telefone.substring(2, 6)}-');
-      telefoneFormatado.write(telefone.substring(6));
-    }
-
-    return telefoneFormatado.toString();
   }
 
   void _pesquisarClientesPorNome(String nome) {

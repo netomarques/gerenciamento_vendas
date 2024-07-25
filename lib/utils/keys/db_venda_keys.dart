@@ -24,7 +24,7 @@ class DbVendaKeys {
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName  v
     GROUP BY v.$idColuna
-    ORDER BY v.$dateColuna DESC;
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC;
   ''';
 
   static const String sqlVendasLazyLoading = '''
@@ -35,7 +35,7 @@ class DbVendaKeys {
     FROM $tableName  v
     WHERE v.$dateColuna BETWEEN ? AND ?
     GROUP BY v.$idColuna
-    ORDER BY v.$dateColuna DESC
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC
     LIMIT ?
     OFFSET ?;
   ''';
@@ -46,7 +46,8 @@ class DbVendaKeys {
            SUM(CASE WHEN (v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) THEN v.$totalColuna ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END) $totalEmAbertoColuna,
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName  v
-    WHERE v.$idColuna = ?;
+    WHERE v.$idColuna = ?
+    ORDER BY v.$dateColuna DESC;
   ''';
 
   static const String sqlVendasPorData = '''
@@ -57,7 +58,7 @@ class DbVendaKeys {
     FROM $tableName  v
     WHERE v.$dateColuna BETWEEN ? AND  ?
     GROUP BY v.$idColuna
-    ORDER BY v.$dateColuna DESC;
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC;
   ''';
 
   static const String sqlVendasPorCliente = '''
@@ -67,15 +68,14 @@ class DbVendaKeys {
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName  v
     WHERE v.$idClienteColuna = ?
-    ORDER BY v.$dateColuna DESC;
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC;
   ''';
 
   static const String sqlTotalEmAbertoDoCliente = '''
     SELECT SUM(CASE WHEN (v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) THEN v.$totalColuna ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END) AS sum_total_em_aberto, 
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName v
-    WHERE v.$idClienteColuna = ? AND $isAbertoColuna = 1
-    ORDER BY v.$dateColuna DESC;
+    WHERE v.$idClienteColuna = ? AND $isAbertoColuna = 1;
   ''';
 
   static const String sqlVendasPorClienteLazyLoading = '''
@@ -85,7 +85,7 @@ class DbVendaKeys {
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName  v
     WHERE v.$idClienteColuna = ?
-    ORDER BY v.$dateColuna DESC
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC
     LIMIT ?
     OFFSET ?;
   ''';
@@ -97,7 +97,7 @@ class DbVendaKeys {
            CASE WHEN ((v.$idColuna NOT IN (SELECT a.${DbAbatimentoKeys.idVendaColuna} FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) OR ((v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) > 0)) THEN 1 ELSE (v.$totalColuna - (SELECT SUM(a.${DbAbatimentoKeys.valorColuna}) FROM ${DbAbatimentoKeys.tableName} a WHERE a.${DbAbatimentoKeys.idVendaColuna} = v.$idColuna)) END $isAbertoColuna
     FROM $tableName  v
     WHERE v.$idClienteColuna = ? AND v.$dateColuna BETWEEN ? AND  ?
-    ORDER BY v.$dateColuna DESC
+    ORDER BY v.$idColuna DESC, v.$dateColuna DESC
     LIMIT ?
     OFFSET ?;
   ''';

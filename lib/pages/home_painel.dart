@@ -129,10 +129,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     return Container(
       width: _deviceSize.width * 0.35,
       alignment: Alignment.topCenter,
-      child: DateButton(
-          Helpers.formatarDateTimeToString(DateTime.now()),
-          Helpers.formatarDateTimeToString(DateTime.now()),
-          pesquisarVendasPorData),
+      child: DateButton(DateTime.now(), DateTime.now(), pesquisarVendasPorData),
     );
   }
 
@@ -262,11 +259,12 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  void pesquisarVendasPorData(String startDate, String endDate) {
-    ref.read(listaVendasProvider.notifier).getVendasPorData(
-          Helpers.stringFormatadaToDateTime(startDate),
-          Helpers.stringFormatadaToDateTime(endDate),
-        );
+  void pesquisarVendasPorData(DateTime startDate, DateTime endDate) {
+    if (!_vendasState.carregando) {
+      ref
+          .read(listaVendasProvider.notifier)
+          .getVendasPorData(startDate, endDate);
+    }
   }
 
   void _onScroll() {

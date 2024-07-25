@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CadastroCliente extends ConsumerStatefulWidget {
   static CadastroCliente builder(BuildContext context, GoRouterState state) =>
@@ -20,10 +20,11 @@ class CadastroCliente extends ConsumerStatefulWidget {
 
 class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _textNomeController;
-  late final TextEditingController _textTelefoneController;
-  late final TextEditingController _textCpfController;
-  late Cliente _cliente;
+  // late final TextEditingController _textNomeController;
+  // late final TextEditingController _textTelefoneController;
+  // late final TextEditingController _textCpfController;
+  late Cliente _clienteForm;
+  late ButtonState _buttonState;
 
   @override
   void initState() {
@@ -33,6 +34,8 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
 
   @override
   Widget build(BuildContext context) {
+    _buttonState = ref.watch(buttonProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFEB710A),
@@ -101,7 +104,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
                         padding: const EdgeInsets.only(top: 60, bottom: 8),
                         child: AcoesTextButton(
                           onFunction: _submitForm,
-                          carregando: false,
+                          carregando: _buttonState.carregando,
                           text: 'Cadastrar Cliente',
                         ),
                       ),
@@ -124,7 +127,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _onSavedNome(String value) {
-    _cliente = _cliente.copyWith(nome: value);
+    _clienteForm = _clienteForm.copyWith(nome: value);
   }
 
   String? _validatorNome(String? value) {
@@ -140,7 +143,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _cliente = _cliente.copyWith(
+    _clienteForm = _clienteForm.copyWith(
         telefone: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
@@ -163,8 +166,8 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _cliente =
-        _cliente.copyWith(cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
+    _clienteForm = _clienteForm.copyWith(
+        cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
   String? _validatorCpf(String? value) {
@@ -176,7 +179,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
       int qtdeNumeroCpfOuCnpj =
           value.replaceAll(RegExp('[^0-9a-zA-Z]+'), '').length;
       if ((qtdeNumeroCpfOuCnpj != 11 && qtdeNumeroCpfOuCnpj != 14)) {
-        return 'CPF deve ter 11 números ou CNPJ 14 números';
+        return 'CPF deve ter 11 números \nou CNPJ 14 números';
       }
     } catch (e) {
       return 'erro não identificado';
@@ -187,19 +190,24 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      String msg = '';
       try {
+        ref.read(buttonProvider.notifier).setCarregando(true);
         _formKey.currentState!.save();
-        Cliente cliente = Cliente(
-          nome: _cliente.nome,
-          telefone: _cliente.telefone,
-          cpf: _cliente.cpf,
+        final cliente = Cliente(
+          nome: _clienteForm.nome,
+          telefone: _clienteForm.telefone,
+          cpf: _clienteForm.cpf,
         );
-        ref.read(clienteServiceProvider).salvarCliente(cliente);
-        _exibirDialog('Cliente cadastrado com sucesso');
+        await ref.read(clienteServiceProvider).salvarCliente(cliente);
+        msg = 'Cliente cadastrado com sucesso';
         _formKey.currentState!.reset();
         _limparCampos();
       } catch (e) {
-        _exibirDialog('Erro ao cadastrar cliente');
+        msg = e.toString();
+      } finally {
+        _exibirDialog(msg);
+        ref.read(buttonProvider.notifier).setCarregando(false);
       }
     }
   }
@@ -215,7 +223,7 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                context.pop();
               },
             ),
           ],
@@ -225,26 +233,31 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   }
 
   void _limparCampos() {
-    _cliente = Cliente(nome: "", telefone: "");
+    // _clienteForm = Cliente(nome: "", telefone: "");
+    _clienteForm = Cliente.initial();
 
-    _textNomeController.text = _cliente.nome;
-    _textTelefoneController.text = _cliente.telefone;
-    _textCpfController.text = _cliente.cpf;
+    // _textNomeController.text = _clienteForm.nome;
+    // _textTelefoneController.text = _clienteForm.telefone;
+    // _textCpfController.text = _clienteForm.cpf;
+    // _textNomeController.text = '';
+    // _textTelefoneController.text = '';
+    // _textCpfController.text = '';
   }
 
   void _carregarDados() {
-    _cliente = Cliente(nome: "", telefone: "");
+    // _clienteForm = Cliente(nome: "", telefone: "");
+    _clienteForm = Cliente.initial();
 
-    _textNomeController = TextEditingController();
-    _textTelefoneController = TextEditingController();
-    _textCpfController = TextEditingController();
+    // _textNomeController = TextEditingController();
+    // _textTelefoneController = TextEditingController();
+    // _textCpfController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _textNomeController.dispose();
-    _textTelefoneController.dispose();
-    _textCpfController.dispose();
+    // _textNomeController.dispose();
+    // _textTelefoneController.dispose();
+    // _textCpfController.dispose();
     super.dispose();
   }
 }

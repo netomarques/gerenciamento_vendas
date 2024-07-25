@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/repositories/repositories.dart';
@@ -123,10 +124,18 @@ class VendaService {
     }
   }
 
-  Future<double> getTotalEmAbertoDoCliente(int idCliente) async {
+  Future<Decimal> getTotalEmAbertoDoCliente(int idCliente) async {
     try {
       final resultado = await _repository.getTotalEmAbertoDoCliente(idCliente);
-      double totalEmAberto = resultado.first['sum_total_em_aberto'] ?? 0.0;
+      double resultadoDouble = resultado.first['sum_total_em_aberto'] ?? 0.0;
+      Decimal totalEmAberto;
+      if (resultadoDouble != 0.0) {
+        totalEmAberto = Decimal.parse(
+            Decimal.parse(resultadoDouble.toString()).toStringAsFixed(2));
+      } else {
+        totalEmAberto = Decimal.zero;
+      }
+
       return totalEmAberto;
     } catch (e) {
       debugPrint(e.toString());

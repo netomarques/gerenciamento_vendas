@@ -10,9 +10,7 @@ class ClienteService {
   Future<Cliente> getClienteId(int id) async {
     try {
       final resultado = await _repository.getByIdRecord(id);
-      Cliente cliente = List.generate(
-              resultado.length, (index) => Cliente.fromJson(resultado[index]))
-          .first;
+      Cliente cliente = Cliente.fromJson(resultado.first);
       return cliente;
     } catch (e) {
       debugPrint(e.toString());
@@ -51,7 +49,8 @@ class ClienteService {
     int offset,
   ) async {
     try {
-      final resultados = await _repository.getClientesLazyLoading(limit, offset);
+      final resultados =
+          await _repository.getClientesLazyLoading(limit, offset);
       final List<Cliente> clientes = [];
 
       for (var clienteJson in resultados) {
@@ -65,9 +64,9 @@ class ClienteService {
     }
   }
 
-  Future<void> atualizarCliente(Cliente cliente) async {
+  Future<int> atualizarCliente(Cliente cliente) async {
     try {
-      await _repository.updateRecord(cliente.toJson(), cliente.id!);
+      return await _repository.updateRecord(cliente.toJson(), cliente.id!);
     } catch (e) {
       debugPrint(e.toString());
       throw Exception('Erro ao atualizar Cliente');

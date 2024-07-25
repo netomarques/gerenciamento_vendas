@@ -12,6 +12,7 @@ class AppTextFormField2 extends StatelessWidget {
   final TextEditingController? controller;
   final bool? isReadOnly;
   final List<TextInputFormatter>? formato;
+  final String? initialValue;
 
   const AppTextFormField2(
     this._hintText,
@@ -24,12 +25,14 @@ class AppTextFormField2 extends StatelessWidget {
     this.controller,
     this.isReadOnly = false,
     this.formato,
+    this.initialValue,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue,
       controller: controller,
       style: _textStyle(const Color(0xFFEB710A)),
       decoration: InputDecoration(

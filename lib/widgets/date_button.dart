@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:vendas_gerenciamento/utils/utils.dart';
 
 class DateButton extends StatefulWidget {
-  final String dateStart;
-  final String dateEnd;
+  final DateTime dateStart;
+  final DateTime dateEnd;
   final Function carregarVendas;
 
   const DateButton(this.dateStart, this.dateEnd, this.carregarVendas,
@@ -16,11 +16,9 @@ class DateButton extends StatefulWidget {
 }
 
 class _DateButtonState extends State<DateButton> {
-  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
-  final _now = DateTime.now();
   late final StreamController<Map<String, dynamic>> _streamController;
-  late String _dateStart;
-  late String _dateEnd;
+  late DateTime _dateStart;
+  late DateTime _dateEnd;
 
   @override
   void initState() {
@@ -56,7 +54,7 @@ class _DateButtonState extends State<DateButton> {
               ),
               onPressed: () => _showDateRangePicker(context),
               child: Text(
-                datas["dateEnd"],
+                Helpers.formatarDateTimeToString(datas["dateEnd"]),
                 style: const TextStyle(fontSize: 18, color: Color(0xFFFDFFFF)),
               ),
             ),
@@ -72,7 +70,7 @@ class _DateButtonState extends State<DateButton> {
                 ),
                 onPressed: () => _showDateRangePicker(context),
                 child: Text(
-                  datas["dateStart"],
+                  Helpers.formatarDateTimeToString(datas["dateStart"]),
                   style:
                       const TextStyle(fontSize: 18, color: Color(0xFFFDFFFF)),
                 ),
@@ -88,10 +86,10 @@ class _DateButtonState extends State<DateButton> {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(1900),
-      lastDate: _now,
+      lastDate: DateTime.now(),
       initialDateRange: DateTimeRange(
-        end: _dateFormat.parse(_dateEnd),
-        start: _dateFormat.parse(_dateStart),
+        end: _dateEnd,
+        start: _dateStart,
       ),
       builder: (context, child) {
         return Column(
@@ -108,19 +106,18 @@ class _DateButtonState extends State<DateButton> {
     );
 
     if (picked != null &&
-        (_dateFormat.format(picked.start) != _dateStart ||
-            _dateFormat.format(picked.end) != _dateEnd)) {
-      _dateStart = _dateFormat.format(picked.start);
-      _dateEnd = _dateFormat.format(picked.end);
+        (picked.start != _dateStart || picked.end != _dateEnd)) {
+      _dateStart = picked.start;
+      _dateEnd = picked.end;
 
       Map<String, dynamic> datas = {};
-      datas["dateStart"] = _dateStart;
-      datas["dateEnd"] = _dateEnd;
+      datas["dateStart"] = picked.start;
+      datas["dateEnd"] = picked.end;
       datas["isVisible"] = picked.start != picked.end ? true : false;
 
       _streamController.add(datas);
 
-      widget.carregarVendas(_dateStart, _dateEnd);
+      widget.carregarVendas(picked.start, picked.end);
     }
   }
 

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
+import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 import 'package:vendas_gerenciamento/widgets/date_button.dart';
 
 class PainelCliente extends ConsumerStatefulWidget {
-  final int idCliente;
+  final Cliente cliente;
 
   static PainelCliente builder(BuildContext context, GoRouterState state) =>
-      PainelCliente(state.extra as int);
+      PainelCliente(state.extra as Cliente);
 
-  const PainelCliente(this.idCliente, {super.key});
+  const PainelCliente(this.cliente, {super.key});
 
   @override
   ConsumerState<PainelCliente> createState() => _PainelClienteState();
@@ -25,7 +25,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
   late DateTime _dateEnd;
   late Size _deviceSize;
   late ClienteAtualState _clienteAtualState;
-  late final int _idCliente;
+  late final Cliente _cliente;
   late final ScrollController scrollController;
 
   @override
@@ -35,18 +35,17 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
   }
 
   _carregarDados() {
+    _cliente = widget.cliente;
     scrollController = ScrollController();
     scrollController.addListener(_onScrollCarregarMaisVendas);
     _dateStart = DateTime.now();
     _dateEnd = DateTime.now();
-
-    _idCliente = widget.idCliente;
   }
 
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
-    _clienteAtualState = ref.watch(clienteAtualProvider(_idCliente));
+    _clienteAtualState = ref.watch(clienteAtualProvider(_cliente));
 
     return Scaffold(
       appBar: AppBar(
@@ -73,15 +72,12 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     return Column(
       children: <Widget>[
         _head(),
-        _textoInformacao(),
+        _textoTotalInformacao(),
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: SizedBox(
               width: _deviceSize.width * 0.35,
-              child: DateButton(
-                  Helpers.formatarDateTimeToString(_dateStart),
-                  Helpers.formatarDateTimeToString(_dateEnd),
-                  _carregarVendasPorData)),
+              child: DateButton(_dateStart, _dateEnd, _carregarVendasPorData)),
         ),
         VendasWidget(
           vendas: _clienteAtualState.vendasDoCliente,
@@ -111,22 +107,16 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
               ),
               Container(
                 height: _deviceSize.height * 0.085,
-                margin: const EdgeInsets.only(top: 20),
+                margin: const EdgeInsets.only(top: 30),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Text(
-                      _clienteAtualState.cliente!.nome,
-                      style: const TextStyle(
-                          color: Color(0xffFDFFFF), fontSize: 16),
+                    _text(_clienteAtualState.cliente!.nome),
+                    _text(
+                      _formatarTelefone(_clienteAtualState.cliente!.telefone),
                     ),
-                    Text(
-                      _clienteAtualState.cliente!.telefone,
-                      style: const TextStyle(
-                        color: Color(0xffFDFFFF),
-                        fontSize: 16,
-                      ),
-                    )
+                    _text(_formatarCpfCnpj(_clienteAtualState.cliente!.cpf)),
+                    // _text(_clienteAtualState.cliente!.cpf),
                   ],
                 ),
               ),
@@ -135,7 +125,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
         ),
         GestureDetector(
           onTap: () =>
-              context.push(RouteLocation.alterarCliente, extra: _idCliente),
+              context.push(RouteLocation.alterarCliente, extra: _cliente),
           child: Container(
             margin: EdgeInsets.only(top: 8, left: _deviceSize.width * 0.40),
             child: Image.asset(
@@ -148,7 +138,42 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     );
   }
 
-  _textoInformacao() {
+  _text(text, {double fontSize = 16.0}) {
+    return Text(text,
+        style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
+  }
+
+  String _formatarTelefone(String telefone) {
+    final telefoneFormatado = StringBuffer();
+
+    telefoneFormatado.write('(${telefone.substring(0, 2)}) ');
+
+    if (telefone.length == 11) {
+      telefoneFormatado.write('${telefone.substring(2, 7)}-');
+      telefoneFormatado.write(telefone.substring(7));
+    } else {
+      telefoneFormatado.write('${telefone.substring(2, 6)}-');
+      telefoneFormatado.write(telefone.substring(6));
+    }
+
+    return telefoneFormatado.toString();
+  }
+
+  String _formatarCpfCnpj(String cpf) {
+    final newText = StringBuffer();
+
+    if (cpf.length == 11) {
+      newText.write(
+          '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9)}');
+    } else {
+      newText.write(
+          '${cpf.substring(0, 2)}.${cpf.substring(2, 5)}.${cpf.substring(5, 8)}/${cpf.substring(8, 12)}-${cpf.substring(12)}');
+    }
+
+    return newText.toString();
+  }
+
+  _textoTotalInformacao() {
     return Container(
       width: _deviceSize.width,
       height: _deviceSize.height * 0.07,
@@ -157,10 +182,9 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
       child: Opacity(
         opacity: 0.65,
         child: Center(
-          child: Text(
-            "Total a receber: R\$ ${_clienteAtualState.totalEmAberto.toStringAsFixed(2)}",
-            style: const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
-          ),
+          child: _text(
+              "Total a receber: R\$ ${_clienteAtualState.totalEmAberto}",
+              fontSize: 20.0),
         ),
       ),
     );
@@ -171,29 +195,25 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
             scrollController.position.maxScrollExtent &&
         !_clienteAtualState.carregando) {
       ref
-          .read(clienteAtualProvider(_idCliente).notifier)
+          .read(clienteAtualProvider(_cliente).notifier)
           .getMaisVendasPorClienteLazyLoading(
-            startDate: Helpers.formatarDateTimeToDateDB(_dateStart),
-            endDate: Helpers.formatarDateTimeToDateDB(_dateEnd),
-          );
+              startDate: _dateStart, endDate: _dateEnd);
     }
   }
 
-  void _carregarVendasPorData(String dateStart, String dateEnd) async {
+  void _carregarVendasPorData(DateTime dateStart, DateTime dateEnd) async {
     if (!_clienteAtualState.carregando) {
-      _dateStart = Helpers.stringFormatadaToDateTime(dateStart);
-      _dateEnd = Helpers.stringFormatadaToDateTime(dateEnd);
+      _dateStart = dateStart;
+      _dateEnd = dateEnd;
       ref
-          .read(clienteAtualProvider(_idCliente).notifier)
+          .read(clienteAtualProvider(_cliente).notifier)
           .getVendasPorClienteLazyLoading(
-            startDate: Helpers.formatarDateTimeToDateDB(_dateStart),
-            endDate: Helpers.formatarDateTimeToDateDB(_dateEnd),
-          );
+              startDate: _dateStart, endDate: _dateEnd);
     }
   }
 
   _limparDados() {
-    ref.read(clienteAtualProvider(widget.idCliente).notifier).limparDados();
+    ref.read(clienteAtualProvider(widget.cliente).notifier).limparDados();
   }
 
   @override

@@ -10,12 +10,12 @@ import 'package:vendas_gerenciamento/widgets/acoes_text_button.dart';
 import 'package:vendas_gerenciamento/widgets/app_text_form_field2.dart';
 
 class AlterarCliente extends ConsumerStatefulWidget {
-  final int idCliente;
+  final Cliente cliente;
 
   static AlterarCliente builder(BuildContext context, GoRouterState state) =>
-      AlterarCliente(state.extra as int);
+      AlterarCliente(state.extra as Cliente);
 
-  const AlterarCliente(this.idCliente, {super.key});
+  const AlterarCliente(this.cliente, {super.key});
 
   @override
   ConsumerState<AlterarCliente> createState() => _AlterarClienteState();
@@ -23,20 +23,14 @@ class AlterarCliente extends ConsumerStatefulWidget {
 
 class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _textNomeController;
-  late final TextEditingController _textTelefoneController;
-  late final TextEditingController _textCpfController;
-  late Cliente _clienteAtualizado;
-  late ClienteAtualNotifier _clienteAtualNotifier;
-  late final int _idCliente;
+  late Cliente _clienteForm;
+  late ClienteAtualState _clienteAtualState;
+  late ClienteAtualNotifier _clienteNotifier;
   late ButtonState _buttonState;
   late Size _deviceSize;
 
   @override
   void initState() {
-    _idCliente = widget.idCliente;
-    _clienteAtualNotifier =
-        ref.read(clienteAtualProvider(widget.idCliente).notifier);
     _carregarDados();
     super.initState();
   }
@@ -44,6 +38,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
+    _clienteAtualState = ref.watch(clienteAtualProvider(widget.cliente));
     _buttonState = ref.watch(buttonProvider);
 
     return Scaffold(
@@ -70,62 +65,67 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _containerTextForm(
-                      AppTextFormField2(
-                        'Informe o nome',
-                        'Nome',
-                        TextInputType.text,
-                        _validatorNome,
-                        _onSavedNome,
-                        controller: _textNomeController,
-                      ),
-                    ),
-                    _containerTextForm(
-                      AppTextFormField2(
-                        'Informe o telefone',
-                        'Telefone',
-                        TextInputType.number,
-                        _validatorTelefone,
-                        _onSavedTelefone,
-                        controller: _textTelefoneController,
-                        formato: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          TelefoneFormato(),
+              _clienteAtualState.carregando
+                  ? const Center(child: CircularProgressIndicator())
+                  : Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _containerTextForm(
+                            AppTextFormField2(
+                              initialValue: _clienteAtualState.cliente!.nome,
+                              'Informe o nome',
+                              'Nome',
+                              TextInputType.text,
+                              _validatorNome,
+                              _onSavedNome,
+                            ),
+                          ),
+                          _containerTextForm(
+                            AppTextFormField2(
+                              initialValue: _formatarTelefone(
+                                  _clienteAtualState.cliente!.telefone),
+                              'Informe o telefone',
+                              'Telefone',
+                              TextInputType.number,
+                              _validatorTelefone,
+                              _onSavedTelefone,
+                              formato: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                TelefoneFormato(),
+                              ],
+                            ),
+                          ),
+                          _containerTextForm(
+                            AppTextFormField2(
+                              initialValue: _formatarCpfCnpj(
+                                  _clienteAtualState.cliente!.cpf),
+                              'Informe o CPF/CNPJ',
+                              'CPF/CNPJ',
+                              TextInputType.number,
+                              _validatorCpf,
+                              _onSavedCpf,
+                              formato: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
+                              ],
+                            ),
+                          ),
+                          Center(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 60, bottom: 8),
+                              child: AcoesTextButton(
+                                onFunction: _submitForm,
+                                carregando: _buttonState.carregando,
+                                text: 'Atualizar Cliente',
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    _containerTextForm(
-                      AppTextFormField2(
-                        'Informe o CPF/CNPJ',
-                        'CPF/CNPJ',
-                        TextInputType.number,
-                        _validatorCpf,
-                        _onSavedCpf,
-                        controller: _textCpfController,
-                        formato: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]),
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 60, bottom: 8),
-                        child: AcoesTextButton(
-                          onFunction: _submitForm,
-                          carregando: _buttonState.carregando,
-                          text: 'Salvar modificação',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -140,9 +140,9 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
       color: const Color(0xFFEB710A),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: Text(
-        ref.watch(clienteAtualProvider(widget.idCliente)).cliente!.nome,
+        _clienteAtualState.cliente!.nome,
         style: const TextStyle(
-          color: Color(0xffFDFFFF),
+          color: Color(0xFFFDFFFF),
           fontSize: 30,
         ),
       ),
@@ -157,7 +157,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   }
 
   void _onSavedNome(String value) {
-    _clienteAtualizado = _clienteAtualizado.copyWith(nome: value);
+    _clienteForm = _clienteForm.copyWith(nome: value);
   }
 
   String? _validatorNome(String? value) {
@@ -173,7 +173,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   }
 
   void _onSavedTelefone(String value) {
-    _clienteAtualizado = _clienteAtualizado.copyWith(
+    _clienteForm = _clienteForm.copyWith(
         telefone: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
@@ -196,7 +196,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
   }
 
   void _onSavedCpf(String value) {
-    _clienteAtualizado = _clienteAtualizado.copyWith(
+    _clienteForm = _clienteForm.copyWith(
         cpf: value.replaceAll(RegExp('[^0-9a-zA-Z]+'), ''));
   }
 
@@ -220,15 +220,24 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      String msg = '';
       try {
+        ref.read(buttonProvider.notifier).setCarregando(true);
         _formKey.currentState!.save();
-        _clienteAtualNotifier.atualizarCliente(_clienteAtualizado);
-        _exibirDialog('Cliente atualizado com sucesso');
-        //_limparCampos();
+        final cliente = Cliente(
+          id: _clienteForm.id,
+          nome: _clienteForm.nome,
+          telefone: _clienteForm.telefone,
+          cpf: _clienteForm.cpf,
+        );
+        await _clienteNotifier.atualizarCliente(cliente);
+        msg = 'Cliente atualizado com sucesso';
       } catch (e) {
         _formKey.currentState!.reset();
-        print('Erro ao atualizar cliente: ${e.toString().toUpperCase()}');
-        _exibirDialog('Erro ao atualizar cliente');
+        msg = 'Erro ao atualizar cliente';
+      } finally {
+        _exibirDialog(msg);
+        ref.read(buttonProvider.notifier).setCarregando(false);
       }
     }
   }
@@ -251,34 +260,38 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
     );
   }
 
+  String _formatarTelefone(String telefone) {
+    final telefoneFormatado = StringBuffer();
+
+    telefoneFormatado.write('(${telefone.substring(0, 2)}) ');
+
+    if (telefone.length == 11) {
+      telefoneFormatado.write('${telefone.substring(2, 7)}-');
+      telefoneFormatado.write(telefone.substring(7));
+    } else {
+      telefoneFormatado.write('${telefone.substring(2, 6)}-');
+      telefoneFormatado.write(telefone.substring(6));
+    }
+
+    return telefoneFormatado.toString();
+  }
+
+  String _formatarCpfCnpj(String cpf) {
+    final newText = StringBuffer();
+
+    if (cpf.length == 11) {
+      newText.write(
+          '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9)}');
+    } else {
+      newText.write(
+          '${cpf.substring(0, 2)}.${cpf.substring(2, 5)}.${cpf.substring(5, 8)}/${cpf.substring(8, 12)}-${cpf.substring(12)}');
+    }
+
+    return newText.toString();
+  }
+
   void _carregarDados() async {
-    _textNomeController = TextEditingController();
-    _textTelefoneController = TextEditingController();
-    _textCpfController = TextEditingController();
-
-    _clienteAtualizado =
-        await ref.read(clienteServiceProvider).getClienteId(_idCliente);
-
-    _textNomeController.text = _clienteAtualizado.nome;
-    _textTelefoneController.text =
-        _formatarCampo(_clienteAtualizado.telefone, TelefoneFormato());
-    _textCpfController.text = _formatarCampo(_clienteAtualizado.cpf,
-        CpfOuCnpjFormato([CpfFormato(), CnpjFormato()]));
-  }
-
-  //Formatar campos ao carregar dados
-  String _formatarCampo(String text, TextInputFormatter formato) {
-    return formato
-        .formatEditUpdate(
-            TextEditingValue(text: text), TextEditingValue(text: text))
-        .text;
-  }
-
-  @override
-  void dispose() {
-    _textCpfController.dispose();
-    _textTelefoneController.dispose();
-    _textNomeController.dispose();
-    super.dispose();
+    _clienteNotifier = ref.read(clienteAtualProvider(widget.cliente).notifier);
+    _clienteForm = Cliente.initial(id: widget.cliente.id);
   }
 }

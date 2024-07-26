@@ -20,16 +20,13 @@ class CadastroCliente extends ConsumerStatefulWidget {
 
 class _CadastroClienteState extends ConsumerState<CadastroCliente> {
   final _formKey = GlobalKey<FormState>();
-  // late final TextEditingController _textNomeController;
-  // late final TextEditingController _textTelefoneController;
-  // late final TextEditingController _textCpfController;
   late Cliente _clienteForm;
   late ButtonState _buttonState;
 
   @override
   void initState() {
     super.initState();
-    _carregarDados();
+    _clienteForm = Cliente.initial();
   }
 
   @override
@@ -212,52 +209,16 @@ class _CadastroClienteState extends ConsumerState<CadastroCliente> {
     }
   }
 
-  void _exibirDialog(String mensagem) {
+  void _exibirDialog(String msg) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Mensagem'),
-          content: Text(mensagem),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                context.pop();
-              },
-            ),
-          ],
-        );
+        return AlertDialogWidget(msg);
       },
     );
   }
 
   void _limparCampos() {
-    // _clienteForm = Cliente(nome: "", telefone: "");
     _clienteForm = Cliente.initial();
-
-    // _textNomeController.text = _clienteForm.nome;
-    // _textTelefoneController.text = _clienteForm.telefone;
-    // _textCpfController.text = _clienteForm.cpf;
-    // _textNomeController.text = '';
-    // _textTelefoneController.text = '';
-    // _textCpfController.text = '';
-  }
-
-  void _carregarDados() {
-    // _clienteForm = Cliente(nome: "", telefone: "");
-    _clienteForm = Cliente.initial();
-
-    // _textNomeController = TextEditingController();
-    // _textTelefoneController = TextEditingController();
-    // _textCpfController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    // _textNomeController.dispose();
-    // _textTelefoneController.dispose();
-    // _textCpfController.dispose();
-    super.dispose();
   }
 }

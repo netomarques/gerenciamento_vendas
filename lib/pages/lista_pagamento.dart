@@ -1,18 +1,19 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/cadastro_abatimento.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
-import 'package:decimal/decimal.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ListaPagamento extends ConsumerStatefulWidget {
   final Venda venda;
 
   static ListaPagamento builder(BuildContext context, GoRouterState state) =>
-      ListaPagamento(venda: state.extra! as Venda);
+      ListaPagamento(venda: state.extra as Venda);
 
   const ListaPagamento({super.key, required this.venda});
 
@@ -21,14 +22,20 @@ class ListaPagamento extends ConsumerStatefulWidget {
 }
 
 class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
+  late final NumberFormat _formatterMoeda;
   late final Venda _venda;
   late VendaState _vendaState;
   late Size _deviceSize;
 
   @override
   void initState() {
-    _venda = widget.venda;
+    _carregarDados();
     super.initState();
+  }
+
+  _carregarDados() {
+    _venda = widget.venda;
+    _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   }
 
   @override
@@ -42,7 +49,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         title: const Text(
           'Venda - Abatimentos',
           style: TextStyle(
-            color: Color(0xffFDFFFF),
+            color: Color(0xFFFDFFFF),
           ),
         ),
         leading: BackButton(
@@ -79,7 +86,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         _textoInformacao(),
         Expanded(
           child: _vendaState.carregando
-              ? const CircularProgressIndicator()
+              ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: _vendaState.abatimentosDaVenda.length,
                   shrinkWrap: true,
@@ -110,26 +117,17 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
               ),
               Container(
                 height: _deviceSize.height * 0.085,
-                margin: const EdgeInsets.only(top: 20),
-                child: _vendaState.carregando
-                    ? const CircularProgressIndicator()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Text(
-                            _vendaState.venda!.cliente.nome,
-                            style: const TextStyle(
-                                color: Color(0xffFDFFFF), fontSize: 16),
-                          ),
-                          Text(
-                            _vendaState.venda!.cliente.telefone,
-                            style: const TextStyle(
-                              color: Color(0xffFDFFFF),
-                              fontSize: 16,
-                            ),
-                          )
-                        ],
-                      ),
+                margin: const EdgeInsets.only(top: 30),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    _text(_venda.cliente.nome),
+                    _text(
+                      _formatarTelefone(_venda.cliente.telefone),
+                    ),
+                    _text(_formatarCpfCnpj(_venda.cliente.cpf)),
+                  ],
+                ),
               ),
             ],
           ),
@@ -145,6 +143,41 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
+  _text(text, {double fontSize = 16.0}) {
+    return Text(text,
+        style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
+  }
+
+  String _formatarTelefone(String telefone) {
+    final telefoneFormatado = StringBuffer();
+
+    telefoneFormatado.write('(${telefone.substring(0, 2)}) ');
+
+    if (telefone.length == 11) {
+      telefoneFormatado.write('${telefone.substring(2, 7)}-');
+      telefoneFormatado.write(telefone.substring(7));
+    } else {
+      telefoneFormatado.write('${telefone.substring(2, 6)}-');
+      telefoneFormatado.write(telefone.substring(6));
+    }
+
+    return telefoneFormatado.toString();
+  }
+
+  String _formatarCpfCnpj(String cpf) {
+    final newText = StringBuffer();
+
+    if (cpf.length == 11) {
+      newText.write(
+          '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9)}');
+    } else {
+      newText.write(
+          '${cpf.substring(0, 2)}.${cpf.substring(2, 5)}.${cpf.substring(5, 8)}/${cpf.substring(8, 12)}-${cpf.substring(12)}');
+    }
+
+    return newText.toString();
+  }
+
   _textTotalAReceber() {
     return Container(
       height: _deviceSize.height * 0.07,
@@ -154,9 +187,9 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         opacity: 0.65,
         child: Center(
           child: _vendaState.carregando
-              ? const CircularProgressIndicator()
+              ? const Center(child: CircularProgressIndicator())
               : Text(
-                  "A receber: R\$ ${_vendaState.venda!.totalAberto!.toStringAsFixed(2)}",
+                  "A receber: ${_formatterMoeda.format(_vendaState.venda!.totalAberto!.toDouble())}",
                   style:
                       const TextStyle(color: Color(0xFFFDFFFF), fontSize: 20),
                 ),
@@ -196,25 +229,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
         if (_vendaState.venda!.totalAberto! > Decimal.zero) {
           return CadastroAbatimento(_vendaState.venda!);
         } else {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF006940),
-            content: const Text(
-              'Não há valores em aberto',
-              style: TextStyle(fontSize: 20),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => context.pop(),
-                child: const Text(
-                  "OK",
-                  style: TextStyle(
-                    color: Color(0xFFFDFFFF),
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-            ],
-          );
+          return const AlertDialogWidget('Não há valores em aberto');
         }
       },
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
@@ -27,6 +28,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
   late ClienteAtualState _clienteAtualState;
   late final Cliente _cliente;
   late final ScrollController scrollController;
+  late NumberFormat _formatterMoeda;
 
   @override
   void initState() {
@@ -36,6 +38,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
 
   _carregarDados() {
     _cliente = widget.cliente;
+    _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     scrollController = ScrollController();
     scrollController.addListener(_onScrollCarregarMaisVendas);
     _dateStart = DateTime.now();
@@ -116,7 +119,6 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
                       _formatarTelefone(_clienteAtualState.cliente!.telefone),
                     ),
                     _text(_formatarCpfCnpj(_clienteAtualState.cliente!.cpf)),
-                    // _text(_clienteAtualState.cliente!.cpf),
                   ],
                 ),
               ),
@@ -183,7 +185,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
         opacity: 0.65,
         child: Center(
           child: _text(
-              "Total a receber: R\$ ${_clienteAtualState.totalEmAberto}",
+              'Total a receber: ${_formatterMoeda.format(_clienteAtualState.totalEmAberto.toDouble())}',
               fontSize: 20.0),
         ),
       ),

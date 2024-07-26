@@ -104,7 +104,9 @@ class Venda extends AbstractModel {
       total: Decimal.parse(map[VendaKeys.total].toString()),
       fiado: map[VendaKeys.isFiado] == 1 ? true : false,
       isAberto: map[VendaKeys.isAberto] == 1 ? true : false,
-      totalAberto: Decimal.parse(map[VendaKeys.totalEmAberto].toString()),
+      totalAberto: Decimal.parse(
+          Decimal.parse(map[VendaKeys.totalEmAberto].toString())
+              .toStringAsFixed(2)),
     );
   }
 

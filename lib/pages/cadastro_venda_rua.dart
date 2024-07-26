@@ -353,22 +353,11 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
     }
   }
 
-  void _exibirDialog(String mensagem) {
+  void _exibirDialog(String msg) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Mensagem'),
-          content: Text(mensagem),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                context.pop();
-              },
-            ),
-          ],
-        );
+        return AlertDialogWidget(msg);
       },
     );
   }

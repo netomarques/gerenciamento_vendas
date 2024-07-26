@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VendaWidget extends ConsumerWidget {
   final Venda venda;
+  final NumberFormat _formatterMoeda =
+      NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final NumberFormat _formatterQuantidade = NumberFormat('#,##0.00', 'pt_BR');
 
-  const VendaWidget({
+  VendaWidget({
     super.key,
     required this.venda,
   });
@@ -25,7 +29,11 @@ class VendaWidget extends ConsumerWidget {
       margin: const EdgeInsets.only(left: 16, top: 4, right: 16, bottom: 4),
       width: deviceSize.width,
       height: deviceSize.height * 0.155,
-      color: cor,
+      decoration: BoxDecoration(
+        color: cor,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      // color: cor,
       child: Row(
         children: <Widget>[
           Column(
@@ -55,39 +63,43 @@ class VendaWidget extends ConsumerWidget {
                   margin: const EdgeInsets.only(left: 8, top: 8),
                   child: Row(
                     children: <Widget>[
-                      Image.asset(
-                        "assets/images/checkout_price_icon.png",
+                      SizedBox(
+                        width: deviceSize.width * 0.5 * 0.3,
+                        child: Image.asset(
+                          "assets/images/checkout_price_icon.png",
+                        ),
                       ),
                       Container(
+                        width: deviceSize.width * 0.5 * 0.3,
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            _textCampo('Quant '),
+                            _textCampo('Peso: '),
                             _textCampo('Preço/kg: '),
                             _textCampo('Desconto: '),
                           ],
                         ),
                       ),
                       Container(
+                        width: deviceSize.width * 0.5 * 0.4,
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             _textValor(
-                              'Kg ${vendaState.venda!.quantidade.toStringAsFixed(2)}',
-                              deviceSize,
-                            ),
+                                '${_formatterQuantidade.format(vendaState.venda!.quantidade.toDouble())} kg',
+                                deviceSize),
                             _textValor(
-                              'R\$ ${vendaState.venda!.preco.toStringAsFixed(2)}',
-                              deviceSize,
-                            ),
+                                _formatterMoeda
+                                    .format(vendaState.venda!.preco.toDouble()),
+                                deviceSize),
                             _textValor(
-                              'R\$ ${vendaState.venda!.desconto.toStringAsFixed(2)}',
-                              deviceSize,
-                            ),
+                                _formatterMoeda.format(
+                                    vendaState.venda!.desconto.toDouble()),
+                                deviceSize),
                           ],
                         ),
                       ),
@@ -113,7 +125,8 @@ class VendaWidget extends ConsumerWidget {
                             TextStyle(color: Color(0xFFFDFFFF), fontSize: 12),
                       ),
                       Text(
-                        "R\$ ${vendaState.venda!.total?.toStringAsFixed(2)}",
+                        _formatterMoeda
+                            .format(vendaState.venda!.total!.toDouble()),
                         style: TextStyle(
                           color: const Color(0xFFFDFFFF),
                           fontSize: (deviceSize.width *

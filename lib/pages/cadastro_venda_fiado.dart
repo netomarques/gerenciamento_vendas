@@ -334,7 +334,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   }
 
   void _onSavedDesconto(String value) {
-    _venda = _venda.copyWith(preco: _stringParseDecimal(value));
+    _venda = _venda.copyWith(desconto: _stringParseDecimal(value));
   }
 
   String? _validatorDesconto(String? value) {
@@ -415,22 +415,11 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
     _atualizaValorTotal();
   }
 
-  void _exibirDialog(String mensagem) {
+  void _exibirDialog(String msg) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Mensagem'),
-          content: Text(mensagem),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                context.pop();
-              },
-            ),
-          ],
-        );
+        return AlertDialogWidget(msg);
       },
     );
   }

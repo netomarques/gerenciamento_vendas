@@ -23,11 +23,11 @@ class NavButtonsFloating extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF17CA84),
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(30),
       ),
-      margin: const EdgeInsets.only(right: 38, left: 38, bottom: 2),
-      width: _size.width * 0.8,
-      height: _size.height * 0.095,
+      // margin: const EdgeInsets.only(right: 8, left: 8),
+      // width: _size.width * 0.8,
+      // height: _size.height * 0.095,
       padding: const EdgeInsets.all(4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,7 +52,7 @@ class NavButtonsFloating extends ConsumerWidget {
       backgroundColor: const Color(0xFF17CA84),
       tooltip: tooltip,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
         borderRadius: BorderRadius.circular(100),
       ),
       onPressed: () => _onTapDialog(),
@@ -126,7 +126,7 @@ class NavButtonsFloating extends ConsumerWidget {
       tooltip: tooltip,
       onPressed: () => _context.push(routeLocation),
       shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFF910029)),
+        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Image.asset(
@@ -143,13 +143,17 @@ class NavButtonsFloating extends ConsumerWidget {
         return AlertDialog(
           title: Container(
             margin: const EdgeInsets.only(top: 15),
-            color: const Color(0xFF910029),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEB710A),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            // color: const Color(0xFFEB710A),
             child: const Text(
               textAlign: TextAlign.center,
-              "Venda",
+              "SELECIONAR VENDA",
               style: TextStyle(
                 color: Color(0xFFFDFFFF),
-                fontSize: 30,
+                fontSize: 16,
               ),
             ),
           ),
@@ -157,7 +161,7 @@ class NavButtonsFloating extends ConsumerWidget {
           shape: const RoundedRectangleBorder(
               side: BorderSide(
                 width: 4,
-                color: Color(0xFF910029),
+                color: Color(0xFFEB710A),
               ),
               borderRadius: BorderRadius.all(Radius.circular(26))),
           content: SizedBox(
@@ -180,8 +184,8 @@ class NavButtonsFloating extends ConsumerWidget {
       margin: EdgeInsets.symmetric(horizontal: _size.width * 0.1),
       width: _size.width * 0.5,
       decoration: BoxDecoration(
-        color: const Color(0xFF910029),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFEB710A),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: TextButton(
         onPressed: () => {

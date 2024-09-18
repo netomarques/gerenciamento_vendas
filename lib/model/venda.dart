@@ -13,6 +13,7 @@ class Venda extends AbstractModel {
   final bool? fiado;
   final bool? isAberto;
   final Decimal? totalAberto;
+  final Viagem viagem;
 
   Venda({
     this.id,
@@ -25,6 +26,7 @@ class Venda extends AbstractModel {
     this.fiado,
     this.isAberto,
     this.totalAberto,
+    required this.viagem,
   });
 
   Venda.initial({
@@ -38,6 +40,7 @@ class Venda extends AbstractModel {
     this.fiado,
     this.isAberto,
     this.totalAberto,
+    required this.viagem,
   });
 
   @override
@@ -52,6 +55,7 @@ class Venda extends AbstractModel {
     bool? fiado,
     bool? isAberto,
     Decimal? totalAberto,
+    Viagem? viagem,
   }) {
     return Venda(
       id: id ?? this.id,
@@ -64,6 +68,7 @@ class Venda extends AbstractModel {
       fiado: fiado ?? this.fiado,
       isAberto: isAberto ?? this.isAberto,
       totalAberto: totalAberto ?? this.totalAberto,
+      viagem: viagem ?? this.viagem,
     );
   }
 
@@ -77,6 +82,7 @@ class Venda extends AbstractModel {
       date,
       cliente,
       total!,
+      viagem,
     ];
   }
 
@@ -90,32 +96,34 @@ class Venda extends AbstractModel {
       VendaKeys.dateVenda: Helpers.formatarDateTimeToDateDB(date),
       VendaKeys.idCliente: cliente.id,
       VendaKeys.total: total!.toDouble(),
+      VendaKeys.idViagem: viagem.id,
     };
   }
 
-  factory Venda.fromJson(Map<String, dynamic> map, Cliente cliente) {
+  factory Venda.fromJson(Map<String, dynamic> map) {
     return Venda(
       id: map[VendaKeys.idVenda],
       quantidade: Decimal.parse(map[VendaKeys.quantidade].toString()),
       preco: Decimal.parse(map[VendaKeys.preco].toString()),
       desconto: Decimal.parse(map[VendaKeys.desconto].toString()),
       date: Helpers.dbDataToDateTime(map[VendaKeys.dateVenda]),
-      cliente: cliente,
+      cliente: map['cliente'],
       total: Decimal.parse(map[VendaKeys.total].toString()),
       fiado: map[VendaKeys.isFiado] == 1 ? true : false,
       isAberto: map[VendaKeys.isAberto] == 1 ? true : false,
       totalAberto: Decimal.parse(
           Decimal.parse(map[VendaKeys.totalEmAberto].toString())
               .toStringAsFixed(2)),
+      viagem: map['viagem'],
     );
   }
 
-  @override
-  String toString() {
-    return 'Venda{id: $id, quantidade: $quantidade '
-        'preco: $preco, desconto: $desconto, '
-        'date: $date, cliente: $cliente, '
-        'total: $total, fiado: $fiado, '
-        'isAberto: $isAberto, totalAberto: $totalAberto}';
-  }
+  // @override
+  // String toString() {
+  //   return 'Venda{id: $id, quantidade: $quantidade '
+  //       'preco: $preco, desconto: $desconto, '
+  //       'date: $date, cliente: $cliente, '
+  //       'total: $total, fiado: $fiado, '
+  //       'isAberto: $isAberto, totalAberto: $totalAberto}';
+  // }
 }

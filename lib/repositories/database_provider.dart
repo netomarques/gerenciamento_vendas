@@ -70,9 +70,38 @@ class DatabaseProvider {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await db.execute(_barcos);
+    await db.execute(_viagens);
     await db.execute(_clientes);
     await db.execute(_vendas);
     await db.execute(_abatimentos);
+    //------------- INSERINDO BARCOS ------------//
+    await db.insert(DbBarcoKeys.tableName, {
+      DbBarcoKeys.nomeColuna: 'BARCO 1',
+    });
+    await db.insert(DbBarcoKeys.tableName, {
+      DbBarcoKeys.nomeColuna: 'BARCO 2',
+    });
+    await db.insert(DbBarcoKeys.tableName, {
+      DbBarcoKeys.nomeColuna: 'BARCO 3',
+    });
+    //------------- INSERINDO VIAGENS ------------//
+    await db.insert(DbViagemKeys.tableName, {
+      DbViagemKeys.dateViagemChegadaColuna: '2023-01-01',
+      DbViagemKeys.pesoColuna: 2000.00,
+      DbViagemKeys.idBarcoColuna: 1
+    });
+    await db.insert(DbViagemKeys.tableName, {
+      DbViagemKeys.dateViagemChegadaColuna: '2023-01-01',
+      DbViagemKeys.pesoColuna: 2000.00,
+      DbViagemKeys.idBarcoColuna: 2
+    });
+    await db.insert(DbViagemKeys.tableName, {
+      DbViagemKeys.dateViagemChegadaColuna: '2023-01-01',
+      DbViagemKeys.pesoColuna: 3500.00,
+      DbViagemKeys.idBarcoColuna: 2
+    });
+    //------------- INSERINDO CLIENTES ------------//
     await db.insert(DbClienteKeys.tableName, {
       DbClienteKeys.nomeColuna: 'RUA',
       DbClienteKeys.telefoneColuna: '92999999999',
@@ -111,7 +140,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 299.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 3588.00,
-      DbClienteKeys.idColuna: 2
+      DbClienteKeys.idColuna: 2,
+      DbViagemKeys.idColuna: 1
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-01-27',
@@ -119,7 +149,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 13.50,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 162.00,
-      DbClienteKeys.idColuna: 5
+      DbClienteKeys.idColuna: 5,
+      DbViagemKeys.idColuna: 2
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-01-28',
@@ -127,7 +158,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 81.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 972.00,
-      DbClienteKeys.idColuna: 1
+      DbClienteKeys.idColuna: 1,
+      DbViagemKeys.idColuna: 3
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-01-31',
@@ -135,7 +167,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 8.70,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 104.40,
-      DbClienteKeys.idColuna: 6
+      DbClienteKeys.idColuna: 6,
+      DbViagemKeys.idColuna: 2
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-01-31',
@@ -143,7 +176,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 4.50,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 54.00,
-      DbClienteKeys.idColuna: 1
+      DbClienteKeys.idColuna: 1,
+      DbViagemKeys.idColuna: 1
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-05',
@@ -151,7 +185,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 80.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 960.00,
-      DbClienteKeys.idColuna: 2
+      DbClienteKeys.idColuna: 2,
+      DbViagemKeys.idColuna: 3
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-07',
@@ -159,7 +194,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 85.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 1020.00,
-      DbClienteKeys.idColuna: 5
+      DbClienteKeys.idColuna: 5,
+      DbViagemKeys.idColuna: 1
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-10',
@@ -167,7 +203,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 4.70,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 56.40,
-      DbClienteKeys.idColuna: 5
+      DbClienteKeys.idColuna: 5,
+      DbViagemKeys.idColuna: 3
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-14',
@@ -175,7 +212,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 150.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 1800.00,
-      DbClienteKeys.idColuna: 4
+      DbClienteKeys.idColuna: 4,
+      DbViagemKeys.idColuna: 2
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-15',
@@ -183,7 +221,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 67.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 804.00,
-      DbClienteKeys.idColuna: 6
+      DbClienteKeys.idColuna: 6,
+      DbViagemKeys.idColuna: 3
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-15',
@@ -191,7 +230,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 58.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 696.00,
-      DbClienteKeys.idColuna: 1
+      DbClienteKeys.idColuna: 1,
+      DbViagemKeys.idColuna: 2
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-19',
@@ -199,7 +239,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 26.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 312.00,
-      DbClienteKeys.idColuna: 6
+      DbClienteKeys.idColuna: 6,
+      DbViagemKeys.idColuna: 1
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-19',
@@ -207,7 +248,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 4.50,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 54.00,
-      DbClienteKeys.idColuna: 4
+      DbClienteKeys.idColuna: 4,
+      DbViagemKeys.idColuna: 3
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-22',
@@ -215,7 +257,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 48.00,
       DbVendaKeys.descontoColuna: 0.0,
       DbVendaKeys.totalColuna: 576.00,
-      DbClienteKeys.idColuna: 1
+      DbClienteKeys.idColuna: 1,
+      DbViagemKeys.idColuna: 2
     });
     await db.insert(DbVendaKeys.tableName, {
       DbVendaKeys.dateColuna: '2023-02-28',
@@ -223,7 +266,8 @@ class DatabaseProvider {
       DbVendaKeys.quantidadeColuna: 24.60,
       DbVendaKeys.descontoColuna: 0.20,
       DbVendaKeys.totalColuna: 295.00,
-      DbClienteKeys.idColuna: 1
+      DbClienteKeys.idColuna: 1,
+      DbViagemKeys.idColuna: 1
     });
 
     //------------- INSERINDO ABATIMENTOS ------------//
@@ -319,6 +363,24 @@ class DatabaseProvider {
     });
   }
 
+  String get _barcos => '''
+    CREATE TABLE ${DbBarcoKeys.tableName} (
+      ${DbBarcoKeys.idColuna} INTEGER PRIMARY KEY AUTOINCREMENT, 
+      ${DbBarcoKeys.nomeColuna} TEXT 
+    );
+  ''';
+
+  String get _viagens => '''
+    CREATE TABLE ${DbViagemKeys.tableName} (
+      ${DbViagemKeys.idColuna} INTEGER PRIMARY KEY AUTOINCREMENT, 
+      ${DbViagemKeys.dateViagemChegadaColuna} DATE,
+      ${DbViagemKeys.pesoColuna} REAL,
+      ${DbViagemKeys.dateViagemFechadaColuna} DATE,
+      ${DbViagemKeys.idBarcoColuna} INTEGER, 
+      FOREIGN KEY (${DbViagemKeys.idBarcoColuna}) REFERENCES ${DbBarcoKeys.tableName} (${DbBarcoKeys.idColuna})
+    );
+  ''';
+
   String get _clientes => '''
     CREATE TABLE ${DbClienteKeys.tableName} (
       ${DbClienteKeys.idColuna} INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -337,7 +399,9 @@ class DatabaseProvider {
       ${DbVendaKeys.descontoColuna} REAL, 
       ${DbVendaKeys.totalColuna} REAL, 
       ${DbVendaKeys.idClienteColuna} INTEGER, 
-      FOREIGN KEY (${DbVendaKeys.idClienteColuna}) REFERENCES Clientes (${DbClienteKeys.idColuna})
+      ${DbVendaKeys.idViagemColuna} INTEGER, 
+      FOREIGN KEY (${DbVendaKeys.idClienteColuna}) REFERENCES ${DbClienteKeys.tableName} (${DbClienteKeys.idColuna}),
+      FOREIGN KEY (${DbVendaKeys.idViagemColuna}) REFERENCES ${DbViagemKeys.tableName} (${DbVendaKeys.idViagemColuna})
     );
   ''';
 

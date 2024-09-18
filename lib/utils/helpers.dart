@@ -12,8 +12,8 @@ class Helpers {
       int day = int.parse(parts[2]);
       return DateTime(year, month, day);
     } catch (e) {
-      debugPrint(e.toString());
-      return DateTime.now();
+      // debugPrint(e.toString());
+      throw Exception('Erro ao formatar data (banco -> DateTime)');
     }
   }
 

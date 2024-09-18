@@ -409,6 +409,12 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       preco: Decimal.zero,
       quantidade: Decimal.zero,
       total: Decimal.zero,
+      viagem: Viagem(
+        id: 0,
+        barco: Barco.inital(),
+        peso: Decimal.zero,
+        dateChegada: DateTime.now(),
+      ),
     );
     _dataVendaController.text =
         Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy');
@@ -450,6 +456,12 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       preco: Decimal.zero,
       quantidade: Decimal.zero,
       total: Decimal.zero,
+      viagem: Viagem(
+        id: 0,
+        barco: Barco.inital(),
+        peso: Decimal.zero,
+        dateChegada: DateTime.now(),
+      ),
     );
     _valorTotalController = TextEditingController();
     _dataVendaController = TextEditingController(

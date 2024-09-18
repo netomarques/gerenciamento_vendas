@@ -12,4 +12,6 @@ class RouteLocation {
   static String get pesquisaCliente => '/pesquisa_cliente';
   static String get painelCliente => '/painel_cliente';
   static String get listarPagamentos => '/lista_pagamento';
+  static String get painelBarco => '/painel_barco';
+  static String get painelViagem => '/painel_viagem';
 }

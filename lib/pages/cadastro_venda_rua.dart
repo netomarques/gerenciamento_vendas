@@ -388,6 +388,12 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
       preco: Decimal.zero,
       quantidade: Decimal.zero,
       total: Decimal.zero,
+      viagem: Viagem(
+        id: 0,
+        barco: Barco.inital(),
+        peso: Decimal.zero,
+        dateChegada: DateTime.now(),
+      ),
     );
     _valorTotalController = TextEditingController();
     _dataVendaController = TextEditingController(
@@ -404,6 +410,12 @@ class _CadastroVendaRuaState extends ConsumerState<CadastroVendaRua> {
       preco: Decimal.zero,
       quantidade: Decimal.zero,
       total: Decimal.zero,
+      viagem: Viagem(
+        id: 0,
+        barco: Barco.inital(),
+        peso: Decimal.zero,
+        dateChegada: DateTime.now(),
+      ),
     );
     _dataVendaController.text =
         Helpers.formatarDateTimeToString(_venda.date, format: 'dd/MM/yyyy');

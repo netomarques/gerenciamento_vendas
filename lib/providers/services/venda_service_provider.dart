@@ -4,7 +4,9 @@ import 'package:vendas_gerenciamento/services/service.dart';
 
 final vendaServiceProvider = Provider<VendaService>((ref) {
   final vendaRepository = ref.read(vendaRepositoryProvider);
+  final viagemService = ref.read(viagemServiceProvider);
   final clienteService = ref.read(clienteServiceProvider);
   final abatimentoService = ref.read(abatimentoServiceProvider);
-  return VendaService(vendaRepository, clienteService, abatimentoService);
+  return VendaService(
+      vendaRepository, clienteService, abatimentoService, viagemService);
 });

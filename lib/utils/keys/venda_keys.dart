@@ -15,4 +15,5 @@ class VendaKeys {
   static const String isAberto = 'is_aberto';
   static const String totalEmAberto = 'total_em_aberto';
   static const String idCliente = ClienteKeys.idCliente;
+  static const String idViagem = ViagemKeys.idViagem;
 }

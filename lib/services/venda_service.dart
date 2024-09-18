@@ -9,18 +9,27 @@ class VendaService {
   final VendaRepositoryImpl _repository;
   final ClienteService _clienteService;
   final AbatimentoService _abatimentoService;
+  final ViagemService _viagemService;
 
-  VendaService(this._repository, this._clienteService, this._abatimentoService);
+  VendaService(
+    this._repository,
+    this._clienteService,
+    this._abatimentoService,
+    this._viagemService,
+  );
 
   Future<List<Venda>> getVendas() async {
     try {
       final resultados = await _repository.getAllRecords();
       final List<Venda> vendas = [];
 
-      for (var vendaJson in resultados) {
-        final Cliente cliente = await _clienteService
-            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        vendas.add(Venda.fromJson(vendaJson, cliente));
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
+        // final Cliente cliente = await _clienteService
+        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        // vendas.add(Venda.fromJson(vendaJson, cliente));
       }
 
       return vendas;
@@ -41,16 +50,16 @@ class VendaService {
           limit, offset, startDate, endDate);
 
       final List<Venda> vendas = [];
-      for (var vendaJson in resultados) {
-        final Cliente cliente = await _clienteService
-            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        vendas.add(Venda.fromJson(vendaJson, cliente));
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        await _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
       }
 
       return vendas;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception('Erro ao consultar Venda');
+      throw Exception('Erro ao buscar Vendas');
     }
   }
 
@@ -97,26 +106,26 @@ class VendaService {
       final resultados = await _repository.getVendasPorData(startDate, endDate);
       final List<Venda> vendas = [];
 
-      for (var vendaJson in resultados) {
-        final Cliente cliente = await _clienteService
-            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        vendas.add(Venda.fromJson(vendaJson, cliente));
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
       }
 
       return vendas;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception('Erro ao consultar Venda');
+      throw Exception('Erro ao consultar Vendas por Data');
     }
   }
 
   Future<Venda> getVendaId(int id) async {
     try {
       final resultado = await _repository.getByIdRecord(id);
-      final Cliente cliente = await _clienteService
-          .getClienteId(resultado.first[DbVendaKeys.idClienteColuna]);
-      Venda venda = List.generate(resultado.length,
-          (index) => Venda.fromJson(resultado[index], cliente)).first;
+      final json = resultado.first;
+      final vendaJson = Map<String, dynamic>.from(json);
+      await _buscarClienteEViagemDaVenda(vendaJson);
+      Venda venda = Venda.fromJson(vendaJson);
       return venda;
     } catch (e) {
       debugPrint(e.toString());
@@ -145,9 +154,12 @@ class VendaService {
 
   Future<List<Abatimento>> getAbatimentosPorVenda(idVenda) async {
     try {
-      final resultado = await _repository.getAbatimentosPorVenda(idVenda);
-      final List<Abatimento> abatimentos = List.generate(
-          resultado.length, (index) => Abatimento.fromJson(resultado[index]));
+      final List<Abatimento> abatimentos = [];
+      final resultados = await _repository.getAbatimentosPorVenda(idVenda);
+      for (var json in resultados) {
+        final abatimento = Abatimento.fromJson(json);
+        abatimentos.add(abatimento);
+      }
       return abatimentos;
     } catch (e) {
       debugPrint(e.toString());
@@ -160,10 +172,12 @@ class VendaService {
       final resultados = await _repository.getVendasPorClientes(idCliente);
       final List<Venda> vendas = [];
 
-      for (var vendaJson in resultados) {
-        final Cliente cliente = await _clienteService
-            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        vendas.add(Venda.fromJson(vendaJson, cliente));
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        // final Cliente cliente = await _clienteService
+        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
       }
 
       return vendas;
@@ -190,10 +204,56 @@ class VendaService {
       );
 
       final List<Venda> vendas = [];
-      for (var vendaJson in resultados) {
-        final Cliente cliente = await _clienteService
-            .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        vendas.add(Venda.fromJson(vendaJson, cliente));
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
+        // final Cliente cliente = await _clienteService
+        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+        // vendas.add(Venda.fromJson(vendaJson, cliente));
+      }
+
+      return vendas;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception('Erro ao consultar Venda por Cliente');
+    }
+  }
+
+  _buscarClienteEViagemDaVenda(Map<String, dynamic> vendaJson) async {
+    final cliente = await _clienteService
+        .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
+    final viagem =
+        await _viagemService.getViagemId(vendaJson[DbVendaKeys.idViagemColuna]);
+    vendaJson['cliente'] = cliente;
+    vendaJson['viagem'] = viagem;
+    // vendaJson['cliente'] = (await _clienteService
+    //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]));
+    // vendaJson['viagem'] = (await _viagemService
+    //     .getViagemId(vendaJson[DbVendaKeys.idViagemColuna]));
+  }
+
+  Future<List<Venda>> getVendasPorViagemLazyLoading(
+    idViagem,
+    limit,
+    offset,
+    startDate,
+    endDate,
+  ) async {
+    try {
+      final resultados = await _repository.getVendasPorViagemLazyLoading(
+        idViagem,
+        limit,
+        offset,
+        startDate,
+        endDate,
+      );
+
+      final List<Venda> vendas = [];
+      for (var json in resultados) {
+        final vendaJson = Map<String, dynamic>.from(json);
+        await _buscarClienteEViagemDaVenda(vendaJson);
+        vendas.add(Venda.fromJson(vendaJson));
       }
 
       return vendas;

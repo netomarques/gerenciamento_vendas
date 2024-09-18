@@ -45,7 +45,42 @@ class _HomePainelState extends ConsumerState<HomePainel> {
             onPressed: () {
               ref.read(connectionProvider).exportDatabase();
             },
-          )
+          ),
+          PopupMenuButton<String>(
+            icon: const ImageIcon(AssetImage('assets/images/boat_icon.png')),
+            onSelected: (String value) {
+              // Lógica para as opções selecionadas
+              context.push(RouteLocation.painelBarco, extra: int.parse(value));
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem<String>(
+                  value: '1',
+                  child: ListTile(
+                    leading:
+                        ImageIcon(AssetImage('assets/images/boat_icon.png')),
+                    title: Text('Barco 1'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: '2',
+                  child: ListTile(
+                    leading:
+                        ImageIcon(AssetImage('assets/images/boat_icon.png')),
+                    title: Text('Barco 2'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: '3',
+                  child: ListTile(
+                    leading:
+                        ImageIcon(AssetImage('assets/images/boat_icon.png')),
+                    title: Text('Barco 3'),
+                  ),
+                ),
+              ];
+            },
+          ),
         ],
       ),
       body: _body(),

@@ -6,3 +6,5 @@ export 'clientes_widget.dart';
 export 'dropdown_cliente_widget.dart';
 export 'venda_widget.dart';
 export 'vendas_widget.dart';
+export 'viagem_widget.dart';
+export 'viagens_widget.dart';

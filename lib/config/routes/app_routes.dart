@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/pages/pages.dart';
-import 'package:go_router/go_router.dart';
 
 final navigationKey = GlobalKey<NavigatorState>();
 
@@ -45,5 +45,15 @@ final appRoutes = [
     path: RouteLocation.cadastroVendaFiado,
     parentNavigatorKey: navigationKey,
     builder: CadastroVendaFiado.builder,
+  ),
+  GoRoute(
+    path: RouteLocation.painelBarco,
+    parentNavigatorKey: navigationKey,
+    builder: PainelBarco.builder,
+  ),
+  GoRoute(
+    path: RouteLocation.painelViagem,
+    parentNavigatorKey: navigationKey,
+    builder: PainelViagem.builder,
   ),
 ];

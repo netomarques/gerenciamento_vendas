@@ -20,7 +20,7 @@ class DropdownFormField extends StatelessWidget {
 
     return DropdownButtonFormField<Cliente>(
       decoration: _dropdownInputDecoration('Cliente'),
-      value: value,
+      initialValue: value,
       items: items,
       onChanged: (value) => onChanged,
       validator: null,
@@ -53,7 +53,7 @@ class DropdownFormField extends StatelessWidget {
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       filled: true,
-      fillColor: const Color(0xFFFDFFFF).withOpacity(0.75),
+      fillColor: const Color(0xFFFDFFFF).withValues(alpha: 0.75),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(32.0),
         borderSide: BorderSide.none,

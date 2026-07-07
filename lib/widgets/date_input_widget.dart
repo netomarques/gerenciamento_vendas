@@ -70,7 +70,7 @@ class _DateInputWidgetState extends State<DateInputWidget> {
                 decoration: InputDecoration(
                   labelText: 'Data início',
                   filled: true,
-                  fillColor: const Color(0xFF006940).withOpacity(0.5),
+                  fillColor: const Color(0xFF006940).withValues(alpha: 0.5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(32),
                   ),
@@ -92,7 +92,7 @@ class _DateInputWidgetState extends State<DateInputWidget> {
                       decoration: InputDecoration(
                         labelText: 'Data Final',
                         filled: true,
-                        fillColor: const Color(0xFF006940).withOpacity(0.5),
+                        fillColor: const Color(0xFF006940).withValues(alpha: 0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(32),
                         ),

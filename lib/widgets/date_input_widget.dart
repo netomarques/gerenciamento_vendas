@@ -8,7 +8,7 @@ class DateInputWidget extends StatefulWidget {
   const DateInputWidget(this._onFunction, {Key? key}) : super(key: key);
 
   @override
-  _DateInputWidgetState createState() => _DateInputWidgetState();
+  State<DateInputWidget> createState() => _DateInputWidgetState();
 }
 
 class _DateInputWidgetState extends State<DateInputWidget> {
@@ -92,7 +92,8 @@ class _DateInputWidgetState extends State<DateInputWidget> {
                       decoration: InputDecoration(
                         labelText: 'Data Final',
                         filled: true,
-                        fillColor: const Color(0xFF006940).withValues(alpha: 0.5),
+                        fillColor:
+                            const Color(0xFF006940).withValues(alpha: 0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(32),
                         ),

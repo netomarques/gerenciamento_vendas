@@ -114,6 +114,9 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
             valor: _abatimentoForm.valor,
             dateAbatimento: _abatimentoForm.dateAbatimento);
         await ref.read(abatimentoServiceProvider).salvarAbatimento(abatimento);
+
+        if (!mounted) return;
+
         ref.read(vendaProvider(_venda).notifier).getVenda();
         msg = 'Abatimento cadastrado com sucesso';
         _formKey.currentState!.reset();
@@ -121,7 +124,9 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
       } catch (e) {
         msg = 'Erro ao salvar abatimento';
       } finally {
-        _exibirDialog(msg);
+        if (mounted) {
+          _exibirDialog(msg);
+        }
       }
     }
   }

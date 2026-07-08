@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class DateInputWidget extends StatefulWidget {
   final Function _onFunction;
 
-  const DateInputWidget(this._onFunction, {Key? key}) : super(key: key);
+  const DateInputWidget(this._onFunction, {super.key});
 
   @override
   State<DateInputWidget> createState() => _DateInputWidgetState();

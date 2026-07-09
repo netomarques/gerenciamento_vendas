@@ -1,12 +1,9 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vendas_gerenciamento/repositories/repositories.dart';
+import 'package:vendas_gerenciamento/repositories/venda_repository.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
-class VendaRepositoryImpl extends DataRepository {
-  @override
-  final DatabaseProvider connection;
-
-  VendaRepositoryImpl(this.connection);
+class VendaRepositoryImpl extends VendaRepository {
+  VendaRepositoryImpl(super.connection);
 
   @override
   Future<int> deleteRecord(int id) async {
@@ -72,6 +69,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getVendasLazyLoading(
       int limit, int offset, String startDate, String endDate) async {
     final Database db = await connection.database;
@@ -86,6 +84,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getAbatimentosPorVenda(int idVenda) async {
     final Database db = await connection.database;
     return db.transaction(
@@ -100,6 +99,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getVendasPorData(
       String startDate, String endDate) async {
     final Database db = await connection.database;
@@ -111,6 +111,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getVendasPorClientes(int idCliente) async {
     final Database db = await connection.database;
     final List<dynamic> args = [idCliente];
@@ -124,6 +125,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getTotalEmAbertoDoCliente(
       int idCliente) async {
     final Database db = await connection.database;
@@ -138,6 +140,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getVendasPorClientesLazyLoading(
       int idCliente,
       int limit,
@@ -156,6 +159,7 @@ class VendaRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getVendasPorViagemLazyLoading(
     idViagem,
     limit,

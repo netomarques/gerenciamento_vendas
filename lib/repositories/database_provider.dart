@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -43,7 +44,7 @@ class DatabaseProvider {
       final dbPath = join(appDocumentsDirectory.path, 'vendaspanai.db');
       final dbFile = File(dbPath);
       if (!await dbFile.exists()) {
-        print('Banco de dados original não encontrado: $dbPath');
+        debugPrint('Banco de dados original não encontrado: $dbPath');
         return;
       }
 
@@ -62,10 +63,10 @@ class DatabaseProvider {
         final newDbFile = File(newDbPath);
         await dbFile.copy(newDbFile.path);
 
-        print('Banco de dados exportado com sucesso para $newDbPath');
+        debugPrint('Banco de dados exportado com sucesso para $newDbPath');
       }
     } catch (e) {
-      print('Erro ao exportar o banco de dados: $e');
+      debugPrint('Erro ao exportar o banco de dados: $e');
     }
   }
 

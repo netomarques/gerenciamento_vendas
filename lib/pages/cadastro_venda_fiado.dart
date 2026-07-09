@@ -164,7 +164,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
           vertical: 10.0,
         ),
         filled: true,
-        fillColor: const Color(0xFFEB710A).withOpacity(0.2),
+        fillColor: const Color(0xFFEB710A).withValues(alpha: 0.2),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(32.0),
           borderSide: BorderSide.none,

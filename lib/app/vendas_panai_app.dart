@@ -13,9 +13,7 @@ class VendasPanaiApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: BuildMaterialColor(
-          const Color(0xFF006940),
-        ),
+        primarySwatch: buildMaterialColor(const Color(0xFF006940)),
         scaffoldBackgroundColor: const Color(0xFFFDFFFF),
       ),
       routerConfig: routeConfig,

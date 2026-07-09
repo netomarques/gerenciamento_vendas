@@ -4,8 +4,7 @@ class AppTextFormField extends StatelessWidget {
   final String _hintText;
   final String _labelText;
 
-  const AppTextFormField(this._hintText, this._labelText, {Key? key})
-      : super(key: key);
+  const AppTextFormField(this._hintText, this._labelText, {super.key});
 
   @override
   Widget build(BuildContext context) {

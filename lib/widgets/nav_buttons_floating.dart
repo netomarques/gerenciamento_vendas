@@ -1,203 +1,195 @@
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
 
 class NavButtonsFloating extends ConsumerWidget {
   static NavButtonsFloating builder(
-          BuildContext context, GoRouterState state) =>
-      NavButtonsFloating();
+    BuildContext context,
+    GoRouterState state,
+  ) =>
+      const NavButtonsFloating();
 
-  NavButtonsFloating({super.key});
-
-  late BuildContext _context;
-  late Size _size;
+  const NavButtonsFloating({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    _context = context;
-    // Size size = MediaQuery.of(context).size;
-    _size = context.devicesize;
-
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF17CA84),
         borderRadius: BorderRadius.circular(30),
       ),
-      // margin: const EdgeInsets.only(right: 8, left: 8),
-      // width: _size.width * 0.8,
-      // height: _size.height * 0.095,
       padding: const EdgeInsets.all(4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _floatingActionButtonRiver(
-              "Cadastro de cliente",
-              "assets/images/account_client_icon.png",
-              RouteLocation.cadastroCliente),
-          _botaoDialogVenda("Venda", "assets/images/buy_shop_icon.png"),
-          _floatingActionButtonRiver(
-              "Pesquisa de cliente",
-              "assets/images/find_search_icon.png",
-              RouteLocation.pesquisaCliente),
+          _FloatingActionButtonRiver(
+            tooltip: "Cadastro de cliente",
+            icon: "assets/images/account_client_icon.png",
+            routeLocation: RouteLocation.cadastroCliente,
+          ),
+          _VendaButtonDialog(
+            tooltip: "Venda",
+            icon: "assets/images/buy_shop_icon.png",
+            // mainContext: context,
+          ),
+          _FloatingActionButtonRiver(
+            tooltip: "Pesquisa de cliente",
+            icon: "assets/images/find_search_icon.png",
+            routeLocation: RouteLocation.pesquisaCliente,
+          ),
         ],
       ),
     );
   }
+}
 
-  _botaoDialogVenda(String tooltip, String icon) {
+class _FloatingActionButtonRiver extends StatelessWidget {
+  const _FloatingActionButtonRiver({
+    required this.tooltip,
+    required this.icon,
+    required this.routeLocation,
+  });
+
+  final String tooltip;
+  final String icon;
+  final String routeLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.devicesize;
+
     return FloatingActionButton(
-      heroTag: UniqueKey(),
       backgroundColor: const Color(0xFF17CA84),
-      tooltip: tooltip,
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      onPressed: () => _onTapDialog(),
-      child: Image.asset(
-        icon,
-        height: _size.height * 0.06,
-        // height: MediaQuery.of(context).size.height * 0.06,
-      ),
-    );
-  }
-
-  // _floatingActionButton(
-  //     String tooltip, String icon, BuildContext context, String routeName) {
-  //   return FloatingActionButton(
-  //     heroTag: UniqueKey(),
-  //     backgroundColor: const Color(0xFF17CA84),
-  //     tooltip: tooltip,
-  //     onPressed: () => pushNamed(context, routeName),
-  //     shape: RoundedRectangleBorder(
-  //       side: const BorderSide(width: 1, color: Color(0xFF910029)),
-  //       borderRadius: BorderRadius.circular(100),
-  //     ),
-  //     child: Image.asset(
-  //       icon,
-  //       height: MediaQuery.of(context).size.height * 0.06,
-  //     ),
-  //   );
-  // }
-
-  // _floatingActionButtonReplacement(
-  //     String tooltip, String icon, BuildContext context, String routeName) {
-  //   return FloatingActionButton(
-  //     heroTag: UniqueKey(),
-  //     backgroundColor: const Color(0xFF17CA84),
-  //     tooltip: tooltip,
-  //     onPressed: () => pushReplacementNamed(context, routeName),
-  //     shape: RoundedRectangleBorder(
-  //       side: const BorderSide(width: 1, color: Color(0xFF910029)),
-  //       borderRadius: BorderRadius.circular(100),
-  //     ),
-  //     child: Image.asset(
-  //       icon,
-  //       height: MediaQuery.of(context).size.height * 0.06,
-  //     ),
-  //   );
-  // }
-
-  _floatingActionButtonReplacementRiver(
-      String tooltip, String icon, String routeLocation) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      backgroundColor: const Color(0xFF17CA84),
-      tooltip: tooltip,
-      onPressed: () => _context.go(routeLocation),
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFF910029)),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Image.asset(
-        icon,
-        height: _size.height * 0.06,
-      ),
-    );
-  }
-
-  _floatingActionButtonRiver(
-      String tooltip, String icon, String routeLocation) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      backgroundColor: const Color(0xFF17CA84),
-      tooltip: tooltip,
-      onPressed: () => _context.push(routeLocation),
+      onPressed: () => context.push(routeLocation),
       shape: RoundedRectangleBorder(
         side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Image.asset(
         icon,
-        height: _size.height * 0.06,
+        height: size.height * 0.06,
       ),
     );
   }
+}
 
-  _onTapDialog() {
-    showDialog(
-      context: _context,
-      builder: (context) {
-        return AlertDialog(
-          title: Container(
-            margin: const EdgeInsets.only(top: 15),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEB710A),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            // color: const Color(0xFFEB710A),
-            child: const Text(
-              textAlign: TextAlign.center,
-              "SELECIONAR VENDA",
-              style: TextStyle(
-                color: Color(0xFFFDFFFF),
-                fontSize: 16,
-              ),
-            ),
-          ),
-          backgroundColor: const Color(0xFF006940),
-          shape: const RoundedRectangleBorder(
-              side: BorderSide(
-                width: 4,
-                color: Color(0xFFEB710A),
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(26))),
-          content: SizedBox(
-            height: _size.height * 0.3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _botaoVenda("Rua", RouteLocation.cadastroVendaRua),
-                _botaoVenda("Fiado", RouteLocation.cadastroVendaFiado),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+class _VendaButton extends StatelessWidget {
+  const _VendaButton({
+    required this.text,
+    required this.routeLocation,
+  });
 
-  _botaoVenda(botaoTexto, routeLocation) {
+  final String text;
+  final String routeLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.devicesize;
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: _size.width * 0.1),
-      width: _size.width * 0.5,
+      margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
+      width: size.width * 0.5,
       decoration: BoxDecoration(
         color: const Color(0xFFEB710A),
         borderRadius: BorderRadius.circular(30),
       ),
       child: TextButton(
-        onPressed: () => {
-          Navigator.pop(_context),
-          _context.push(routeLocation),
+        onPressed: () {
+          context.pop();
+          context.push(routeLocation);
         },
         child: Text(
-          botaoTexto,
+          text,
           style: const TextStyle(
             color: Color(0xFFFDFFFF),
             fontSize: 20,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VendaButtonDialog extends StatelessWidget {
+  const _VendaButtonDialog({
+    required this.tooltip,
+    required this.icon,
+  });
+
+  final String tooltip;
+  final String icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.devicesize;
+
+    return FloatingActionButton(
+      heroTag: 'selecionar_tipo_venda',
+      backgroundColor: const Color(0xFF17CA84),
+      tooltip: tooltip,
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (_) => const _VendaDialog(),
+      ),
+      child: Image.asset(
+        icon,
+        height: size.height * 0.06,
+      ),
+    );
+  }
+}
+
+class _VendaDialog extends StatelessWidget {
+  const _VendaDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.devicesize;
+
+    return AlertDialog(
+      backgroundColor: const Color(0xFF006940),
+      shape: const RoundedRectangleBorder(
+        side: BorderSide(
+          width: 4,
+          color: Color(0xFFEB710A),
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(26)),
+      ),
+      title: Container(
+        margin: const EdgeInsets.only(top: 15),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEB710A),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: const Text(
+          'SELECIONAR VENDA',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0xFFFDFFFF),
+            fontSize: 16,
+          ),
+        ),
+      ),
+      content: SizedBox(
+        height: size.height * 0.3,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _VendaButton(
+              text: 'Rua',
+              routeLocation: RouteLocation.cadastroVendaRua,
+            ),
+            _VendaButton(
+              text: 'Fiado',
+              routeLocation: RouteLocation.cadastroVendaFiado,
+            ),
+          ],
         ),
       ),
     );

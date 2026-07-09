@@ -3,10 +3,7 @@ import 'package:vendas_gerenciamento/repositories/repositories.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
 class ClienteRepositoryImpl extends ClienteRepository {
-  @override
-  final DatabaseProvider connection;
-
-  ClienteRepositoryImpl(this.connection);
+  ClienteRepositoryImpl(super.connection);
 
   @override
   Future<int> deleteRecord(int id) async {
@@ -32,6 +29,7 @@ class ClienteRepositoryImpl extends ClienteRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getClientesLazyLoading(
       int limit, int offset) async {
     final Database db = await connection.database;
@@ -89,7 +87,9 @@ class ClienteRepositoryImpl extends ClienteRepository {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getClientesPorNome(String nome, int limit, int offset) async {
+  @override
+  Future<List<Map<String, dynamic>>> getClientesPorNome(
+      String nome, int limit, int offset) async {
     final Database db = await connection.database;
     return db.transaction(
       (txn) async {

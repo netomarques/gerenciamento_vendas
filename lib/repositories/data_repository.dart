@@ -1,7 +1,9 @@
 import 'package:vendas_gerenciamento/repositories/repositories.dart';
 
 abstract class DataRepository {
-  late DatabaseProvider connection;
+  DataRepository(this.connection);
+
+  final DatabaseProvider connection;
 
   Future<int> insertRecord(Map<String, dynamic> values);
 

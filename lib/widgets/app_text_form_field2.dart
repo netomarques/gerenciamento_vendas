@@ -26,8 +26,8 @@ class AppTextFormField2 extends StatelessWidget {
     this.isReadOnly = false,
     this.formato,
     this.initialValue,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

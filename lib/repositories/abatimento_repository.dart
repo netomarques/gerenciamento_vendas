@@ -1,3 +1,5 @@
 import 'package:vendas_gerenciamento/repositories/repositories.dart';
 
-abstract class AbatimentoRepository extends DataRepository {}
+abstract class AbatimentoRepository extends DataRepository {
+  AbatimentoRepository(super.connection);
+}

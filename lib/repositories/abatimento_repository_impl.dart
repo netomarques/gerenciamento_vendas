@@ -3,10 +3,7 @@ import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 import 'package:sqflite/sqflite.dart';
 
 class AbatimentoRepositoryImpl extends AbatimentoRepository {
-  @override
-  final DatabaseProvider connection;
-
-  AbatimentoRepositoryImpl(this.connection);
+  AbatimentoRepositoryImpl(super.connection);
 
   @override
   Future<int> deleteRecord(int id) async {

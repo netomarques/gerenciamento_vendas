@@ -1,12 +1,9 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vendas_gerenciamento/repositories/repositories.dart';
+import 'package:vendas_gerenciamento/repositories/barco_repository.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
-class BarcoRepositoryImpl extends DataRepository {
-  @override
-  final DatabaseProvider connection;
-
-  BarcoRepositoryImpl(this.connection);
+class BarcoRepositoryImpl extends BarcoRepository {
+  BarcoRepositoryImpl(super.connection);
 
   @override
   Future<int> deleteRecord(int id) async {
@@ -46,6 +43,7 @@ class BarcoRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getBarcoRelatorio(int idBarco) async {
     final Database db = await connection.database;
     final List<dynamic> args = [idBarco];

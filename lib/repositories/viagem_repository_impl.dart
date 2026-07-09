@@ -1,12 +1,9 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:vendas_gerenciamento/repositories/repositories.dart';
+import 'package:vendas_gerenciamento/repositories/viagem_repository.dart';
 import 'package:vendas_gerenciamento/utils/keys/keys.dart';
 
-class ViagemRepositoryImpl extends DataRepository {
-  @override
-  final DatabaseProvider connection;
-
-  ViagemRepositoryImpl(this.connection);
+class ViagemRepositoryImpl extends ViagemRepository {
+  ViagemRepositoryImpl(super.connection);
 
   @override
   Future<int> deleteRecord(int id) async {
@@ -66,6 +63,7 @@ class ViagemRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getViagensPorBarco(int idBarco) async {
     final Database db = await connection.database;
     return db.transaction(
@@ -76,6 +74,7 @@ class ViagemRepositoryImpl extends DataRepository {
     );
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getViagemRelatorio(int idViagem) async {
     final Database db = await connection.database;
     final List<dynamic> args = [idViagem];

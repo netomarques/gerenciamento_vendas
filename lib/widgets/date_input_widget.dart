@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 
 class DateInputWidget extends StatefulWidget {
-  final Function _onFunction;
-
-  const DateInputWidget(this._onFunction, {super.key});
+  const DateInputWidget({super.key});
 
   @override
   State<DateInputWidget> createState() => _DateInputWidgetState();
 }
 
 class _DateInputWidgetState extends State<DateInputWidget> {
-  final DateFormat _dateFormat = DateFormat('dd/MM/yy');
   late final TextEditingController _dateStartController;
   late final TextEditingController _dateEndController;
   late final ValueNotifier<bool> _isCheckedNotifier;
@@ -142,20 +138,6 @@ class _DateInputWidgetState extends State<DateInputWidget> {
         backgroundColor: Colors.orange,
         textColor: Colors.white,
         fontSize: 16.0);
-    // if (_isCheckedNotifier.value) {
-    //   if (_dateStartController.text != "" && _dateEndController.text != "") {
-    //     widget._onFunction(_dateStartController.text, _dateEndController.text);
-    //   } else {
-    //     if (_dateStartController.text != "" && _dateEndController.text == "") {
-    //     } else if (_dateStartController.text == "" &&
-    //         _dateEndController.text != "") {}
-    //   }
-    // } else {
-    //   if (_dateStartController.text != "") {
-    //     widget._onFunction(
-    //         _dateFormat.format(DateTime(1900)), _dateStartController.text);
-    //   } else {}
-    // }
   }
 
   @override

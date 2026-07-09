@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ClientesNotifier extends StateNotifier<ClientesState> {
   final ClienteService _clienteService;

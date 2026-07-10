@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 
-class VendaNotifier extends StateNotifier<VendaState> {
-  final VendaService _vendaService;
+class VendaNotifier extends Notifier<VendaState> {
+  VendaNotifier(this.venda);
 
-  VendaNotifier(this._vendaService, Venda venda)
-      : super(const VendaState.initial()) {
-    _setVenda(venda);
-  }
+  final Venda venda;
 
-  _setVenda(Venda venda) {
-    state = state.copyWith(venda: venda);
+  late final VendaService _vendaService;
+
+  @override
+  VendaState build() {
+    _vendaService = ref.read(vendaServiceProvider);
+
+    return VendaState.initial().copyWith(venda: venda);
   }
 
   void getVenda() async {

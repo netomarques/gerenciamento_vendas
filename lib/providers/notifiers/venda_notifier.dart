@@ -5,23 +5,19 @@ import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 
 class VendaNotifier extends Notifier<VendaState> {
-  VendaNotifier(this.venda);
+  VendaService get _vendaService => ref.read(vendaServiceProvider);
 
-  final Venda venda;
+  VendaNotifier(this._venda);
 
-  late final VendaService _vendaService;
+  final Venda _venda;
 
   @override
-  VendaState build() {
-    _vendaService = ref.read(vendaServiceProvider);
+  VendaState build() => const VendaState.initial().copyWith(venda: _venda);
 
-    return VendaState.initial().copyWith(venda: venda);
-  }
-
-  void getVenda() async {
+  Future<void> getVenda() async {
     final Venda venda;
     final List<Abatimento> abatimentos;
-    int idVenda = state.venda!.id!;
+    int idVenda = _venda.id!;
     try {
       state = state.copyWith(carregando: true);
       venda = await _vendaService.getVendaId(idVenda);

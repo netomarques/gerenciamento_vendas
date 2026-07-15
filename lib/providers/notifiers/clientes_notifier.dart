@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 
-class ClientesNotifier extends StateNotifier<ClientesState> {
-  final ClienteService _clienteService;
+class ClientesNotifier extends Notifier<ClientesState> {
+  ClienteService get _clienteService => ref.read(clienteServiceProvider);
 
-  ClientesNotifier(this._clienteService)
-      : super(const ClientesState.initial()) {
-    getClientesLazyLoading();
-  }
+  ClientesNotifier();
+
+  @override
+  ClientesState build() => const ClientesState.initial();
 
   Future<void> salvarCliente(Cliente cliente) async {
     try {
@@ -20,7 +20,7 @@ class ClientesNotifier extends StateNotifier<ClientesState> {
     }
   }
 
-  void getClientes() async {
+  Future<void> getClientes() async {
     try {
       final list = await _clienteService.getClientes();
       state = state.copyWith(list: list);
@@ -29,7 +29,7 @@ class ClientesNotifier extends StateNotifier<ClientesState> {
     }
   }
 
-  void getClientesLazyLoading() async {
+  Future<void> getClientesLazyLoading() async {
     state = state.copyWith(carregando: true, filtroPorNome: false);
 
     try {
@@ -44,7 +44,7 @@ class ClientesNotifier extends StateNotifier<ClientesState> {
     }
   }
 
-  void carregarMaisClientesLazyLoading() async {
+  Future<void> carregarMaisClientesLazyLoading() async {
     state = state.copyWith(carregando: true);
 
     try {
@@ -69,13 +69,13 @@ class ClientesNotifier extends StateNotifier<ClientesState> {
   Future<void> deletarCliente(int id) async {
     try {
       await _clienteService.deletarCliente(id);
-      getClientes();
+      await getClientes();
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  void getClientesFiltradosLazyLoading(String nome,
+  Future<void> getClientesFiltradosLazyLoading(String nome,
       {bool carregarMais = false}) async {
     state = state.copyWith(carregando: true, filtroPorNome: true);
     List<Cliente> clientesFiltrados = [];

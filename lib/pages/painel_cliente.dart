@@ -114,11 +114,11 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    _text(_clienteAtualState.cliente!.nome),
+                    _text(_clienteAtualState.cliente.nome),
                     _text(
-                      _formatarTelefone(_clienteAtualState.cliente!.telefone),
+                      _formatarTelefone(_clienteAtualState.cliente.telefone),
                     ),
-                    _text(_formatarCpfCnpj(_clienteAtualState.cliente!.cpf)),
+                    _text(_formatarCpfCnpj(_clienteAtualState.cliente.cpf)),
                   ],
                 ),
               ),

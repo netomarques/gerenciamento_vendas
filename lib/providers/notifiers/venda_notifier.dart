@@ -12,7 +12,7 @@ class VendaNotifier extends Notifier<VendaState> {
   final Venda _venda;
 
   @override
-  VendaState build() => const VendaState.initial().copyWith(venda: _venda);
+  VendaState build() => VendaState.initial(venda: _venda);
 
   Future<void> getVenda() async {
     final Venda venda;

@@ -28,7 +28,7 @@ class ClienteWidget extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(
-                clienteState.cliente!.nome,
+                clienteState.cliente.nome,
                 style: const TextStyle(
                   color: Color(0xFFFDFFFF),
                   fontSize: 16,
@@ -41,7 +41,7 @@ class ClienteWidget extends ConsumerWidget {
             width: deviceSize.height * 0.15,
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              formatarTelefone(clienteState.cliente!.telefone),
+              formatarTelefone(clienteState.cliente.telefone),
               style: const TextStyle(
                 color: Color(0xFFFDFFFF),
                 fontSize: 16,

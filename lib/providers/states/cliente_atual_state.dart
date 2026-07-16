@@ -3,12 +3,12 @@ import 'package:equatable/equatable.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 
 class ClienteAtualState extends Equatable {
-  final Cliente? cliente;
+  final Cliente cliente;
   final List<Venda> vendasDoCliente;
   final bool carregando;
   final Decimal totalEmAberto;
 
-  const ClienteAtualState(
+  const ClienteAtualState._(
     this.cliente,
     this.vendasDoCliente,
     this.carregando,
@@ -16,7 +16,7 @@ class ClienteAtualState extends Equatable {
   );
 
   const ClienteAtualState.initial({
-    this.cliente,
+    required this.cliente,
     this.vendasDoCliente = const [],
     this.carregando = false,
     required this.totalEmAberto,
@@ -28,7 +28,7 @@ class ClienteAtualState extends Equatable {
     bool? carregando,
     Decimal? totalEmAberto,
   }) {
-    return ClienteAtualState(
+    return ClienteAtualState._(
       cliente ?? this.cliente,
       vendasDoCliente ?? this.vendasDoCliente,
       carregando ?? this.carregando,

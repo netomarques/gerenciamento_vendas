@@ -74,7 +74,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
                         children: <Widget>[
                           _containerTextForm(
                             AppTextFormField2(
-                              initialValue: _clienteAtualState.cliente!.nome,
+                              initialValue: _clienteAtualState.cliente.nome,
                               'Informe o nome',
                               'Nome',
                               TextInputType.text,
@@ -85,7 +85,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
                           _containerTextForm(
                             AppTextFormField2(
                               initialValue: _formatarTelefone(
-                                  _clienteAtualState.cliente!.telefone),
+                                  _clienteAtualState.cliente.telefone),
                               'Informe o telefone',
                               'Telefone',
                               TextInputType.number,
@@ -100,7 +100,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
                           _containerTextForm(
                             AppTextFormField2(
                               initialValue: _formatarCpfCnpj(
-                                  _clienteAtualState.cliente!.cpf),
+                                  _clienteAtualState.cliente.cpf),
                               'Informe o CPF/CNPJ',
                               'CPF/CNPJ',
                               TextInputType.number,
@@ -140,7 +140,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
       color: const Color(0xFFEB710A),
       padding: const EdgeInsets.only(left: 16, top: 12),
       child: Text(
-        _clienteAtualState.cliente!.nome,
+        _clienteAtualState.cliente.nome,
         style: const TextStyle(
           color: Color(0xFFFDFFFF),
           fontSize: 30,

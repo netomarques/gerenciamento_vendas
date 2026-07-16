@@ -35,6 +35,10 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
   @override
   void initState() {
     super.initState();
+
+    Future.microtask(() {
+      ref.read(barcoProvider(widget.idBarco).notifier).getBarcoRelatorio();
+    });
     _carregarDados();
   }
 

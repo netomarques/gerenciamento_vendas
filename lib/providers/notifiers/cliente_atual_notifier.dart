@@ -1,23 +1,24 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 
-class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
-  final ClienteService _clienteService;
-  final VendaService _vendaService;
+class ClienteAtualNotifier extends Notifier<ClienteAtualState> {
+  ClienteService get _clienteService => ref.read(clienteServiceProvider);
+  VendaService get _vendaService => ref.read(vendaServiceProvider);
 
-  ClienteAtualNotifier(
-    this._clienteService,
-    this._vendaService,
-    Cliente cliente,
-  ) : super(ClienteAtualState.initial(totalEmAberto: Decimal.zero)) {
-    // _getCliente(idCliente);
-    _setClienteState(cliente);
-  }
+  final Cliente _cliente;
+
+  ClienteAtualNotifier(this._cliente);
+
+  static const _pageSize = 10;
+
+  @override
+  ClienteAtualState build() =>
+      ClienteAtualState.initial(totalEmAberto: Decimal.zero, cliente: _cliente);
 
   Future<void> atualizarCliente(Cliente cliente) async {
     try {
@@ -30,28 +31,25 @@ class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
     }
   }
 
-  void _setClienteState(Cliente cliente) async {
-    state = state.copyWith(cliente: cliente);
-  }
-
-  void getVendasPorClienteLazyLoading(
+  Future<void> getVendasPorClienteLazyLoading(
       {DateTime? startDate, DateTime? endDate}) async {
     try {
       startDate ??= DateTime(1900);
       endDate ??= DateTime.now();
 
       state = state.copyWith(carregando: true);
+      final clienteId = state.cliente.id!;
 
       final vendasDoCliente =
           await _vendaService.getVendasPorClienteLazyLoading(
-              state.cliente!.id!,
-              10,
+              clienteId,
+              _pageSize,
               0,
               Helpers.formatarDateTimeToDateDB(startDate),
               Helpers.formatarDateTimeToDateDB(endDate));
 
       final totalEmAberto =
-          await _vendaService.getTotalEmAbertoDoCliente(state.cliente!.id!);
+          await _vendaService.getTotalEmAbertoDoCliente(clienteId);
 
       state = state.copyWith(
         vendasDoCliente: vendasDoCliente,
@@ -60,12 +58,12 @@ class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
       );
     } catch (e) {
       state = state.copyWith(carregando: false);
-      debugPrint(e.toString());
+      debugPrint('CLIENTE ATUAL NOTIFIER: ${e.toString()}');
       rethrow;
     }
   }
 
-  void getMaisVendasPorClienteLazyLoading(
+  Future<void> getMaisVendasPorClienteLazyLoading(
       {DateTime? startDate, DateTime? endDate}) async {
     startDate ??= DateTime(1900);
     endDate ??= DateTime.now();
@@ -74,10 +72,11 @@ class ClienteAtualNotifier extends StateNotifier<ClienteAtualState> {
 
     try {
       state = state.copyWith(carregando: true);
+      final clienteId = state.cliente.id!;
 
       final maisVendas = await _vendaService.getVendasPorClienteLazyLoading(
-        state.cliente!.id!,
-        10,
+        clienteId,
+        _pageSize,
         offset,
         Helpers.formatarDateTimeToDateDB(startDate),
         Helpers.formatarDateTimeToDateDB(endDate),

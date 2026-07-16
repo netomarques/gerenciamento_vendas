@@ -25,6 +25,9 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
   @override
   void initState() {
     super.initState();
+    Future.microtask(() {
+      ref.read(clientesProvider.notifier).getClientesLazyLoading();
+    });
     _carregarDados();
   }
 

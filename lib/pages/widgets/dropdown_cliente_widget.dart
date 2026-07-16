@@ -19,11 +19,6 @@ class _DropdownClienteWidgetState extends ConsumerState<DropdownClienteWidget> {
   late Size _deviceSize;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _deviceSize = context.devicesize;
     _clientesState = ref.watch(clientesProvider);

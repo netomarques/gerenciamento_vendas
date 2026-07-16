@@ -1,35 +1,28 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vendas_gerenciamento/model/model.dart';
 import 'package:vendas_gerenciamento/providers/providers.dart';
 import 'package:vendas_gerenciamento/services/service.dart';
 import 'package:vendas_gerenciamento/utils/utils.dart';
 
-class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
-  final VendaService _vendaService;
+class ListaVendasNotifier extends Notifier<ListaVendasState> {
+  VendaService get _vendaService => ref.read(vendaServiceProvider);
 
-  ListaVendasNotifier(this._vendaService)
-      : super(
-          ListaVendasState.initial(
-            startDate: DateTime(1900),
-            endDate: DateTime.now(),
-            totalDaVendaFiado: Decimal.zero,
-            totalDaVendaRua: Decimal.zero,
-            totalDasVendas: Decimal.zero,
-          ),
-        ) {
-    getVendasLazyLoading();
+  ListaVendasNotifier();
+
+  @override
+  ListaVendasState build() {
+    Future.microtask(getVendasLazyLoading);
+
+    return ListaVendasState.initial(
+      startDate: DateTime(1900),
+      endDate: DateTime.now(),
+      totalDaVendaFiado: Decimal.zero,
+      totalDaVendaRua: Decimal.zero,
+      totalDasVendas: Decimal.zero,
+    );
   }
-
-  // void salvarVenda(Venda venda) async {
-  //   try {
-  //     await _vendaService.salvarVenda(venda);
-  //     getVendas();
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //   }
-  // }
 
   Future<int> salvarVendaRua(Venda venda, Abatimento abatimento) async {
     try {
@@ -63,7 +56,7 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
     }
   }
 
-  void getVendasLazyLoading({bool carregarMaisVendas = false}) async {
+  Future<void> getVendasLazyLoading({bool carregarMaisVendas = false}) async {
     final limit = state.limit;
     final offset = state.list.length;
     final dbStartDate = Helpers.formatarDateTimeToDateDB(state.startDate);
@@ -96,15 +89,19 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
     int qtdeVendaFiado = 0;
 
     for (Venda venda in vendas) {
-      totalDasVendas += venda.total!;
-      if (venda.fiado!) {
+      final Decimal total = venda.total!;
+      final bool isFiado = venda.fiado!;
+
+      totalDasVendas += total;
+      if (isFiado) {
         qtdeVendaFiado += 1;
-        totalVendaFiado += venda.total!;
+        totalVendaFiado += total;
       } else {
         qtdeVendaRua += 1;
-        totalVendaRua += venda.total!;
+        totalVendaRua += total;
       }
     }
+
     state = state.copyWith(
       list: vendas,
       totalDasVendas: totalDasVendas,
@@ -116,7 +113,7 @@ class ListaVendasNotifier extends StateNotifier<ListaVendasState> {
     );
   }
 
-  void getVendasPorData(DateTime startDate, DateTime endDate) async {
+  Future<void> getVendasPorData(DateTime startDate, DateTime endDate) async {
     final limit = state.limit;
     const offset = 0;
     String dbStartDate = Helpers.formatarDateTimeToDateDB(startDate);

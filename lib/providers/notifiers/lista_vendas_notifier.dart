@@ -81,7 +81,7 @@ class ListaVendasNotifier extends Notifier<ListaVendasState> {
     }
   }
 
-  _calcularResumo(List<Venda> vendas) {
+  void _calcularResumo(List<Venda> vendas) {
     Decimal totalDasVendas = Decimal.zero;
     Decimal totalVendaRua = Decimal.zero;
     Decimal totalVendaFiado = Decimal.zero;

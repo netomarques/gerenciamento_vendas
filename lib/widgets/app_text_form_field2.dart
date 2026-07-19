@@ -66,14 +66,14 @@ class AppTextFormField2 extends StatelessWidget {
     );
   }
 
-  _textStyle(Color color) {
+  TextStyle _textStyle(Color color) {
     return TextStyle(
       fontSize: 14,
       color: color,
     );
   }
 
-  _estiloBorda(Color color) {
+  OutlineInputBorder _estiloBorda(Color color) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(32.0),
       borderSide: BorderSide(

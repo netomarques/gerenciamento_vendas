@@ -140,7 +140,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
     );
   }
 
-  _containerTextForm(widget) {
+  Padding _containerTextForm(Widget widget) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
       child: widget,
@@ -203,7 +203,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
     }
   }
 
-  _textTotalAReceber() {
+  Container _textTotalAReceber() {
     return Container(
       height: _deviceSize.height * 0.07,
       padding: const EdgeInsets.all(3.0),
@@ -220,7 +220,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
     );
   }
 
-  _botaoCadastrarAbatimento(String text, Function acao) {
+  Center _botaoCadastrarAbatimento(String text, Function acao) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 16, top: 20, right: 8),
@@ -247,7 +247,7 @@ class _CadastroAbatimentoState extends ConsumerState<CadastroAbatimento> {
     );
   }
 
-  _carregarDados() {
+  void _carregarDados() {
     _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     _venda = widget.venda;
     _abatimentoForm = Abatimento(

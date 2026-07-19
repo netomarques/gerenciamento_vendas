@@ -37,7 +37,7 @@ class _PainelViagemState extends ConsumerState<PainelViagem> {
     _carregarDados();
   }
 
-  _carregarDados() {
+  void _carregarDados() {
     _viagem = widget.viagem;
     _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     _formatterPeso = NumberFormat('#,##0.00 kg', 'pt_BR');
@@ -65,7 +65,7 @@ class _PainelViagemState extends ConsumerState<PainelViagem> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       children: <Widget>[
         _head(),
@@ -87,7 +87,7 @@ class _PainelViagemState extends ConsumerState<PainelViagem> {
     );
   }
 
-  _head() {
+  Stack _head() {
     return Stack(
       children: <Widget>[
         Container(
@@ -165,7 +165,7 @@ class _PainelViagemState extends ConsumerState<PainelViagem> {
     );
   }
 
-  _containerDados(label, valor) {
+  Row _containerDados(String label, String valor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -183,7 +183,7 @@ class _PainelViagemState extends ConsumerState<PainelViagem> {
     );
   }
 
-  _text(text, {double fontSize = 16.0}) {
+  Text _text(String text, {double fontSize = 16.0}) {
     return Text(text,
         style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
   }

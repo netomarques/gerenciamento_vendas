@@ -82,7 +82,7 @@ class _DateButtonState extends State<DateButton> {
     );
   }
 
-  void _showDateRangePicker(context) async {
+  void _showDateRangePicker(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(1900),

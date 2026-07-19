@@ -47,14 +47,14 @@ class _DropdownClienteWidgetState extends ConsumerState<DropdownClienteWidget> {
     );
   }
 
-  _textStyle(Color color) {
+  TextStyle _textStyle(Color color) {
     return TextStyle(
       fontSize: 14,
       color: color,
     );
   }
 
-  _containerCliente(String nome, String telefone) {
+  Container _containerCliente(String nome, String telefone) {
     return Container(
       color: const Color(0xFFEB710A),
       height: _deviceSize.height * 0.1,

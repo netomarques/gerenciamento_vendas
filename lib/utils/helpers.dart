@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class Helpers {
   Helpers._();
 
-  static DateTime dbDataToDateTime(dataSqlite) {
+  static DateTime dbDataToDateTime(String dataSqlite) {
     try {
       List<String> parts = dataSqlite.split('-');
       int year = int.parse(parts[0]);
@@ -38,7 +38,7 @@ class Helpers {
     }
   }
 
-  static DateTime stringFormatadaToDateTime(stringFormatada) {
+  static DateTime stringFormatadaToDateTime(String stringFormatada) {
     try {
       List<String> parts = stringFormatada.split('/');
       int day = int.parse(parts[0]);

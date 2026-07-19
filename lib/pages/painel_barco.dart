@@ -42,7 +42,7 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
     _carregarDados();
   }
 
-  _carregarDados() {
+  void _carregarDados() {
     _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     _formatterPeso = NumberFormat('#,##0.00 kg', 'pt_BR');
     scrollController = ScrollController();
@@ -71,7 +71,7 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       children: <Widget>[
         _head(),
@@ -92,7 +92,7 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
     );
   }
 
-  _head() {
+  Stack _head() {
     return Stack(
       children: <Widget>[
         Container(
@@ -166,7 +166,7 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
     );
   }
 
-  _containerDados(label, valor) {
+  Row _containerDados(String label, String valor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -184,7 +184,7 @@ class _PainelBarcoState extends ConsumerState<PainelBarco> {
     );
   }
 
-  _text(text, {double fontSize = 16.0}) {
+  Text _text(String text, {double fontSize = 16.0}) {
     return Text(text,
         style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
   }

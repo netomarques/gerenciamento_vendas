@@ -105,7 +105,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painel() {
+  Container _painel() {
     return Container(
       width: _deviceSize.width,
       height: _deviceSize.height * 0.25,
@@ -120,7 +120,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelResumo() {
+  SizedBox _painelResumo() {
     return SizedBox(
       width: _deviceSize.width,
       child: Row(
@@ -134,7 +134,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelTotal() {
+  SizedBox _painelTotal() {
     return SizedBox(
       width: _deviceSize.width * 0.5,
       child: Column(
@@ -160,7 +160,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelFiltroData() {
+  Container _painelFiltroData() {
     return Container(
       width: _deviceSize.width * 0.35,
       alignment: Alignment.topCenter,
@@ -168,7 +168,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelDados() {
+  SizedBox _painelDados() {
     return SizedBox(
       width: _deviceSize.width,
       child: _vendasState.carregando
@@ -182,7 +182,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelTotalVendas() {
+  SizedBox _painelTotalVendas() {
     return SizedBox(
       width: _deviceSize.width * 0.4,
       child: Row(
@@ -221,7 +221,7 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _painelDadosValorQuantidade() {
+  SizedBox _painelDadosValorQuantidade() {
     return SizedBox(
       width: _deviceSize.width * 0.6,
       child: Row(
@@ -271,14 +271,14 @@ class _HomePainelState extends ConsumerState<HomePainel> {
     );
   }
 
-  _text(text, double fontSize) {
+  Text _text(String text, double fontSize) {
     return Text(
       text,
       style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize),
     );
   }
 
-  _textoInformacao() {
+  Container _textoInformacao() {
     return Container(
       width: _deviceSize.width,
       color: const Color(0xff3B7554),

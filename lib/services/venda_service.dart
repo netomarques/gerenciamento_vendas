@@ -152,7 +152,7 @@ class VendaService {
     }
   }
 
-  Future<List<Abatimento>> getAbatimentosPorVenda(idVenda) async {
+  Future<List<Abatimento>> getAbatimentosPorVenda(int idVenda) async {
     try {
       final List<Abatimento> abatimentos = [];
       final resultados = await _repository.getAbatimentosPorVenda(idVenda);
@@ -167,7 +167,7 @@ class VendaService {
     }
   }
 
-  Future<List<Venda>> getVendasPorCliente(idCliente) async {
+  Future<List<Venda>> getVendasPorCliente(int idCliente) async {
     try {
       final resultados = await _repository.getVendasPorClientes(idCliente);
       final List<Venda> vendas = [];
@@ -220,7 +220,8 @@ class VendaService {
     }
   }
 
-  _buscarClienteEViagemDaVenda(Map<String, dynamic> vendaJson) async {
+  Future<void> _buscarClienteEViagemDaVenda(
+      Map<String, dynamic> vendaJson) async {
     final cliente = await _clienteService
         .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
     final viagem =
@@ -234,11 +235,11 @@ class VendaService {
   }
 
   Future<List<Venda>> getVendasPorViagemLazyLoading(
-    idViagem,
-    limit,
-    offset,
-    startDate,
-    endDate,
+    int idViagem,
+    int limit,
+    int offset,
+    String startDate,
+    String endDate,
   ) async {
     try {
       final resultados = await _repository.getVendasPorViagemLazyLoading(

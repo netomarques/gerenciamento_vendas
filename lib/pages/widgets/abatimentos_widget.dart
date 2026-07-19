@@ -1,6 +1,7 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
-import 'package:vendas_gerenciamento/model/abatimento.dart';
 import 'package:intl/intl.dart';
+import 'package:vendas_gerenciamento/model/abatimento.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
 
 class AbatimentosWidget extends StatelessWidget {
@@ -43,7 +44,7 @@ class AbatimentosWidget extends StatelessWidget {
     ));
   }
 
-  _abatimentoData(data) {
+  Container _abatimentoData(DateTime data) {
     return Container(
       width: _deviceSize.width * 0.26,
       height: _deviceSize.height * 0.03,
@@ -64,7 +65,7 @@ class AbatimentosWidget extends StatelessWidget {
     );
   }
 
-  _abatimentoValor(valor) {
+  Container _abatimentoValor(Decimal valor) {
     return Container(
       width: _deviceSize.width * 0.6,
       height: _deviceSize.height * 0.095,

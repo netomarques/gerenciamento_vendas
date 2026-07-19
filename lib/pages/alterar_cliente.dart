@@ -56,7 +56,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -133,7 +133,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
     );
   }
 
-  _tituloForm() {
+  Container _tituloForm() {
     return Container(
       width: _deviceSize.width,
       height: _deviceSize.height * 0.1,
@@ -149,7 +149,7 @@ class _AlterarClienteState extends ConsumerState<AlterarCliente> {
     );
   }
 
-  _containerTextForm(widget) {
+  Padding _containerTextForm(Widget widget) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
       child: widget,

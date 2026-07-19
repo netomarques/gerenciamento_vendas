@@ -123,7 +123,7 @@ class ViagemWidget extends ConsumerWidget {
     );
   }
 
-  _textCampo(text) {
+  Text _textCampo(String text) {
     return Text(
       text,
       style: const TextStyle(
@@ -133,7 +133,7 @@ class ViagemWidget extends ConsumerWidget {
     );
   }
 
-  _textValor(text, deviceSize) {
+  Text _textValor(String text, deviceSize) {
     return Text(
       text,
       style: TextStyle(

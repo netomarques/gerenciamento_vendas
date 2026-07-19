@@ -30,10 +30,10 @@ abstract class VendaRepository extends DataRepository {
   );
 
   Future<List<Map<String, dynamic>>> getVendasPorViagemLazyLoading(
-    idViagem,
-    limit,
-    offset,
-    startDate,
-    endDate,
+    int idViagem,
+    int limit,
+    int offset,
+    String startDate,
+    String endDate,
   );
 }

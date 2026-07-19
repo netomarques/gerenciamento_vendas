@@ -36,7 +36,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     _carregarDados();
   }
 
-  _carregarDados() {
+  void _carregarDados() {
     _cliente = widget.cliente;
     _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     scrollController = ScrollController();
@@ -71,7 +71,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       children: <Widget>[
         _head(),
@@ -94,7 +94,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     );
   }
 
-  _head() {
+  Stack _head() {
     return Stack(
       children: <Widget>[
         Container(
@@ -140,7 +140,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     );
   }
 
-  _text(text, {double fontSize = 16.0}) {
+  Text _text(String text, {double fontSize = 16.0}) {
     return Text(text,
         style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
   }
@@ -175,7 +175,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     return newText.toString();
   }
 
-  _textoTotalInformacao() {
+  Container _textoTotalInformacao() {
     return Container(
       width: _deviceSize.width,
       height: _deviceSize.height * 0.07,
@@ -214,7 +214,7 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
     }
   }
 
-  _limparDados() {
+  void _limparDados() {
     ref.read(clienteAtualProvider(widget.cliente).notifier).limparDados();
   }
 

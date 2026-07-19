@@ -58,7 +58,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -149,7 +149,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
     );
   }
 
-  _textValorTotal() {
+  TextField _textValorTotal() {
     return TextField(
       controller: _valorTotalController,
       style: const TextStyle(
@@ -217,7 +217,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
   //   );
   // }
 
-  _containerTextForm(widget) {
+  Padding _containerTextForm(Widget widget) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 20, right: 32),
       child: widget,
@@ -256,7 +256,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       if (error != null) {
         return error;
       }
-      _venda = _venda.copyWith(preco: _stringParseDecimal(value));
+      _venda = _venda.copyWith(preco: _stringParseDecimal(value!));
       _atualizaValorTotal();
     } catch (e) {
       return 'Erro não identificado';
@@ -359,7 +359,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
       if (error != null) {
         return error;
       }
-      _venda = _venda.copyWith(desconto: _stringParseDecimal(value));
+      _venda = _venda.copyWith(desconto: _stringParseDecimal(value!));
       _atualizaValorTotal();
     } on FormatException {
       return 'Por favor, informe um valor numérico válido para o desconto';
@@ -370,7 +370,7 @@ class _CadastroVendaFiadoState extends ConsumerState<CadastroVendaFiado> {
     return null;
   }
 
-  Decimal _stringParseDecimal(value) {
+  Decimal _stringParseDecimal(String value) {
     return Decimal.parse(_formatterMoeda.parse(value).toString());
   }
 

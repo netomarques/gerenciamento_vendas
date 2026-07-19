@@ -52,7 +52,7 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
     );
   }
 
-  _body() {
+  Container _body() {
     return Container(
       color: const Color(0xFF006940),
       child: Column(
@@ -76,7 +76,7 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
     );
   }
 
-  _containerTextPesquisa() {
+  Container _containerTextPesquisa() {
     return Container(
       height: _deviceSize.height * 0.08,
       margin: const EdgeInsets.only(left: 16, top: 20, right: 32, bottom: 16),
@@ -84,7 +84,7 @@ class _PesquisaClienteState extends ConsumerState<PesquisaCliente> {
     );
   }
 
-  _textPesquisaClientePorNomeForm() {
+  Container _textPesquisaClientePorNomeForm() {
     return Container(
       padding: const EdgeInsets.only(left: 12),
       decoration: BoxDecoration(

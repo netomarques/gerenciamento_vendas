@@ -33,7 +33,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     super.initState();
   }
 
-  _carregarDados() {
+  void _carregarDados() {
     _venda = widget.venda;
     _formatterMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   }
@@ -64,7 +64,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _body() {
+  Column _body() {
     return Column(
       children: <Widget>[
         _head(),
@@ -101,7 +101,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _head() {
+  Stack _head() {
     return Stack(
       children: <Widget>[
         Container(
@@ -143,7 +143,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _text(text, {double fontSize = 16.0}) {
+  Text _text(String text, {double fontSize = 16.0}) {
     return Text(text,
         style: TextStyle(color: const Color(0xFFFDFFFF), fontSize: fontSize));
   }
@@ -178,7 +178,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     return newText.toString();
   }
 
-  _textTotalAReceber() {
+  Container _textTotalAReceber() {
     return Container(
       height: _deviceSize.height * 0.07,
       color: const Color(0xFF3B7554),
@@ -198,7 +198,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _textoInformacao() {
+  Container _textoInformacao() {
     return Container(
       height: _deviceSize.height * 0.07,
       color: const Color(0xFF3B7554),
@@ -215,14 +215,14 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _botaoAbatimento() {
+  GestureDetector _botaoAbatimento() {
     return GestureDetector(
       onTap: () => _onTapDialog(),
       child: Image.asset("assets/images/check_money_icon.png"),
     );
   }
 
-  _onTapDialog() {
+  void _onTapDialog() {
     showDialog(
       context: context,
       builder: (context) {
@@ -235,7 +235,7 @@ class _ListaPagamentoState extends ConsumerState<ListaPagamento> {
     );
   }
 
-  _limparDados() {
+  void _limparDados() {
     ref.read(vendaProvider(_venda).notifier).limparDados();
   }
 }

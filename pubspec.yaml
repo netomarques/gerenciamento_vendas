@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_riverpod: ^3.3.2
   equatable: ^2.0.5
-  decimal: ^3.0.2
+  decimal: ^3.2.5
   syncfusion_flutter_datepicker: ^29.1.33
   fluttertoast: ^8.2.1
   sqflite: ^2.2.8

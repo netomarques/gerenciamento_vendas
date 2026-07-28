@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vendas_gerenciamento/config/config.dart';
 import 'package:vendas_gerenciamento/utils/extensions.dart';
 
-class NavButtonsFloating extends ConsumerWidget {
+const _primaryGreen = Color(0xFF17CA84);
+const _accentOrange = Color(0xFFEB710A);
+const _surfaceWhite = Color(0xFFFDFFFF);
+const _darkGreen = Color(0xFF006940);
+const _fabShape = RoundedRectangleBorder(
+  side: BorderSide(width: 1, color: _accentOrange),
+  borderRadius: BorderRadius.all(Radius.circular(100)),
+);
+
+class NavButtonsFloating extends StatelessWidget {
   static NavButtonsFloating builder(
     BuildContext context,
     GoRouterState state,
@@ -12,12 +20,15 @@ class NavButtonsFloating extends ConsumerWidget {
       const NavButtonsFloating();
 
   const NavButtonsFloating({super.key});
+  
+  static const _cadastroClienteHeroTag = 'nav_cadastro_cliente';
+  static const _pesquisaClienteHeroTag = 'nav_pesquisa_cliente';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF17CA84),
+        color: _primaryGreen,
         borderRadius: BorderRadius.circular(30),
       ),
       padding: const EdgeInsets.all(4),
@@ -28,16 +39,17 @@ class NavButtonsFloating extends ConsumerWidget {
             tooltip: "Cadastro de cliente",
             icon: "assets/images/account_client_icon.png",
             routeLocation: RouteLocation.cadastroCliente,
+            heroTag: _cadastroClienteHeroTag,
           ),
           _VendaButtonDialog(
             tooltip: "Venda",
             icon: "assets/images/buy_shop_icon.png",
-            // mainContext: context,
           ),
           _FloatingActionButtonRiver(
             tooltip: "Pesquisa de cliente",
             icon: "assets/images/find_search_icon.png",
             routeLocation: RouteLocation.pesquisaCliente,
+            heroTag: _pesquisaClienteHeroTag,
           ),
         ],
       ),
@@ -50,23 +62,24 @@ class _FloatingActionButtonRiver extends StatelessWidget {
     required this.tooltip,
     required this.icon,
     required this.routeLocation,
+    required this.heroTag,
   });
 
   final String tooltip;
   final String icon;
   final String routeLocation;
+  final String heroTag;
 
   @override
   Widget build(BuildContext context) {
     final size = context.devicesize;
 
     return FloatingActionButton(
-      backgroundColor: const Color(0xFF17CA84),
+      tooltip: tooltip,
+      heroTag: heroTag,
+      backgroundColor: _primaryGreen,
       onPressed: () => context.push(routeLocation),
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
-        borderRadius: BorderRadius.circular(100),
-      ),
+      shape: _fabShape,
       child: Image.asset(
         icon,
         height: size.height * 0.06,
@@ -92,18 +105,19 @@ class _VendaButton extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
       width: size.width * 0.5,
       decoration: BoxDecoration(
-        color: const Color(0xFFEB710A),
+        color: _accentOrange,
         borderRadius: BorderRadius.circular(30),
       ),
       child: TextButton(
         onPressed: () {
+          final router = GoRouter.of(context);
           context.pop();
-          context.push(routeLocation);
+          router.push(routeLocation);
         },
         child: Text(
           text,
           style: const TextStyle(
-            color: Color(0xFFFDFFFF),
+            color: _surfaceWhite,
             fontSize: 20,
           ),
         ),
@@ -121,18 +135,17 @@ class _VendaButtonDialog extends StatelessWidget {
   final String tooltip;
   final String icon;
 
+  static const _selecionarVendaHeroTag = 'selecionar_tipo_venda';
+
   @override
   Widget build(BuildContext context) {
     final size = context.devicesize;
 
     return FloatingActionButton(
-      heroTag: 'selecionar_tipo_venda',
-      backgroundColor: const Color(0xFF17CA84),
+      heroTag: _selecionarVendaHeroTag,
+      backgroundColor: _primaryGreen,
       tooltip: tooltip,
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Color(0xFFEB710A)),
-        borderRadius: BorderRadius.circular(100),
-      ),
+      shape: _fabShape,
       onPressed: () => showDialog(
         context: context,
         builder: (_) => const _VendaDialog(),
@@ -153,25 +166,25 @@ class _VendaDialog extends StatelessWidget {
     final size = context.devicesize;
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF006940),
+      backgroundColor: _darkGreen,
       shape: const RoundedRectangleBorder(
         side: BorderSide(
           width: 4,
-          color: Color(0xFFEB710A),
+          color: _accentOrange,
         ),
         borderRadius: BorderRadius.all(Radius.circular(26)),
       ),
       title: Container(
         margin: const EdgeInsets.only(top: 15),
         decoration: BoxDecoration(
-          color: const Color(0xFFEB710A),
+          color: _accentOrange,
           borderRadius: BorderRadius.circular(5),
         ),
         child: const Text(
           'SELECIONAR VENDA',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Color(0xFFFDFFFF),
+            color: _surfaceWhite,
             fontSize: 16,
           ),
         ),

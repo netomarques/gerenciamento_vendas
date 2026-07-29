@@ -21,16 +21,7 @@ class VendaService {
   Future<List<Venda>> getVendas() async {
     try {
       final resultados = await _repository.getAllRecords();
-      final List<Venda> vendas = [];
-
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-        // final Cliente cliente = await _clienteService
-        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        // vendas.add(Venda.fromJson(vendaJson, cliente));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
@@ -49,12 +40,7 @@ class VendaService {
       final resultados = await _repository.getVendasLazyLoading(
           limit, offset, startDate, endDate);
 
-      final List<Venda> vendas = [];
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        await _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
@@ -82,7 +68,7 @@ class VendaService {
       return idVenda;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception(e);
+      throw Exception('Erro ao salvar Venda Rua');
     }
   }
 
@@ -97,20 +83,15 @@ class VendaService {
       return idVenda;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception(e);
+      throw Exception('Erro ao salvar Venda Fiado');
     }
   }
 
   Future<List<Venda>> getVendasPorData(String startDate, String endDate) async {
     try {
       final resultados = await _repository.getVendasPorData(startDate, endDate);
-      final List<Venda> vendas = [];
 
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
@@ -122,9 +103,14 @@ class VendaService {
   Future<Venda> getVendaId(int id) async {
     try {
       final resultado = await _repository.getByIdRecord(id);
+      if (resultado.isEmpty) {
+        throw Exception('Venda não encontrada para o id $id');
+      }
       final json = resultado.first;
       final vendaJson = Map<String, dynamic>.from(json);
+
       await _buscarClienteEViagemDaVenda(vendaJson);
+
       Venda venda = Venda.fromJson(vendaJson);
       return venda;
     } catch (e) {
@@ -170,15 +156,7 @@ class VendaService {
   Future<List<Venda>> getVendasPorCliente(int idCliente) async {
     try {
       final resultados = await _repository.getVendasPorClientes(idCliente);
-      final List<Venda> vendas = [];
-
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        // final Cliente cliente = await _clienteService
-        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
@@ -203,15 +181,7 @@ class VendaService {
         endDate,
       );
 
-      final List<Venda> vendas = [];
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-        // final Cliente cliente = await _clienteService
-        //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-        // vendas.add(Venda.fromJson(vendaJson, cliente));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
@@ -222,16 +192,12 @@ class VendaService {
 
   Future<void> _buscarClienteEViagemDaVenda(
       Map<String, dynamic> vendaJson) async {
-    final cliente = await _clienteService
-        .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]);
-    final viagem =
-        await _viagemService.getViagemId(vendaJson[DbVendaKeys.idViagemColuna]);
-    vendaJson['cliente'] = cliente;
-    vendaJson['viagem'] = viagem;
-    // vendaJson['cliente'] = (await _clienteService
-    //     .getClienteId(vendaJson[DbVendaKeys.idClienteColuna]));
-    // vendaJson['viagem'] = (await _viagemService
-    //     .getViagemId(vendaJson[DbVendaKeys.idViagemColuna]));
+    final results = await Future.wait<Object?>([
+      _clienteService.getClienteId(vendaJson[DbVendaKeys.idClienteColuna]),
+      _viagemService.getViagemId(vendaJson[DbVendaKeys.idViagemColuna]),
+    ]);
+    vendaJson['cliente'] = results[0];
+    vendaJson['viagem'] = results[1];
   }
 
   Future<List<Venda>> getVendasPorViagemLazyLoading(
@@ -250,17 +216,21 @@ class VendaService {
         endDate,
       );
 
-      final List<Venda> vendas = [];
-      for (var json in resultados) {
-        final vendaJson = Map<String, dynamic>.from(json);
-        await _buscarClienteEViagemDaVenda(vendaJson);
-        vendas.add(Venda.fromJson(vendaJson));
-      }
+      final List<Venda> vendas = await _mapearResultadosParaVendas(resultados);
 
       return vendas;
     } catch (e) {
       debugPrint(e.toString());
-      throw Exception('Erro ao consultar Venda por Cliente');
+      throw Exception('Erro ao consultar Venda por Viagem');
     }
+  }
+
+  Future<List<Venda>> _mapearResultadosParaVendas(
+      List<Map<String, Object?>> resultados) async {
+    return Future.wait<Venda>(resultados.map((json) async {
+      final vendaJson = Map<String, dynamic>.from(json);
+      await _buscarClienteEViagemDaVenda(vendaJson);
+      return Venda.fromJson(vendaJson);
+    }));
   }
 }

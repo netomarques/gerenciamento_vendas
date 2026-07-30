@@ -61,8 +61,8 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
         ),
         leading: BackButton(
           onPressed: () {
-            context.pop();
             _limparDados();
+            context.pop();
           },
         ),
       ),
@@ -109,10 +109,9 @@ class _PainelClienteState extends ConsumerState<PainelCliente> {
                 height: _deviceSize.height * 0.075,
               ),
               Container(
-                height: _deviceSize.height * 0.085,
                 margin: const EdgeInsets.only(top: 30),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     _text(_clienteAtualState.cliente.nome),
                     _text(
